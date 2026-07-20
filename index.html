@@ -41,6 +41,11 @@
     margin:8px auto 22px;max-width:520px;flex-wrap:wrap}
   .masterqr img{width:108px;height:108px;border-radius:8px;background:#fff}
   .masterqr .t{text-align:left}
+  .sharebtn{margin-top:10px;background:var(--saffron);color:#fff;border:none;border-radius:20px;
+    padding:8px 16px;font-weight:700;font-size:14px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;
+    box-shadow:0 4px 12px rgba(255,106,0,.4)}
+  .sharebtn:hover{filter:brightness(1.08)}
+  .sharebtn:active{transform:scale(.97)}
 
   #liveBanner{display:none;background:linear-gradient(90deg,#d7263d,#ff5252);color:#fff;
     border-radius:14px;padding:12px 16px;margin:0 0 18px;box-shadow:var(--shadow);
@@ -154,7 +159,8 @@
   <div class="masterqr">
     <img id="pageQr" alt="Scan for this page">
     <div class="t"><b>📱 Scan to open this page</b><br>
-      <span style="font-size:13px;color:#8a6a2a">Share this QR with all members</span></div>
+      <span style="font-size:13px;color:#8a6a2a">Share this QR with all members</span><br>
+      <button class="sharebtn" onclick="sharePage()">🔗 Share link</button></div>
   </div>
 
   <div id="liveBanner">
@@ -249,6 +255,15 @@ const SAMPLE_SC={headers:["Team","Members","Score","Rank"],rows:[["Team A","Arun
 
 /* ---------- helpers ---------- */
 function qr(d,s){ return "https://api.qrserver.com/v1/create-qr-code/?size="+s+"x"+s+"&data="+encodeURIComponent(d); }
+async function sharePage(){
+  const url=location.href;
+  const data={title:"CAFS Onam Sports Fiesta 2026",
+    text:"Join the CAFS Onam Sports Fiesta 2026! Events, live scores & schedule 👉",url:url};
+  try{
+    if(navigator.share){ await navigator.share(data); }
+    else { await navigator.clipboard.writeText(url); alert("Link copied!\n\n"+url); }
+  }catch(e){ /* user dismissed the share sheet */ }
+}
 function esc(s){ return (s==null?"":String(s)).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
 function idx(h,n){ return h.findIndex(x=>String(x).trim().toLowerCase()===n.toLowerCase()); }
 async function fetchTab(tab){
