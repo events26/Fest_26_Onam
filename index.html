@@ -123,6 +123,20 @@
   .empty{color:#a07a3a;text-align:center;padding:22px;font-style:italic}
 
   footer{text-align:center;color:#a07a3a;font-size:13px;margin-top:34px}
+
+  /* ---------- mobile-specific ---------- */
+  @media (max-width:640px){
+    #teamsBtn{top:auto;bottom:18px;right:14px;padding:12px 18px;font-size:14px;
+      box-shadow:0 10px 26px rgba(11,122,59,.55);z-index:70}
+    header{padding-top:14px}
+    h1{font-size:26px;padding:0 6px;line-height:1.2}
+    .wrap{padding-bottom:96px}          /* room so the floating button never hides the footer */
+    .masterqr{gap:10px;padding:12px}
+    .masterqr img{width:92px;height:92px}
+    .overlay{padding:14px 8px}
+    .modal .mhead h2{font-size:19px}
+    table.sc th,table.sc td{padding:8px 7px;font-size:13px}
+  }
 </style>
 </head>
 <body>
