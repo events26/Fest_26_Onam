@@ -12,9 +12,11 @@
     background:radial-gradient(circle at 50% 12%,#fff6e2 0,#ffedcf 55%,#ffe0c2 100%);}
 
   /* festive side image bands */
-  .side{position:absolute;top:0;bottom:0;width:24mm;background:url("bg.jpg") center/cover no-repeat;}
+  .side{position:absolute;top:0;bottom:0;width:24mm;overflow:hidden;}
+  .side::before{content:"";position:absolute;inset:-40px;background:url("bg.jpg") center/cover no-repeat;
+     filter:blur(10px) saturate(1.15);transform:scale(1.15);}
   .side.left{left:0;} .side.right{right:0;transform:scaleX(-1);}
-  .side::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(215,38,61,.25),rgba(11,122,59,.25));}
+  .side::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,140,0,.18),rgba(11,122,59,.20));}
   .sideborder{position:absolute;top:0;bottom:0;width:5mm;background:repeating-linear-gradient(180deg,
      var(--red) 0 8mm,var(--marigold) 8mm 16mm,var(--green) 16mm 24mm,var(--gold) 24mm 32mm);}
   .sideborder.l{left:24mm;} .sideborder.r{right:24mm;}
