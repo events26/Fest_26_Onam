@@ -206,7 +206,7 @@ function dbEnsure(){ let db=dbLoad(); if(!db){ db=JSON.parse(JSON.stringify(SEED
 function uid(pre){ return pre+Date.now()+Math.floor((performance.now()%1000)); }
 
 /* ---------- data layer (demo local vs live Apps Script) ---------- */
-let CRED={user:"",pass:""}, TEAMS=[], PARTICIPANTS=[], MATCHES=[], EVENTS=[], GALLERY=[], VIDEOS=[];
+let CRED={user:"",pass:""}, TEAMS=[], PARTICIPANTS=[], MATCHES=[], EVENTS=[], GALLERY=[], VIDEOS=[], EVENTSFULL=[];
 
 async function api(payload){
   const res=await fetch(CONFIG.SCRIPT_URL,{method:"POST",redirect:"follow",
@@ -289,7 +289,7 @@ async function loadEvents(){
 async function refreshAll(flash){
   try{
     const r=await dataGetAll();
-    TEAMS=r.teams||[]; PARTICIPANTS=r.participants||[]; MATCHES=r.matches||[]; GALLERY=r.gallery||[]; VIDEOS=r.videos||[];
+    TEAMS=r.teams||[]; PARTICIPANTS=r.participants||[]; MATCHES=r.matches||[]; GALLERY=r.gallery||[]; VIDEOS=r.videos||[]; EVENTSFULL=r.events||[];
     renderTeamlist(); renderList(); renderSport(); renderTeamsEditor(); renderGalleryAdmin(); renderVideosAdmin();
     if(flash) { /* noop visual */ }
   }catch(e){ console.error(e); }
@@ -347,7 +347,28 @@ function renderSport(){
      '<select id="nmB"><option value="">Second team…</option>'+tOpts+'</select>'+
      '<button class="btn green sm" onclick="addMatch(\''+esc(ev)+'\')">+ Add match</button></div>';
   h+='<div class="hint">Set a match to <b>Live</b> to show it on the main page. Set <b>Done</b> and pick a winner to record the result.</div>';
+
+  const teamOptsSel=(cur)=>'<option value="">—</option>'+teamNames().map(n=>'<option'+(n===cur?' selected':'')+'>'+esc(n)+'</option>').join('');
+  const ef=EVENTSFULL.find(x=>x.name===ev)||{points:'',w1:'',w2:'',w3:''};
+  const pp=parsePointsClient(ef.points);
+  h+='<h2 style="margin-top:20px">🏅 Result — Podium &amp; Points</h2>';
+  h+='<p class="hint">Points for this sport → 🥇 '+pp[0]+' · 🥈 '+pp[1]+' · 🥉 '+pp[2]+'. Saving auto-updates the cumulative points table.</p>';
+  h+='<div class="matchrow"><span class="vs" style="flex:0 0 40px">🥇 1st</span><select id="r1">'+teamOptsSel(ef.w1)+'</select><b>('+pp[0]+' pts)</b></div>';
+  h+='<div class="matchrow"><span class="vs" style="flex:0 0 40px">🥈 2nd</span><select id="r2">'+teamOptsSel(ef.w2)+'</select><b>('+pp[1]+' pts)</b></div>';
+  h+='<div class="matchrow"><span class="vs" style="flex:0 0 40px">🥉 3rd</span><select id="r3">'+teamOptsSel(ef.w3)+'</select><b>('+pp[2]+' pts)</b></div>';
+  h+='<button class="btn sm" onclick="saveResult(\''+esc(ev)+'\')">💾 Save result</button>';
   box.innerHTML=h;
+}
+function parsePointsClient(str){ const a=String(str||'').split(/[,\/]/).map(x=>parseFloat(x.trim())||0); return [a[0]||0,a[1]||0,a[2]||0]; }
+async function saveResult(ev){
+  if(DEMO){ alert('Results need the live backend (deploy the Apps Script).'); return; }
+  const w1=$('r1').value, w2=$('r2').value, w3=$('r3').value;
+  const chosen=[w1,w2,w3].filter(Boolean);
+  if(new Set(chosen).size!==chosen.length){ alert('The same team is picked for more than one position — please fix.'); return; }
+  try{ const r=await api({action:'setResult',user:CRED.user,pass:CRED.pass,p:{event:ev,w1:w1,w2:w2,w3:w3}});
+    if(r.ok){ EVENTSFULL=r.events||EVENTSFULL; TEAMS=r.teams||TEAMS; renderSport(); renderTeamsEditor(); alert('✅ '+ev+' result saved — cumulative points updated.'); }
+    else alert(r.error||'Could not save result');
+  }catch(e){ alert('Error: '+e.message); }
 }
 function matchRow(m,tOpts){
   const sel=(v,val)=>v===val?' selected':'';
@@ -392,9 +413,11 @@ function renderTeamsEditor(){
     '<td><input id="tn_'+i+'" value="'+esc(t.name)+'"></td>'+
     '<td><input id="tc_'+i+'" value="'+esc(t.cap||"")+'"></td>'+
     '<td><input id="tv_'+i+'" value="'+esc(t.vc||"")+'"></td>'+
-    '<td><input id="tp_'+i+'" class="scoreIn" value="'+esc(t.points!=null?t.points:0)+'"></td>'+
+    '<td><input id="tp_'+i+'" class="scoreIn" value="'+esc(t.points!=null?t.points:0)+'" readonly title="Auto-calculated from sport results"></td>'+
     '<td><button class="del" onclick="delTeam('+i+')">✕</button></td></tr>'; });
-  h+='</tbody></table><button class="btn green sm" style="margin-top:10px" onclick="saveTeams()">💾 Save team points</button>';
+  h+='</tbody></table>'+
+     '<p class="hint">Points are <b>auto-calculated</b> from each sport\'s 🥇🥈🥉 results (set those in the <b>Sports &amp; Matches</b> tab). Edit team names / captains here.</p>'+
+     '<button class="btn green sm" style="margin-top:6px" onclick="saveTeams()">💾 Save teams</button>';
   box.innerHTML=h;
 }
 async function addTeam(){

@@ -48,7 +48,7 @@ function handle(d) {
   var out;
   try {
     var a = (d && d.action) || 'all';
-    if (a === 'all')        out = { ok: true, teams: listTeams(), participants: listParts(), matches: listMatches(), gallery: listGallery(), videos: listVideos() };
+    if (a === 'all')        out = { ok: true, teams: listTeams(), participants: listParts(), matches: listMatches(), gallery: listGallery(), videos: listVideos(), events: listEvents() };
     else if (a === 'auth')  out = { ok: valid(d.user, d.pass), error: 'Invalid username or password' };
     else if (a === 'list')  out = { ok: true, rows: listParts() };
     else if (a === 'add')      out = need(d) || (addPart(d.p || {}, d.user),       { ok: true, participants: listParts() });
@@ -60,6 +60,7 @@ function handle(d) {
     else if (a === 'delPhoto')    out = need(d) || (delPhoto(d.rowId),               { ok: true, gallery: listGallery() });
     else if (a === 'addVideo')    out = need(d) || (addVideo(d.p || {}, d.user),     { ok: true, videos: listVideos() });
     else if (a === 'delVideo')    out = need(d) || (delVideo(d.rowId),               { ok: true, videos: listVideos() });
+    else if (a === 'setResult')   out = need(d) || (setResult(d.p || {}),            { ok: true, events: listEvents(), teams: listTeams() });
     else out = { ok: false, error: 'Unknown action' };
   } catch (err) { out = { ok: false, error: String(err) }; }
   return ContentService.createTextOutput(JSON.stringify(out)).setMimeType(ContentService.MimeType.JSON);
@@ -122,6 +123,7 @@ function saveTeams(teams) {
   if (!teams.length) return;
   var rows = teams.map(function (t) { return [t.name||'', t.cap||'', t.vc||'', (t.points!=null?t.points:0)]; });
   s.getRange(2, 1, rows.length, TEAM_HEAD.length).setValues(rows);
+  recomputeTotals();   // keep cumulative points correct after roster changes
 }
 
 /* ---------- gallery (photos stored in a Drive folder) ---------- */
@@ -173,6 +175,63 @@ function delVideo(id) {   // removes from the list only — does NOT delete the 
   var s = tab(TAB_VIDEO, VIDEO_HEAD), last = s.getLastRow(); if (last < 2) return;
   var vals = s.getRange(2, 1, last - 1, VIDEO_HEAD.length).getValues();
   for (var i = 0; i < vals.length; i++) if (vals[i][0] === id) { s.deleteRow(i + 2); return; }
+}
+
+/* ---------- events results & cumulative points ---------- */
+function eventsData() {
+  var s = ss().getSheetByName('Events'); if (!s) return null;
+  var values = s.getRange(1, 1, s.getLastRow(), s.getLastColumn()).getValues();
+  var head = values[0].map(function (h) { return String(h).trim().toLowerCase(); });
+  function ci(name) { return head.indexOf(name.toLowerCase()); }
+  return { sheet:s, values:values, idx:{
+    no:ci('Sl No'), ev:ci('Events'), pts:ci('Points- 1st, 2nd, 3rd'),
+    w1:ci('Winner1'), w2:ci('Winner2'), w3:ci('Winner3') } };
+}
+function listEvents() {
+  var e = eventsData(); if (!e) return [];
+  var out = [];
+  for (var r = 1; r < e.values.length; r++) {
+    var row = e.values[r], name = e.idx.ev>=0 ? String(row[e.idx.ev]).trim() : '';
+    if (!name) continue;
+    out.push({ no: e.idx.no>=0?row[e.idx.no]:'', name:name,
+      points: e.idx.pts>=0?String(row[e.idx.pts]):'',
+      w1: e.idx.w1>=0?String(row[e.idx.w1]).trim():'',
+      w2: e.idx.w2>=0?String(row[e.idx.w2]).trim():'',
+      w3: e.idx.w3>=0?String(row[e.idx.w3]).trim():'' });
+  }
+  return out;
+}
+function parsePoints(str) {
+  var a = String(str||'').split(/[,\/]/).map(function (x) { return parseFloat(x.trim())||0; });
+  return [a[0]||0, a[1]||0, a[2]||0];
+}
+function setResult(p) {
+  var e = eventsData(); if (!e) throw new Error('No Events sheet');
+  for (var r = 1; r < e.values.length; r++) {
+    if (String(e.values[r][e.idx.ev]).trim() === String(p.event).trim()) {
+      if (e.idx.w1>=0) e.sheet.getRange(r+1, e.idx.w1+1).setValue(p.w1||'');
+      if (e.idx.w2>=0) e.sheet.getRange(r+1, e.idx.w2+1).setValue(p.w2||'');
+      if (e.idx.w3>=0) e.sheet.getRange(r+1, e.idx.w3+1).setValue(p.w3||'');
+      break;
+    }
+  }
+  recomputeTotals();
+}
+function recomputeTotals() {
+  var evs = listEvents(), totals = {};
+  evs.forEach(function (ev) {
+    var pts = parsePoints(ev.points);
+    if (ev.w1) totals[ev.w1] = (totals[ev.w1]||0) + pts[0];
+    if (ev.w2) totals[ev.w2] = (totals[ev.w2]||0) + pts[1];
+    if (ev.w3) totals[ev.w3] = (totals[ev.w3]||0) + pts[2];
+  });
+  var s = tab(TAB_TEAMS, TEAM_HEAD), last = s.getLastRow(); if (last < 2) return;
+  var rng = s.getRange(2, 1, last-1, TEAM_HEAD.length), vals = rng.getValues();
+  for (var i = 0; i < vals.length; i++) {
+    var name = String(vals[i][0]).trim();
+    if (name) vals[i][3] = totals[name] || 0;
+  }
+  rng.setValues(vals);
 }
 
 /* ---------- shared ---------- */
