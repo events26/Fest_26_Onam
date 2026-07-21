@@ -35,6 +35,8 @@ const TEAM_HEAD  = ['Team','Captain','Vice Captain','Total Points'];
 const TAB_GALLERY = 'Gallery';
 const GALLERY_HEAD = ['ID','Timestamp','FileId','Caption','AddedBy'];
 const GALLERY_FOLDER_NAME = 'CAFS Onam Gallery';   // Drive folder auto-created for photos
+const TAB_VIDEO   = 'Videos';
+const VIDEO_HEAD  = ['ID','Timestamp','FileId','Caption','AddedBy'];   // videos are Drive links (not uploaded files)
 
 function doGet(e)  { return handle({ action: 'all' }); }
 function doPost(e) {
@@ -46,7 +48,7 @@ function handle(d) {
   var out;
   try {
     var a = (d && d.action) || 'all';
-    if (a === 'all')        out = { ok: true, teams: listTeams(), participants: listParts(), matches: listMatches(), gallery: listGallery() };
+    if (a === 'all')        out = { ok: true, teams: listTeams(), participants: listParts(), matches: listMatches(), gallery: listGallery(), videos: listVideos() };
     else if (a === 'auth')  out = { ok: valid(d.user, d.pass), error: 'Invalid username or password' };
     else if (a === 'list')  out = { ok: true, rows: listParts() };
     else if (a === 'add')      out = need(d) || (addPart(d.p || {}, d.user),       { ok: true, participants: listParts() });
@@ -56,6 +58,8 @@ function handle(d) {
     else if (a === 'saveTeams')out = need(d) || (saveTeams(d.teams || []),          { ok: true, teams: listTeams() });
     else if (a === 'uploadPhoto') out = need(d) || (uploadPhoto(d.p || {}, d.user),  { ok: true, gallery: listGallery() });
     else if (a === 'delPhoto')    out = need(d) || (delPhoto(d.rowId),               { ok: true, gallery: listGallery() });
+    else if (a === 'addVideo')    out = need(d) || (addVideo(d.p || {}, d.user),     { ok: true, videos: listVideos() });
+    else if (a === 'delVideo')    out = need(d) || (delVideo(d.rowId),               { ok: true, videos: listVideos() });
     else out = { ok: false, error: 'Unknown action' };
   } catch (err) { out = { ok: false, error: String(err) }; }
   return ContentService.createTextOutput(JSON.stringify(out)).setMimeType(ContentService.MimeType.JSON);
@@ -147,6 +151,28 @@ function delPhoto(id) {
     try { DriveApp.getFileById(vals[i][2]).setTrashed(true); } catch (e) {}
     s.deleteRow(i + 2); return;
   }
+}
+
+/* ---------- videos (Google Drive links; not uploaded through the script) ---------- */
+function listVideos() {
+  var s = tab(TAB_VIDEO, VIDEO_HEAD), last = s.getLastRow(); if (last < 2) return [];
+  return s.getRange(2, 1, last - 1, VIDEO_HEAD.length).getValues()
+    .filter(function (r) { return r[0] !== ''; })
+    .map(function (r) { return { id:r[0], ts:r[1], fileId:r[2], caption:r[3], addedBy:r[4] }; });
+}
+function addVideo(p, user) {
+  var fid = p.fileId || '';
+  if (!fid) throw new Error('No video file id');
+  // if the video lives in this account's Drive, make it public-view automatically
+  try { DriveApp.getFileById(fid).setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW); } catch (e) {}
+  var s = tab(TAB_VIDEO, VIDEO_HEAD);
+  var ts = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd HH:mm');
+  s.appendRow(['V' + (new Date().getTime()), ts, fid, p.caption || '', user || '']);
+}
+function delVideo(id) {   // removes from the list only — does NOT delete the admin's Drive file
+  var s = tab(TAB_VIDEO, VIDEO_HEAD), last = s.getLastRow(); if (last < 2) return;
+  var vals = s.getRange(2, 1, last - 1, VIDEO_HEAD.length).getValues();
+  for (var i = 0; i < vals.length; i++) if (vals[i][0] === id) { s.deleteRow(i + 2); return; }
 }
 
 /* ---------- shared ---------- */

@@ -78,6 +78,7 @@
       <button class="tab" data-t="tab-sport" onclick="switchTab(this)">🏆 Sports &amp; Matches</button>
       <button class="tab" data-t="tab-teams" onclick="switchTab(this)">🥇 Team Points</button>
       <button class="tab" data-t="tab-gallery" onclick="switchTab(this)">📸 Gallery</button>
+      <button class="tab" data-t="tab-video" onclick="switchTab(this)">📹 Videos</button>
     </div>
 
     <!-- PARTICIPANTS -->
@@ -159,6 +160,23 @@
         <div id="galleryAdmin" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;margin-top:10px"></div>
       </div>
     </div>
+
+    <div class="sec" id="tab-video">
+      <div class="card">
+        <h1>📹 Videos — Add by Drive link</h1>
+        <p class="hint">Upload the video to <b>Google Drive</b> first, set it to <b>Anyone with the link</b>, then paste the link here.</p>
+        <label>Google Drive video link</label>
+        <input id="v_url" placeholder="https://drive.google.com/file/d/FILE_ID/view">
+        <label>Caption (optional)</label>
+        <input id="v_caption" placeholder="e.g. Tug of War final">
+        <button class="btn" onclick="addVideoLink()">Add video</button>
+        <div class="msg" id="vidMsg"></div>
+      </div>
+      <div class="card">
+        <div class="row" style="align-items:center"><h1 style="flex:1;margin:0">🎬 Added</h1><span class="count" id="vidCount">0</span></div>
+        <div id="videosAdmin" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-top:10px"></div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -189,7 +207,7 @@ function dbEnsure(){ let db=dbLoad(); if(!db){ db=JSON.parse(JSON.stringify(SEED
 function uid(pre){ return pre+Date.now()+Math.floor((performance.now()%1000)); }
 
 /* ---------- data layer (demo local vs live Apps Script) ---------- */
-let CRED={user:"",pass:""}, TEAMS=[], PARTICIPANTS=[], MATCHES=[], EVENTS=[], GALLERY=[];
+let CRED={user:"",pass:""}, TEAMS=[], PARTICIPANTS=[], MATCHES=[], EVENTS=[], GALLERY=[], VIDEOS=[];
 
 async function api(payload){
   const res=await fetch(CONFIG.SCRIPT_URL,{method:"POST",redirect:"follow",
@@ -272,8 +290,8 @@ async function loadEvents(){
 async function refreshAll(flash){
   try{
     const r=await dataGetAll();
-    TEAMS=r.teams||[]; PARTICIPANTS=r.participants||[]; MATCHES=r.matches||[]; GALLERY=r.gallery||[];
-    renderTeamlist(); renderList(); renderSport(); renderTeamsEditor(); renderGalleryAdmin();
+    TEAMS=r.teams||[]; PARTICIPANTS=r.participants||[]; MATCHES=r.matches||[]; GALLERY=r.gallery||[]; VIDEOS=r.videos||[];
+    renderTeamlist(); renderList(); renderSport(); renderTeamsEditor(); renderGalleryAdmin(); renderVideosAdmin();
     if(flash) { /* noop visual */ }
   }catch(e){ console.error(e); }
 }
@@ -437,6 +455,40 @@ function renderGalleryAdmin(){
     '<button class="del" style="position:absolute;top:6px;right:6px" onclick="delGalleryPhoto(\''+esc(g.id)+'\')">✕</button>'+
     (g.caption?'<div style="font-size:11px;padding:4px 6px;color:#7a4d00">'+esc(g.caption)+'</div>':'')+
     '</div>').join('') : '<p class="hint">No photos uploaded yet.</p>';
+}
+
+/* ---------- videos (Drive links) ---------- */
+function extractDriveId(url){
+  if(!url) return "";
+  var m=url.match(/\/d\/([-\w]{20,})/) || url.match(/[?&]id=([-\w]{20,})/);
+  if(m) return m[1];
+  var t=(url||"").trim(); return /^[-\w]{20,}$/.test(t)?t:"";
+}
+async function addVideoLink(){
+  if(DEMO){ msg('vidMsg','Videos need the live backend (deploy the Apps Script).',false); return; }
+  var fid=extractDriveId($('v_url').value);
+  if(!fid){ msg('vidMsg','Paste a valid Google Drive video link',false); return; }
+  msg('vidMsg','Adding…',true);
+  try{ var r=await api({action:'addVideo',user:CRED.user,pass:CRED.pass,p:{fileId:fid,caption:$('v_caption').value.trim()}});
+    if(r.ok){ VIDEOS=r.videos||[]; $('v_url').value=''; $('v_caption').value=''; renderVideosAdmin(); msg('vidMsg','✅ Added — now live on the main page.',true); }
+    else msg('vidMsg', r.error||'Could not add', false);
+  }catch(e){ msg('vidMsg','Error: '+e.message,false); }
+}
+async function delVideoLink(id){
+  if(!confirm('Remove this video from the page? (Your Drive file is NOT deleted.)')) return;
+  try{ var r=await api({action:'delVideo',user:CRED.user,pass:CRED.pass,rowId:id});
+    if(r.ok){ VIDEOS=r.videos||[]; renderVideosAdmin(); } else alert(r.error||'Could not remove');
+  }catch(e){ alert('Error: '+e.message); }
+}
+function renderVideosAdmin(){
+  var box=$('videosAdmin'); if(!box) return;
+  $('vidCount').textContent=VIDEOS.length;
+  box.innerHTML = VIDEOS.length ? VIDEOS.map(v=>
+    '<div style="position:relative;border-radius:10px;overflow:hidden;box-shadow:0 4px 12px rgba(120,60,0,.15)">'+
+    '<a href="https://drive.google.com/file/d/'+esc(v.fileId)+'/view" target="_blank" rel="noopener"><img src="'+driveThumb(v.fileId,300)+'" style="width:100%;height:100px;object-fit:cover;display:block;background:#222"></a>'+
+    '<button class="del" style="position:absolute;top:6px;right:6px" onclick="delVideoLink(\''+esc(v.id)+'\')">✕</button>'+
+    (v.caption?'<div style="font-size:11px;padding:4px 6px;color:#7a4d00">'+esc(v.caption)+'</div>':'')+
+    '</div>').join('') : '<p class="hint">No videos added yet.</p>';
 }
 
 /* ---------- init ---------- */

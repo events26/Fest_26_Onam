@@ -140,6 +140,14 @@
     display:flex;align-items:center;justify-content:center;text-decoration:none;font-size:15px;box-shadow:0 2px 6px rgba(0,0,0,.25)}
   .btn-dl{display:inline-block;background:var(--green);color:#fff;border:none;border-radius:22px;padding:9px 18px;
     font-weight:700;text-decoration:none;cursor:pointer;font-size:14px}
+  .vgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;margin-bottom:10px}
+  .vcard{background:var(--card);border-radius:14px;box-shadow:var(--shadow);overflow:hidden;cursor:pointer;transition:transform .15s}
+  .vcard:hover{transform:translateY(-3px)}
+  .vthumb{position:relative;width:100%;height:130px;background:#222}
+  .vthumb img{width:100%;height:100%;object-fit:cover;display:block}
+  .vplay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:34px;
+    text-shadow:0 2px 10px rgba(0,0,0,.6);background:rgba(0,0,0,.15)}
+  .vcard .cap{padding:6px 9px;font-size:12px;color:#7a4d00}
   #teamside{margin:8px auto 16px}
   .tshead{background:linear-gradient(90deg,var(--red),var(--saffron),var(--green));color:#fff;
     border-radius:12px;padding:11px 10px;font-weight:800;font-size:10.5px;letter-spacing:0;
@@ -265,6 +273,22 @@
   <div id="galleryEmpty" style="text-align:center;color:#a07a3a;font-size:13px;margin:-6px 0 12px;display:none">No photos yet — check back during the fest! 📷</div>
   <div class="ggrid" id="galleryGrid"></div>
 
+  <div class="section-title"><span>📹 Videos</span></div>
+  <div id="videoEmpty" style="text-align:center;color:#a07a3a;font-size:13px;margin:-6px 0 12px;display:none">No videos yet — check back during the fest! 🎥</div>
+  <div class="vgrid" id="videoGrid"></div>
+
+  <div class="overlay" id="videoOverlay" onclick="if(event.target===this)closeVideo()">
+    <div style="max-width:94vw;width:900px;text-align:center;margin:auto">
+      <div style="position:relative;width:100%;padding-top:56.25%;border-radius:12px;overflow:hidden;box-shadow:0 12px 40px rgba(0,0,0,.5);background:#000">
+        <iframe id="videoFrame" allow="autoplay" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:0"></iframe>
+      </div>
+      <div style="margin-top:12px">
+        <a id="videoOpen" class="btn-dl" target="_blank" rel="noopener">↗ Open in Drive</a>
+        <button class="btn-dl" style="background:#eee;color:#7a4d00;margin-left:8px" onclick="closeVideo()">Close</button>
+      </div>
+    </div>
+  </div>
+
   <div class="overlay" id="photoOverlay" onclick="if(event.target===this)closePhoto()">
     <div style="max-width:94vw;text-align:center;margin:auto">
       <img id="photoFull" alt="photo" style="max-width:94vw;max-height:78vh;border-radius:12px;box-shadow:0 12px 40px rgba(0,0,0,.5);background:#fff">
@@ -306,6 +330,7 @@ const CONFIG = {
   PARTICIPANTS_TAB: "Participants",
   MATCHES_TAB: "Matches",
   GALLERY_TAB: "Gallery",
+  VIDEOS_TAB: "Videos",
   REFRESH_SECONDS: 30
 };
 
@@ -371,7 +396,7 @@ async function fetchTab(tab){
   return {headers,rows};
 }
 
-let EVENTS=[], lastTeams={headers:TEAM_HEADERS,rows:[]}, scCache={}, PARTS={}, MATCHES=[], GALLERY=[];
+let EVENTS=[], lastTeams={headers:TEAM_HEADERS,rows:[]}, scCache={}, PARTS={}, MATCHES=[], GALLERY=[], VIDEOS=[];
 let openState={type:null,no:null};
 
 function groupParts(list){ const m={}; list.forEach(p=>{ (m[p.event]=m[p.event]||[]).push(p); }); return m; }
@@ -395,6 +420,13 @@ function galleryFromTab(p){
 }
 function driveThumb(id,w){ return "https://drive.google.com/thumbnail?id="+id+"&sz=w"+(w||800); }
 function driveDownload(id){ return "https://drive.google.com/uc?export=download&id="+id; }
+function drivePreview(id){ return "https://drive.google.com/file/d/"+id+"/preview"; }
+function driveOpen(id){ return "https://drive.google.com/file/d/"+id+"/view"; }
+function videosFromTab(p){
+  const c={id:idx(p.headers,"ID"),fid:idx(p.headers,"FileId"),cap:idx(p.headers,"Caption")};
+  const g=(r,i)=>i>=0&&r[i]!=null?String(r[i]).trim():"";
+  return p.rows.filter(r=>g(r,c.fid)).map(r=>({id:g(r,c.id),fileId:g(r,c.fid),caption:g(r,c.cap)}));
+}
 
 async function loadAll(){
   const st=document.getElementById("statusText");
@@ -404,18 +436,20 @@ async function loadAll(){
       ev={headers:EV_HEADERS,rows:SAMPLE_EVENTS};
       const db=dbEnsure();
       teams={headers:TEAM_HEADERS,rows:db.teams.map(t=>[t.name,t.cap||"",t.vc||"",String(t.points!=null?t.points:0)])};
-      PARTS=groupParts(db.participants); MATCHES=db.matches||[]; GALLERY=[]; live=false;
+      PARTS=groupParts(db.participants); MATCHES=db.matches||[]; GALLERY=[]; VIDEOS=[]; live=false;
     }
     else {
       [ev,teams]=await Promise.all([fetchTab(CONFIG.EVENTS_TAB),fetchTab(CONFIG.TEAMS_TAB)]); live=true;
       try{ PARTS=partsFromTab(await fetchTab(CONFIG.PARTICIPANTS_TAB)); }catch(e){ PARTS={}; }
       try{ MATCHES=matchesFromTab(await fetchTab(CONFIG.MATCHES_TAB)); }catch(e){ MATCHES=[]; }
       try{ GALLERY=galleryFromTab(await fetchTab(CONFIG.GALLERY_TAB)); }catch(e){ GALLERY=[]; }
+      try{ VIDEOS=videosFromTab(await fetchTab(CONFIG.VIDEOS_TAB)); }catch(e){ VIDEOS=[]; }
     }
     parseEvents(ev.headers,ev.rows);
     lastTeams=teams;
     renderEvents();
     renderGallery();
+    renderVideos();
     updateLeadPill();
     const now=new Date();
     st.textContent=(live?"Live from Google Sheet · ":"Preview (sample data) · ")+"updated "+now.toLocaleTimeString();
@@ -494,6 +528,8 @@ window.addEventListener("popstate",function(){
   document.getElementById("overlay").classList.remove("open");
   document.getElementById("waOverlay").classList.remove("open");
   document.getElementById("photoOverlay").classList.remove("open");
+  var vf=document.getElementById("videoFrame"); if(vf) vf.src="";
+  document.getElementById("videoOverlay").classList.remove("open");
   openState={type:null,no:null};
 });
 function closeModal(){ document.getElementById("overlay").classList.remove("open"); openState={type:null,no:null}; onCloseModal(); }
@@ -598,6 +634,25 @@ function openPhoto(id){
 }
 function closePhoto(){ document.getElementById("photoOverlay").classList.remove("open"); onCloseModal(); }
 
+function renderVideos(){
+  const grid=document.getElementById("videoGrid");
+  const empty=document.getElementById("videoEmpty");
+  if(!VIDEOS.length){ grid.innerHTML=""; empty.style.display="block"; return; }
+  empty.style.display="none";
+  grid.innerHTML=VIDEOS.map(v=>
+    '<div class="vcard" onclick="openVideo(\''+esc(v.fileId)+'\')">'+
+    '<div class="vthumb"><img loading="lazy" src="'+driveThumb(v.fileId,600)+'" alt="'+esc(v.caption||"video")+'"><span class="vplay">▶</span></div>'+
+    (v.caption?'<div class="cap">'+esc(v.caption)+'</div>':'')+'</div>'
+  ).join('');
+}
+function openVideo(id){
+  document.getElementById("videoFrame").src=drivePreview(id);
+  document.getElementById("videoOpen").href=driveOpen(id);
+  document.getElementById("videoOverlay").classList.add("open");
+  onOpenModal();
+}
+function closeVideo(){ document.getElementById("videoFrame").src=""; document.getElementById("videoOverlay").classList.remove("open"); onCloseModal(); }
+
 function renderScTable(d){
   // skip a leading title row (single non-empty first cell) if present
   let rows=d.rows.filter(r=>r.some(c=>String(c).trim()!==""));
@@ -613,7 +668,7 @@ function renderScTable(d){
   return h;
 }
 
-document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ closeModal(); closeWA(); closePhoto(); } });
+document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ closeModal(); closeWA(); closePhoto(); closeVideo(); } });
 window.addEventListener("storage",e=>{ if(e.key===DB_KEY) loadAll(); });  // live sync from admin page (demo mode)
 document.getElementById("pageQr").src=qr(location.href,200);
 loadAll();
