@@ -35,7 +35,10 @@
   .scan{font-size:17px;font-weight:800;color:var(--green);margin-bottom:2mm}
   .qr{width:56mm;height:56mm;display:block;margin:0 auto}
   .url{margin-top:2mm;font-size:14px;font-weight:700;color:var(--saffron);word-break:break-all}
-  .arrow{font-size:20px;color:var(--red);margin-top:0}
+  .arrow{font-size:18px;color:var(--red);margin-top:0}
+  .clickhere{display:inline-block;color:var(--red);font-weight:900;font-size:20px;text-decoration:underline;
+    letter-spacing:.5px;margin:1mm 0;animation:flash 1s ease-in-out infinite}
+  @keyframes flash{0%,100%{opacity:1}50%{opacity:.2}}
 
   .instr{margin-top:4mm;width:134mm;background:#fff8e8;border:2px solid var(--gold);border-radius:5mm;padding:3mm 6mm;text-align:left}
   .instr b{color:var(--saffron);font-size:15px}
@@ -67,6 +70,7 @@
         <div class="scan">📱 Scan to open the Event Page</div>
         <img class="qr" src="poster/qr-main.png" alt="Event page QR">
         <div class="arrow">↓</div>
+        <a class="clickhere" href="https://events26.github.io/Fest_26_Onam/" target="_blank" rel="noopener">👉 CLICK HERE</a>
         <div class="url">events26.github.io/Fest_26_Onam</div>
       </div>
 
