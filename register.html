@@ -149,7 +149,7 @@
    stored in this browser and shared with index.html in the same browser).
    Set SCRIPT_URL to the deployed Apps Script /exec URL to go live.
    ===================================================================== */
-const CONFIG = { SCRIPT_URL:"", SHEET_ID:"", EVENTS_TAB:"Events" };
+const CONFIG = { SCRIPT_URL:"https://script.google.com/macros/s/AKfycbz3475oqZIIcYRhzqE0eI9qshSECJ6UxlI5ZSMbGMDM6S0NwJtVy4ui0uwdlrAlJzP4Kw/exec", SHEET_ID:"1Swb7T4g1t-PvuiT5Qc5qxhbW1mnihhtQhFCKijazap4", EVENTS_TAB:"Events" };
 const DEMO = !CONFIG.SCRIPT_URL;
 const DEMO_CRED = { user:"admin", pass:"demo" };   // LOCAL PREVIEW ONLY — the real password lives server-side in the Apps Script
 const DB_KEY = "onam_db";
@@ -160,19 +160,7 @@ const FALLBACK_EVENTS = ["Badminton","Carroms","Surprise Event","Treasure Hunt",
  "Tug of War - Women","Uriyadi","The Perfect Slice","Musical Chair","Balloon the Pyramid",
  "Onion Peeling","Quiz Challenge","Pookkalam","Photography"];
 
-const SEED = {
-  teams:[{name:"Team A",cap:"Arun",vc:"Vishnu",points:28},{name:"Team B",cap:"Manu",vc:"Kiran",points:22},
-         {name:"Team C",cap:"Deepa",vc:"Meera",points:19},{name:"Team D",cap:"Roy",vc:"Sanjay",points:15}],
-  participants:[
-    {id:"P1",event:"Badminton",name:"Arun & Vishnu",dept:"Engineering",phone:"7012041423",team:"Team A",gender:"Gents",notes:"",addedBy:"seed",ts:""},
-    {id:"P2",event:"Badminton",name:"Manu & Kiran",dept:"F&B Service",phone:"8714110477",team:"Team B",gender:"Gents",notes:"",addedBy:"seed",ts:""},
-    {id:"P3",event:"Carroms",name:"Deepa & Meera",dept:"HR",phone:"",team:"Team C",gender:"",notes:"",addedBy:"seed",ts:""}
-  ],
-  matches:[
-    {id:"M1",event:"Badminton",teamA:"Team A",teamB:"Team B",status:"Live",scoreA:"1",scoreB:"0",winner:"",note:""},
-    {id:"M2",event:"Carroms",teamA:"Team C",teamB:"Team D",status:"Done",scoreA:"25",scoreB:"18",winner:"Team C",note:""}
-  ]
-};
+const SEED = { teams:[], participants:[], matches:[] };   // demo-only; live mode uses the sheet
 
 /* ---------- local demo DB (shared with index.html via localStorage) ---------- */
 function dbLoad(){ try{ return JSON.parse(localStorage.getItem(DB_KEY)); }catch(e){ return null; } }

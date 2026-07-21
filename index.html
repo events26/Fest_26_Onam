@@ -278,7 +278,7 @@
    named in the ScoreTab column of Events).
    ===================================================================== */
 const CONFIG = {
-  SHEET_ID: "",
+  SHEET_ID: "1Swb7T4g1t-PvuiT5Qc5qxhbW1mnihhtQhFCKijazap4",
   EVENTS_TAB: "Events",
   TEAMS_TAB:  "Teams & Scores",
   PARTICIPANTS_TAB: "Participants",
@@ -315,28 +315,15 @@ const SAMPLE_EVENTS=[
  ["24","19-08-2026","Wednesday","3:00 PM onwards","Photography","Individual - No preference","2 per team","CAFS Premises","","5, 3, 2","","","","","SC24",""]
 ];
 const TEAM_HEADERS=["Team","Captain","Vice Captain","Total Points"];
-const SAMPLE_TEAMS=[["Team A","Arun","Vishnu","28"],["Team B","Manu","Kiran","22"],["Team C","Deepa","Meera","19"],["Team D","Roy","Sanjay","15"]];
-const SAMPLE_PARTS=[
- {event:"Badminton",name:"Arun & Vishnu",dept:"Engineering",phone:"7012041423",team:"Team A"},
- {event:"Badminton",name:"Manu & Kiran",dept:"F&B Service",phone:"8714110477",team:"Team B"},
- {event:"Carroms",name:"Deepa & Meera",dept:"HR",phone:"",team:"Team C"},
- {event:"Tug of War - Men",name:"Roy (Captain) + 6",dept:"Operations",phone:"",team:"Team A"}
-];
-/* shared local demo DB (same key/shape as register.html) */
+const SAMPLE_TEAMS=[];
+const SAMPLE_PARTS=[];
+/* local demo DB (only used if SHEET_ID is empty; live mode ignores it) */
 const DB_KEY="onam_db";
-const SEED={
-  teams:[{name:"Team A",cap:"Arun",vc:"Vishnu",points:28},{name:"Team B",cap:"Manu",vc:"Kiran",points:22},
-         {name:"Team C",cap:"Deepa",vc:"Meera",points:19},{name:"Team D",cap:"Roy",vc:"Sanjay",points:15}],
-  participants:SAMPLE_PARTS.map((p,i)=>Object.assign({id:"P"+(i+1),gender:"",notes:"",addedBy:"seed",ts:""},p)),
-  matches:[
-    {id:"M1",event:"Badminton",teamA:"Team A",teamB:"Team B",status:"Live",scoreA:"1",scoreB:"0",winner:"",note:""},
-    {id:"M2",event:"Carroms",teamA:"Team C",teamB:"Team D",status:"Done",scoreA:"25",scoreB:"18",winner:"Team C",note:""}
-  ]
-};
+const SEED={ teams:[], participants:[], matches:[] };
 function dbLoad(){ try{ return JSON.parse(localStorage.getItem(DB_KEY)); }catch(e){ return null; } }
 function dbEnsure(){ let db=dbLoad(); if(!db){ db=JSON.parse(JSON.stringify(SEED)); localStorage.setItem(DB_KEY,JSON.stringify(db)); }
   db.teams=db.teams||[]; db.participants=db.participants||[]; db.matches=db.matches||[]; return db; }
-const SAMPLE_SC={headers:["Team","Members","Score","Rank"],rows:[["Team A","Arun, Vishnu","2","1"],["Team B","Manu, Kiran","1","2"],["Team C","Deepa, Meera","0","3"]]};
+const SAMPLE_SC={headers:[],rows:[]};
 
 /* ---------- helpers ---------- */
 function qr(d,s){ return "https://api.qrserver.com/v1/create-qr-code/?size="+s+"x"+s+"&data="+encodeURIComponent(d); }
