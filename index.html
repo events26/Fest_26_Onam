@@ -132,11 +132,22 @@
   .pcount{background:#fff0b3;color:#a1560a;border-radius:14px;padding:1px 9px;font-size:13px;margin-left:6px}
   .pill{display:inline-block;border-radius:20px;padding:2px 9px;font-size:11px;font-weight:700}
   .pill.done{background:#e6f7ec;color:#0b7a3b} .pill.sched{background:#fff0b3;color:#a1560a}
-  .wagrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;margin-bottom:8px}
-  .wacard{background:var(--card);border-radius:14px;box-shadow:var(--shadow);padding:10px;text-align:center;
-    border-top:4px solid var(--green)}
-  .wacard img{width:100%;border-radius:10px;display:block;background:#fff}
-  .waname{margin-top:8px;font-weight:700;color:#0b7a3b;font-size:14px}
+  #teamside{margin:6px auto 12px}
+  .tshead{font-weight:800;color:#7a4d00;font-size:16px;margin-bottom:10px;text-align:left}
+  .tsinner{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+  .tsbox{background:var(--card);border-radius:12px;box-shadow:var(--shadow);padding:9px;
+    border-left:4px solid var(--green);text-decoration:none;color:var(--ink);display:block;transition:transform .12s}
+  .tsbox:hover{transform:translateY(-2px)}
+  .tsbox img{width:100%;border-radius:8px;background:#fff;display:block}
+  .tsrow{display:flex;align-items:center;gap:6px;margin-top:7px}
+  .tsname{flex:1;font-weight:700;font-size:12.5px;color:var(--green);line-height:1.2}
+  .tsarrow{width:30px;height:30px;border-radius:50%;background:var(--saffron);color:#fff;
+    display:flex;align-items:center;justify-content:center;flex:none;box-shadow:0 3px 9px rgba(255,106,0,.4)}
+  @media(min-width:1550px){
+    #teamside{position:fixed;left:14px;top:96px;width:200px;max-height:calc(100vh - 112px);overflow-y:auto;
+      margin:0;z-index:50;background:rgba(255,247,230,.65);border-radius:14px;padding:12px 10px}
+    #teamside .tsinner{grid-template-columns:1fr}
+  }
 
   footer{text-align:center;color:#a07a3a;font-size:13px;margin-top:34px}
 
@@ -198,18 +209,19 @@
       <div class="nm">Mr. Manu B</div><a href="tel:8714110477">📞 8714110477</a></div>
   </div>
 
-  <div class="section-title"><span>📱 Join your Team WhatsApp Group</span></div>
-  <p style="text-align:left;color:#8a6a2a;font-size:14px;margin:-6px 0 12px">Find your team below and scan the QR with your WhatsApp camera to join the group.</p>
-  <div class="wagrid">
-    <div class="wacard"><a href="wa/thiruvonam-titans.jpg" target="_blank" rel="noopener"><img src="wa/thiruvonam-titans.jpg" alt="Team Thiruvonam Titan's"></a><div class="waname">Team Thiruvonam Titan's 🌸</div></div>
-    <div class="wacard"><a href="wa/gajaveerans.jpg" target="_blank" rel="noopener"><img src="wa/gajaveerans.jpg" alt="Gajaveerans"></a><div class="waname">Gajaveerans</div></div>
-    <div class="wacard"><a href="wa/pulikali-panthers.jpg" target="_blank" rel="noopener"><img src="wa/pulikali-panthers.jpg" alt="Pulikali Panthers"></a><div class="waname">Pulikali Panthers</div></div>
-    <div class="wacard"><a href="wa/onam-kombans.jpg" target="_blank" rel="noopener"><img src="wa/onam-kombans.jpg" alt="Onam Kombans"></a><div class="waname">Onam Kombans</div></div>
-    <div class="wacard"><a href="wa/maveli-squad.jpg" target="_blank" rel="noopener"><img src="wa/maveli-squad.jpg" alt="Maveli Squad"></a><div class="waname">Maveli Squad 👑</div></div>
-    <div class="wacard"><a href="wa/chenda-champions.jpg" target="_blank" rel="noopener"><img src="wa/chenda-champions.jpg" alt="Team Chenda Champions"></a><div class="waname">Team Chenda Champions</div></div>
-    <div class="wacard"><a href="wa/vallam-vikings.jpg" target="_blank" rel="noopener"><img src="wa/vallam-vikings.jpg" alt="Team Vallam Vikings"></a><div class="waname">Team Vallam Vikings</div></div>
-    <div class="wacard"><a href="wa/kerala-vibes.jpg" target="_blank" rel="noopener"><img src="wa/kerala-vibes.jpg" alt="Kerala vibes"></a><div class="waname">Kerala vibes ✨</div></div>
-  </div>
+  <aside id="teamside">
+    <div class="tshead">📱 Join your Team WhatsApp Group</div>
+    <div class="tsinner">
+      <a class="tsbox" href="https://chat.whatsapp.com/D9fOdxD56Ss4h542QVxxsw?s=qt&amp;p=a&amp;mlu=0&amp;ilr=0&amp;amv=3" target="_blank" rel="noopener"><img src="wa/thiruvonam-titans-qr.png" alt="Team Thiruvonam Titan's QR"><div class="tsrow"><span class="tsname">Team Thiruvonam Titan's 🌸</span><span class="tsarrow"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19c0-7 5-9 10-9"/><path d="M11 6l5 4-5 4"/></svg></span></div></a>
+      <a class="tsbox" href="https://chat.whatsapp.com/EpFlHgffInuJxZ5rXV6UtS?s=qt&amp;p=a&amp;ilr=0&amp;amv=1" target="_blank" rel="noopener"><img src="wa/gajaveerans-qr.png" alt="Gajaveerans QR"><div class="tsrow"><span class="tsname">Gajaveerans</span><span class="tsarrow"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19c0-7 5-9 10-9"/><path d="M11 6l5 4-5 4"/></svg></span></div></a>
+      <a class="tsbox" href="https://chat.whatsapp.com/BjGq8EmHFudElXhpQ7JWKz?s=qt&amp;p=a&amp;ilr=4" target="_blank" rel="noopener"><img src="wa/pulikali-panthers-qr.png" alt="Pulikali Panthers QR"><div class="tsrow"><span class="tsname">Pulikali Panthers</span><span class="tsarrow"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19c0-7 5-9 10-9"/><path d="M11 6l5 4-5 4"/></svg></span></div></a>
+      <a class="tsbox" href="https://chat.whatsapp.com/EjHVspGk0uI1lggPVhOuWr?s=qt&amp;p=a&amp;ilr=1&amp;amv=2" target="_blank" rel="noopener"><img src="wa/onam-kombans-qr.png" alt="Onam Kombans QR"><div class="tsrow"><span class="tsname">Onam Kombans</span><span class="tsarrow"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19c0-7 5-9 10-9"/><path d="M11 6l5 4-5 4"/></svg></span></div></a>
+      <a class="tsbox" href="https://chat.whatsapp.com/JxugpYoo4OW9BGxNkrOSxr?s=qt&amp;p=a&amp;ilr=0" target="_blank" rel="noopener"><img src="wa/maveli-squad-qr.png" alt="Maveli Squad QR"><div class="tsrow"><span class="tsname">Maveli Squad 👑</span><span class="tsarrow"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19c0-7 5-9 10-9"/><path d="M11 6l5 4-5 4"/></svg></span></div></a>
+      <a class="tsbox" href="https://chat.whatsapp.com/GOvJZsFv0g2KnJCRLYCA39" target="_blank" rel="noopener"><img src="wa/chenda-champions-qr.png" alt="Team Chenda Champions QR"><div class="tsrow"><span class="tsname">Team Chenda Champions</span><span class="tsarrow"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19c0-7 5-9 10-9"/><path d="M11 6l5 4-5 4"/></svg></span></div></a>
+      <a class="tsbox" href="https://chat.whatsapp.com/Iys5uqHJoIbHWMO08ZaJHs?s=qs&amp;p=i&amp;ilr=1" target="_blank" rel="noopener"><img src="wa/vallam-vikings-qr.png" alt="Team Vallam Vikings QR"><div class="tsrow"><span class="tsname">Team Vallam Vikings</span><span class="tsarrow"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19c0-7 5-9 10-9"/><path d="M11 6l5 4-5 4"/></svg></span></div></a>
+      <a class="tsbox" href="https://chat.whatsapp.com/H1c44zh9sqY9e02hny2tmh?s=qt&amp;p=a&amp;ilr=4" target="_blank" rel="noopener"><img src="wa/kerala-vibes-qr.png" alt="Kerala vibes QR"><div class="tsrow"><span class="tsname">Kerala vibes ✨</span><span class="tsarrow"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19c0-7 5-9 10-9"/><path d="M11 6l5 4-5 4"/></svg></span></div></a>
+    </div>
+  </aside>
 
   <div class="section-title"><span>🏆 Event Schedule</span></div>
   <div class="status"><span class="dot"></span><span id="statusText">Loading…</span>
