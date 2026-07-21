@@ -87,9 +87,8 @@
         <h1>➕ Add Participant</h1>
         <div class="row">
           <div><label>Event *</label><select id="f_event"></select></div>
-          <div><label>Team (type or pick)</label>
-            <input id="f_team" list="teamlist" placeholder="e.g. Maveli Squad">
-            <datalist id="teamlist"></datalist></div>
+          <div><label>Team</label>
+            <select id="f_team"><option value="">— select team —</option></select></div>
         </div>
         <div class="row">
           <div><label>Participant name(s) *</label><input id="f_name" placeholder="e.g. Arun (or 'Arun & Vishnu')"></div>
@@ -296,7 +295,10 @@ async function refreshAll(flash){
   }catch(e){ console.error(e); }
 }
 function renderTeamlist(){
-  $('teamlist').innerHTML = teamNames().map(n=>'<option value="'+esc(n)+'">').join('');
+  const sel=$('f_team'); if(!sel) return;
+  const cur=sel.value;
+  sel.innerHTML='<option value="">— select team —</option>'+teamNames().map(n=>'<option>'+esc(n)+'</option>').join('');
+  if(cur) sel.value=cur;
 }
 
 /* ---------- participants ---------- */
