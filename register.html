@@ -86,7 +86,7 @@
         <div class="row">
           <div><label>Event *</label><select id="f_event"></select></div>
           <div><label>Team (type or pick)</label>
-            <input id="f_team" list="teamlist" placeholder="e.g. Team A">
+            <input id="f_team" list="teamlist" placeholder="e.g. Maveli Squad">
             <datalist id="teamlist"></datalist></div>
         </div>
         <div class="row">
@@ -303,9 +303,9 @@ function renderSport(){
   h+='<div id="matchList">'+ (matches.length? matches.map(m=>matchRow(m,tOpts)).join('') : '<p class="hint">No matches yet.</p>') +'</div>';
 
   h+='<div class="matchrow" style="background:#f7f2e6">'+
-     '<select id="nmA"><option value="">Team A…</option>'+tOpts+'</select>'+
+     '<select id="nmA"><option value="">First team…</option>'+tOpts+'</select>'+
      '<b>vs</b>'+
-     '<select id="nmB"><option value="">Team B…</option>'+tOpts+'</select>'+
+     '<select id="nmB"><option value="">Second team…</option>'+tOpts+'</select>'+
      '<button class="btn green sm" onclick="addMatch(\''+esc(ev)+'\')">+ Add match</button></div>';
   h+='<div class="hint">Set a match to <b>Live</b> to show it on the main page. Set <b>Done</b> and pick a winner to record the result.</div>';
   box.innerHTML=h;
