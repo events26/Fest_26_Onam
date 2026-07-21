@@ -35,6 +35,15 @@
     box-shadow:0 6px 18px rgba(11,122,59,.4);display:flex;align-items:center;gap:8px}
   #teamsBtn:hover{filter:brightness(1.08)}
   #teamsBtn .lead{background:rgba(255,255,255,.25);border-radius:14px;padding:1px 8px;font-size:13px}
+  /* top-left hamburger menu */
+  #menuBtn{position:fixed;top:16px;left:14px;z-index:70;background:var(--saffron);color:#fff;border:none;border-radius:12px;
+    width:46px;height:46px;font-size:22px;cursor:pointer;box-shadow:0 6px 18px rgba(255,106,0,.45);display:flex;align-items:center;justify-content:center}
+  #menuDrop{position:fixed;top:68px;left:14px;z-index:70;background:#fff;border-radius:12px;
+    box-shadow:0 12px 30px rgba(120,60,0,.3);padding:6px;display:none;min-width:190px}
+  #menuDrop.open{display:block}
+  .menuitem{display:block;width:100%;text-align:left;background:none;border:none;padding:12px 14px;
+    font-size:15px;font-weight:700;color:var(--ink);cursor:pointer;border-radius:8px}
+  .menuitem:hover{background:#fff0d6}
 
   .masterqr{display:flex;gap:16px;align-items:center;justify-content:center;
     background:var(--card);border-radius:16px;padding:14px 18px;box-shadow:var(--shadow);
@@ -206,6 +215,12 @@
 <div class="bgwrap"></div>
 
 
+<button id="menuBtn" onclick="event.stopPropagation();toggleMenu()" title="Menu" aria-label="Menu">☰</button>
+<div id="menuDrop">
+  <button class="menuitem" onclick="navTo('galSec')">📸 Gallery</button>
+  <button class="menuitem" onclick="navTo('vidSec')">📹 Videos</button>
+</div>
+
 <button id="teamsBtn" onclick="openTeams()">🏆 Teams &amp; Scores<span class="lead" id="leadPill"></span></button>
 
 <header>
@@ -269,11 +284,11 @@
   <div style="text-align:center;color:#a07a3a;font-size:13px;margin:-8px 0 14px">👆 Tap any event to see its rules, team members &amp; scorecard</div>
   <div class="grid" id="eventGrid"></div>
 
-  <div class="section-title"><span>📸 Gallery</span></div>
+  <div class="section-title" id="galSec"><span>📸 Gallery</span></div>
   <div id="galleryEmpty" style="text-align:center;color:#a07a3a;font-size:13px;margin:-6px 0 12px;display:none">No photos yet — check back during the fest! 📷</div>
   <div class="ggrid" id="galleryGrid"></div>
 
-  <div class="section-title"><span>📹 Videos</span></div>
+  <div class="section-title" id="vidSec"><span>📹 Videos</span></div>
   <div id="videoEmpty" style="text-align:center;color:#a07a3a;font-size:13px;margin:-6px 0 12px;display:none">No videos yet — check back during the fest! 🎥</div>
   <div class="vgrid" id="videoGrid"></div>
 
@@ -653,6 +668,12 @@ function openVideo(id){
 }
 function closeVideo(){ document.getElementById("videoFrame").src=""; document.getElementById("videoOverlay").classList.remove("open"); onCloseModal(); }
 
+/* top-left menu */
+function toggleMenu(){ document.getElementById("menuDrop").classList.toggle("open"); }
+function closeMenu(){ document.getElementById("menuDrop").classList.remove("open"); }
+function navTo(id){ const el=document.getElementById(id); if(el) el.scrollIntoView({behavior:"smooth",block:"start"}); closeMenu(); }
+document.addEventListener("click",e=>{ if(!e.target.closest("#menuDrop")&&!e.target.closest("#menuBtn")) closeMenu(); });
+
 function renderScTable(d){
   // skip a leading title row (single non-empty first cell) if present
   let rows=d.rows.filter(r=>r.some(c=>String(c).trim()!==""));
@@ -668,7 +689,7 @@ function renderScTable(d){
   return h;
 }
 
-document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ closeModal(); closeWA(); closePhoto(); closeVideo(); } });
+document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ closeModal(); closeWA(); closePhoto(); closeVideo(); closeMenu(); } });
 window.addEventListener("storage",e=>{ if(e.key===DB_KEY) loadAll(); });  // live sync from admin page (demo mode)
 document.getElementById("pageQr").src=qr(location.href,200);
 loadAll();
