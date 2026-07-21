@@ -151,7 +151,7 @@
    ===================================================================== */
 const CONFIG = { SCRIPT_URL:"", SHEET_ID:"", EVENTS_TAB:"Events" };
 const DEMO = !CONFIG.SCRIPT_URL;
-const DEMO_CRED = { user:"admin", pass:"cloudOnam26!" };
+const DEMO_CRED = { user:"admin", pass:"demo" };   // LOCAL PREVIEW ONLY — the real password lives server-side in the Apps Script
 const DB_KEY = "onam_db";
 
 const FALLBACK_EVENTS = ["Badminton","Carroms","Surprise Event","Treasure Hunt","Cycle Slow Race",
@@ -386,7 +386,7 @@ async function saveTeams(){
 (function(){
   if(DEMO){ const b=document.createElement('div'); b.className='demoNote';
     b.innerHTML='🧪 DEMO MODE — data saved in THIS browser only (shared with the main page here). '+
-      'Log in with <b>admin</b> / <b>cloudOnam26!</b>. Set CONFIG.SCRIPT_URL to go live.';
+      'Local preview login: <b>admin</b> / <b>demo</b>. Set CONFIG.SCRIPT_URL to go live (real password lives in the Apps Script).';
     document.body.insertBefore(b,document.body.firstChild); }
   const saved=sessionStorage.getItem('onam_cred');
   if(saved){ try{ CRED=JSON.parse(saved); enterApp(); return; }catch(e){} }

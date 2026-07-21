@@ -25,7 +25,9 @@ const TAB_PART    = 'Participants';
 const TAB_MATCH   = 'Matches';
 const TAB_TEAMS   = 'Teams & Scores';
 
-const ADMINS = { 'admin': 'cloudOnam26!' };   // server-side only
+// SET YOUR REAL PASSWORD HERE inside the Apps Script editor in Google ONLY.
+// Do NOT commit the real password to the repo. Pick a fresh, strong one.
+const ADMINS = { 'admin': 'REPLACE_WITH_A_STRONG_PASSWORD' };   // server-side only
 
 const PART_HEAD  = ['ID','Timestamp','Event','Name','Department','Phone','Team','Gender','Notes','AddedBy'];
 const MATCH_HEAD = ['ID','Event','TeamA','TeamB','Status','ScoreA','ScoreB','Winner','Note'];
