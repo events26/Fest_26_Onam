@@ -132,6 +132,14 @@
   .pcount{background:#fff0b3;color:#a1560a;border-radius:14px;padding:1px 9px;font-size:13px;margin-left:6px}
   .pill{display:inline-block;border-radius:20px;padding:2px 9px;font-size:11px;font-weight:700}
   .pill.done{background:#e6f7ec;color:#0b7a3b} .pill.sched{background:#fff0b3;color:#a1560a}
+  .ggrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-bottom:10px}
+  .gcard{background:var(--card);border-radius:14px;box-shadow:var(--shadow);overflow:hidden;position:relative}
+  .gcard img{width:100%;height:150px;object-fit:cover;display:block;cursor:pointer;background:#eee}
+  .gcard .cap{padding:6px 9px;font-size:12px;color:#7a4d00}
+  .gcard .dl{position:absolute;top:8px;right:8px;background:rgba(255,255,255,.92);border-radius:50%;width:32px;height:32px;
+    display:flex;align-items:center;justify-content:center;text-decoration:none;font-size:15px;box-shadow:0 2px 6px rgba(0,0,0,.25)}
+  .btn-dl{display:inline-block;background:var(--green);color:#fff;border:none;border-radius:22px;padding:9px 18px;
+    font-weight:700;text-decoration:none;cursor:pointer;font-size:14px}
   #teamside{margin:8px auto 16px}
   .tshead{background:linear-gradient(90deg,var(--red),var(--saffron),var(--green));color:#fff;
     border-radius:12px;padding:11px 10px;font-weight:800;font-size:10.5px;letter-spacing:0;
@@ -253,6 +261,20 @@
   <div style="text-align:center;color:#a07a3a;font-size:13px;margin:-8px 0 14px">👆 Tap any event to see its rules, team members &amp; scorecard</div>
   <div class="grid" id="eventGrid"></div>
 
+  <div class="section-title"><span>📸 Gallery</span></div>
+  <div id="galleryEmpty" style="text-align:center;color:#a07a3a;font-size:13px;margin:-6px 0 12px;display:none">No photos yet — check back during the fest! 📷</div>
+  <div class="ggrid" id="galleryGrid"></div>
+
+  <div class="overlay" id="photoOverlay" onclick="if(event.target===this)closePhoto()">
+    <div style="max-width:94vw;text-align:center;margin:auto">
+      <img id="photoFull" alt="photo" style="max-width:94vw;max-height:78vh;border-radius:12px;box-shadow:0 12px 40px rgba(0,0,0,.5);background:#fff">
+      <div style="margin-top:12px">
+        <a id="photoDl" class="btn-dl" download>⬇ Download</a>
+        <button class="btn-dl" style="background:#eee;color:#7a4d00;margin-left:8px" onclick="closePhoto()">Close</button>
+      </div>
+    </div>
+  </div>
+
   <footer>🌼 Onam Sports Fiesta 2026 · CAFS · Made with team spirit 🌼<br>
     <small id="lastUpdated"></small><br>
     <a href="register.html" style="color:#b98a3a;font-size:12px">🔐 Admin registration →</a></footer>
@@ -283,6 +305,7 @@ const CONFIG = {
   TEAMS_TAB:  "Teams & Scores",
   PARTICIPANTS_TAB: "Participants",
   MATCHES_TAB: "Matches",
+  GALLERY_TAB: "Gallery",
   REFRESH_SECONDS: 30
 };
 
@@ -348,7 +371,7 @@ async function fetchTab(tab){
   return {headers,rows};
 }
 
-let EVENTS=[], lastTeams={headers:TEAM_HEADERS,rows:[]}, scCache={}, PARTS={}, MATCHES=[];
+let EVENTS=[], lastTeams={headers:TEAM_HEADERS,rows:[]}, scCache={}, PARTS={}, MATCHES=[], GALLERY=[];
 let openState={type:null,no:null};
 
 function groupParts(list){ const m={}; list.forEach(p=>{ (m[p.event]=m[p.event]||[]).push(p); }); return m; }
@@ -365,6 +388,13 @@ function matchesFromTab(p){
   return p.rows.filter(r=>g(r,c.ev)&&g(r,c.a)).map(r=>({id:g(r,c.id),event:g(r,c.ev),teamA:g(r,c.a),teamB:g(r,c.b),
     status:g(r,c.st)||"Scheduled",scoreA:g(r,c.sa),scoreB:g(r,c.sb),winner:g(r,c.w)}));
 }
+function galleryFromTab(p){
+  const c={id:idx(p.headers,"ID"),fid:idx(p.headers,"FileId"),cap:idx(p.headers,"Caption")};
+  const g=(r,i)=>i>=0&&r[i]!=null?String(r[i]).trim():"";
+  return p.rows.filter(r=>g(r,c.fid)).map(r=>({id:g(r,c.id),fileId:g(r,c.fid),caption:g(r,c.cap)}));
+}
+function driveThumb(id,w){ return "https://drive.google.com/thumbnail?id="+id+"&sz=w"+(w||800); }
+function driveDownload(id){ return "https://drive.google.com/uc?export=download&id="+id; }
 
 async function loadAll(){
   const st=document.getElementById("statusText");
@@ -374,16 +404,18 @@ async function loadAll(){
       ev={headers:EV_HEADERS,rows:SAMPLE_EVENTS};
       const db=dbEnsure();
       teams={headers:TEAM_HEADERS,rows:db.teams.map(t=>[t.name,t.cap||"",t.vc||"",String(t.points!=null?t.points:0)])};
-      PARTS=groupParts(db.participants); MATCHES=db.matches||[]; live=false;
+      PARTS=groupParts(db.participants); MATCHES=db.matches||[]; GALLERY=[]; live=false;
     }
     else {
       [ev,teams]=await Promise.all([fetchTab(CONFIG.EVENTS_TAB),fetchTab(CONFIG.TEAMS_TAB)]); live=true;
       try{ PARTS=partsFromTab(await fetchTab(CONFIG.PARTICIPANTS_TAB)); }catch(e){ PARTS={}; }
       try{ MATCHES=matchesFromTab(await fetchTab(CONFIG.MATCHES_TAB)); }catch(e){ MATCHES=[]; }
+      try{ GALLERY=galleryFromTab(await fetchTab(CONFIG.GALLERY_TAB)); }catch(e){ GALLERY=[]; }
     }
     parseEvents(ev.headers,ev.rows);
     lastTeams=teams;
     renderEvents();
+    renderGallery();
     updateLeadPill();
     const now=new Date();
     st.textContent=(live?"Live from Google Sheet · ":"Preview (sample data) · ")+"updated "+now.toLocaleTimeString();
@@ -461,6 +493,7 @@ window.addEventListener("popstate",function(){
   modalPushed=false;
   document.getElementById("overlay").classList.remove("open");
   document.getElementById("waOverlay").classList.remove("open");
+  document.getElementById("photoOverlay").classList.remove("open");
   openState={type:null,no:null};
 });
 function closeModal(){ document.getElementById("overlay").classList.remove("open"); openState={type:null,no:null}; onCloseModal(); }
@@ -546,6 +579,25 @@ function renderParts(ev){
   return h;
 }
 
+function renderGallery(){
+  const grid=document.getElementById("galleryGrid");
+  const empty=document.getElementById("galleryEmpty");
+  if(!GALLERY.length){ grid.innerHTML=""; empty.style.display="block"; return; }
+  empty.style.display="none";
+  grid.innerHTML=GALLERY.map(g=>
+    '<div class="gcard"><img loading="lazy" src="'+driveThumb(g.fileId,600)+'" alt="'+esc(g.caption||"photo")+'" onclick="openPhoto(\''+esc(g.fileId)+'\')">'+
+    '<a class="dl" href="'+driveDownload(g.fileId)+'" title="Download" onclick="event.stopPropagation()">⬇</a>'+
+    (g.caption?'<div class="cap">'+esc(g.caption)+'</div>':'')+'</div>'
+  ).join('');
+}
+function openPhoto(id){
+  document.getElementById("photoFull").src=driveThumb(id,1600);
+  document.getElementById("photoDl").href=driveDownload(id);
+  document.getElementById("photoOverlay").classList.add("open");
+  onOpenModal();
+}
+function closePhoto(){ document.getElementById("photoOverlay").classList.remove("open"); onCloseModal(); }
+
 function renderScTable(d){
   // skip a leading title row (single non-empty first cell) if present
   let rows=d.rows.filter(r=>r.some(c=>String(c).trim()!==""));
@@ -561,7 +613,7 @@ function renderScTable(d){
   return h;
 }
 
-document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ closeModal(); closeWA(); } });
+document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ closeModal(); closeWA(); closePhoto(); } });
 window.addEventListener("storage",e=>{ if(e.key===DB_KEY) loadAll(); });  // live sync from admin page (demo mode)
 document.getElementById("pageQr").src=qr(location.href,200);
 loadAll();

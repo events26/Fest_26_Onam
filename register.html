@@ -77,6 +77,7 @@
       <button class="tab active" data-t="tab-part" onclick="switchTab(this)">👤 Participants</button>
       <button class="tab" data-t="tab-sport" onclick="switchTab(this)">🏆 Sports &amp; Matches</button>
       <button class="tab" data-t="tab-teams" onclick="switchTab(this)">🥇 Team Points</button>
+      <button class="tab" data-t="tab-gallery" onclick="switchTab(this)">📸 Gallery</button>
     </div>
 
     <!-- PARTICIPANTS -->
@@ -140,6 +141,24 @@
         <div class="msg" id="teamMsg"></div>
       </div>
     </div>
+
+    <div class="sec" id="tab-gallery">
+      <div class="card">
+        <h1>📸 Gallery — Upload Photos</h1>
+        <p class="hint">Uploaded photos appear on the main page for everyone to view &amp; download.</p>
+        <label>Choose image(s)</label>
+        <input id="g_files" type="file" accept="image/*" multiple>
+        <label>Caption (optional — applies to this batch)</label>
+        <input id="g_caption" placeholder="e.g. Tug of War finals">
+        <button class="btn" onclick="uploadPhotos()">Upload</button>
+        <div class="msg" id="galMsg"></div>
+        <div class="hint">Large photos are auto-resized before upload.</div>
+      </div>
+      <div class="card">
+        <div class="row" style="align-items:center"><h1 style="flex:1;margin:0">🖼️ Uploaded</h1><span class="count" id="galCount">0</span></div>
+        <div id="galleryAdmin" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;margin-top:10px"></div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -170,7 +189,7 @@ function dbEnsure(){ let db=dbLoad(); if(!db){ db=JSON.parse(JSON.stringify(SEED
 function uid(pre){ return pre+Date.now()+Math.floor((performance.now()%1000)); }
 
 /* ---------- data layer (demo local vs live Apps Script) ---------- */
-let CRED={user:"",pass:""}, TEAMS=[], PARTICIPANTS=[], MATCHES=[], EVENTS=[];
+let CRED={user:"",pass:""}, TEAMS=[], PARTICIPANTS=[], MATCHES=[], EVENTS=[], GALLERY=[];
 
 async function api(payload){
   const res=await fetch(CONFIG.SCRIPT_URL,{method:"POST",redirect:"follow",
@@ -253,8 +272,8 @@ async function loadEvents(){
 async function refreshAll(flash){
   try{
     const r=await dataGetAll();
-    TEAMS=r.teams||[]; PARTICIPANTS=r.participants||[]; MATCHES=r.matches||[];
-    renderTeamlist(); renderList(); renderSport(); renderTeamsEditor();
+    TEAMS=r.teams||[]; PARTICIPANTS=r.participants||[]; MATCHES=r.matches||[]; GALLERY=r.gallery||[];
+    renderTeamlist(); renderList(); renderSport(); renderTeamsEditor(); renderGalleryAdmin();
     if(flash) { /* noop visual */ }
   }catch(e){ console.error(e); }
 }
@@ -368,6 +387,56 @@ async function saveTeams(){
   const out=TEAMS.map((t,i)=>({name:$('tn_'+i).value.trim(),cap:$('tc_'+i).value.trim(),
     vc:$('tv_'+i).value.trim(),points:parseFloat($('tp_'+i).value)||0}));
   await dataSaveTeams(out); await refreshAll(); msg('teamMsg','✅ Saved',true);
+}
+
+/* ---------- gallery ---------- */
+function driveThumb(id,w){ return "https://drive.google.com/thumbnail?id="+id+"&sz=w"+(w||300); }
+function resizeImage(file,maxDim,quality){
+  return new Promise((res,rej)=>{
+    const img=new Image(), url=URL.createObjectURL(file);
+    img.onload=()=>{ URL.revokeObjectURL(url); let w=img.width,h=img.height;
+      if(w>=h && w>maxDim){ h=Math.round(h*maxDim/w); w=maxDim; }
+      else if(h>maxDim){ w=Math.round(w*maxDim/h); h=maxDim; }
+      const c=document.createElement('canvas'); c.width=w; c.height=h;
+      c.getContext('2d').drawImage(img,0,0,w,h);
+      const durl=c.toDataURL('image/jpeg',quality||0.82);
+      res({data:durl.split(',')[1],mime:'image/jpeg',name:(file.name||'photo').replace(/\.[^.]+$/,'')+'.jpg'});
+    };
+    img.onerror=()=>{URL.revokeObjectURL(url);rej(new Error('unsupported image'));}; img.src=url;
+  });
+}
+async function uploadPhotos(){
+  if(DEMO){ msg('galMsg','Gallery upload needs the live backend (deploy the Apps Script).',false); return; }
+  const files=$('g_files').files;
+  if(!files.length){ msg('galMsg','Pick at least one image',false); return; }
+  const cap=$('g_caption').value.trim();
+  for(let i=0;i<files.length;i++){
+    msg('galMsg','Uploading '+(i+1)+' of '+files.length+'…',true);
+    try{
+      const p=await resizeImage(files[i],1600,0.82); p.caption=cap;
+      const r=await api({action:'uploadPhoto',user:CRED.user,pass:CRED.pass,p:p});
+      if(!r.ok){ msg('galMsg','Failed: '+(r.error||'error'),false); return; }
+      GALLERY=r.gallery||GALLERY;
+    }catch(e){ msg('galMsg','Error: '+e.message,false); return; }
+  }
+  $('g_files').value=''; $('g_caption').value=''; renderGalleryAdmin();
+  msg('galMsg','✅ Uploaded '+files.length+' photo(s) — now live on the main page.',true);
+}
+async function delGalleryPhoto(id){
+  if(!confirm('Delete this photo?')) return;
+  try{ const r=await api({action:'delPhoto',user:CRED.user,pass:CRED.pass,rowId:id});
+    if(r.ok){ GALLERY=r.gallery||[]; renderGalleryAdmin(); } else alert(r.error||'Could not delete');
+  }catch(e){ alert('Error: '+e.message); }
+}
+function renderGalleryAdmin(){
+  const box=$('galleryAdmin'); if(!box) return;
+  $('galCount').textContent=GALLERY.length;
+  box.innerHTML = GALLERY.length ? GALLERY.map(g=>
+    '<div style="position:relative;border-radius:10px;overflow:hidden;box-shadow:0 4px 12px rgba(120,60,0,.15)">'+
+    '<img src="'+driveThumb(g.fileId,300)+'" style="width:100%;height:110px;object-fit:cover;display:block;background:#eee">'+
+    '<button class="del" style="position:absolute;top:6px;right:6px" onclick="delGalleryPhoto(\''+esc(g.id)+'\')">✕</button>'+
+    (g.caption?'<div style="font-size:11px;padding:4px 6px;color:#7a4d00">'+esc(g.caption)+'</div>':'')+
+    '</div>').join('') : '<p class="hint">No photos uploaded yet.</p>';
 }
 
 /* ---------- init ---------- */

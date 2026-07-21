@@ -32,6 +32,9 @@ const ADMINS = { 'admin': 'REPLACE_WITH_A_STRONG_PASSWORD' };   // server-side o
 const PART_HEAD  = ['ID','Timestamp','Event','Name','Department','Phone','Team','Gender','Notes','AddedBy'];
 const MATCH_HEAD = ['ID','Event','TeamA','TeamB','Status','ScoreA','ScoreB','Winner','Note'];
 const TEAM_HEAD  = ['Team','Captain','Vice Captain','Total Points'];
+const TAB_GALLERY = 'Gallery';
+const GALLERY_HEAD = ['ID','Timestamp','FileId','Caption','AddedBy'];
+const GALLERY_FOLDER_NAME = 'CAFS Onam Gallery';   // Drive folder auto-created for photos
 
 function doGet(e)  { return handle({ action: 'all' }); }
 function doPost(e) {
@@ -43,7 +46,7 @@ function handle(d) {
   var out;
   try {
     var a = (d && d.action) || 'all';
-    if (a === 'all')        out = { ok: true, teams: listTeams(), participants: listParts(), matches: listMatches() };
+    if (a === 'all')        out = { ok: true, teams: listTeams(), participants: listParts(), matches: listMatches(), gallery: listGallery() };
     else if (a === 'auth')  out = { ok: valid(d.user, d.pass), error: 'Invalid username or password' };
     else if (a === 'list')  out = { ok: true, rows: listParts() };
     else if (a === 'add')      out = need(d) || (addPart(d.p || {}, d.user),       { ok: true, participants: listParts() });
@@ -51,6 +54,8 @@ function handle(d) {
     else if (a === 'saveMatch')out = need(d) || (saveMatch(d.m || {}),              { ok: true, matches: listMatches() });
     else if (a === 'delMatch') out = need(d) || (delMatch(d.rowId),                 { ok: true, matches: listMatches() });
     else if (a === 'saveTeams')out = need(d) || (saveTeams(d.teams || []),          { ok: true, teams: listTeams() });
+    else if (a === 'uploadPhoto') out = need(d) || (uploadPhoto(d.p || {}, d.user),  { ok: true, gallery: listGallery() });
+    else if (a === 'delPhoto')    out = need(d) || (delPhoto(d.rowId),               { ok: true, gallery: listGallery() });
     else out = { ok: false, error: 'Unknown action' };
   } catch (err) { out = { ok: false, error: String(err) }; }
   return ContentService.createTextOutput(JSON.stringify(out)).setMimeType(ContentService.MimeType.JSON);
@@ -113,6 +118,35 @@ function saveTeams(teams) {
   if (!teams.length) return;
   var rows = teams.map(function (t) { return [t.name||'', t.cap||'', t.vc||'', (t.points!=null?t.points:0)]; });
   s.getRange(2, 1, rows.length, TEAM_HEAD.length).setValues(rows);
+}
+
+/* ---------- gallery (photos stored in a Drive folder) ---------- */
+function galleryFolder() {
+  var it = DriveApp.getFoldersByName(GALLERY_FOLDER_NAME);
+  return it.hasNext() ? it.next() : DriveApp.createFolder(GALLERY_FOLDER_NAME);
+}
+function listGallery() {
+  var s = tab(TAB_GALLERY, GALLERY_HEAD), last = s.getLastRow(); if (last < 2) return [];
+  return s.getRange(2, 1, last - 1, GALLERY_HEAD.length).getValues()
+    .filter(function (r) { return r[0] !== ''; })
+    .map(function (r) { return { id:r[0], ts:r[1], fileId:r[2], caption:r[3], addedBy:r[4] }; });
+}
+function uploadPhoto(p, user) {
+  var bytes = Utilities.base64Decode(p.data);
+  var blob = Utilities.newBlob(bytes, p.mime || 'image/jpeg', p.name || ('photo_' + (new Date().getTime()) + '.jpg'));
+  var file = galleryFolder().createFile(blob);
+  file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+  var s = tab(TAB_GALLERY, GALLERY_HEAD);
+  var ts = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd HH:mm');
+  s.appendRow(['G' + (new Date().getTime()), ts, file.getId(), p.caption || '', user || '']);
+}
+function delPhoto(id) {
+  var s = tab(TAB_GALLERY, GALLERY_HEAD), last = s.getLastRow(); if (last < 2) return;
+  var vals = s.getRange(2, 1, last - 1, GALLERY_HEAD.length).getValues();
+  for (var i = 0; i < vals.length; i++) if (vals[i][0] === id) {
+    try { DriveApp.getFileById(vals[i][2]).setTrashed(true); } catch (e) {}
+    s.deleteRow(i + 2); return;
+  }
 }
 
 /* ---------- shared ---------- */
