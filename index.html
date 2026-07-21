@@ -463,9 +463,19 @@ function updateLeadPill(){
 }
 
 /* ---------- modals ---------- */
-function closeModal(){ document.getElementById("overlay").classList.remove("open"); openState={type:null,no:null}; }
-function openWA(){ document.getElementById("waOverlay").classList.add("open"); }
-function closeWA(){ document.getElementById("waOverlay").classList.remove("open"); }
+/* make the phone Back button close an open popup instead of leaving the page */
+let modalPushed=false;
+function onOpenModal(){ if(!modalPushed){ modalPushed=true; history.pushState({modal:1},""); } }
+function onCloseModal(){ if(modalPushed){ modalPushed=false; history.back(); } }
+window.addEventListener("popstate",function(){
+  modalPushed=false;
+  document.getElementById("overlay").classList.remove("open");
+  document.getElementById("waOverlay").classList.remove("open");
+  openState={type:null,no:null};
+});
+function closeModal(){ document.getElementById("overlay").classList.remove("open"); openState={type:null,no:null}; onCloseModal(); }
+function openWA(){ document.getElementById("waOverlay").classList.add("open"); onOpenModal(); }
+function closeWA(){ document.getElementById("waOverlay").classList.remove("open"); onCloseModal(); }
 function refreshOpenModal(){
   if(openState.type==="teams") renderTeamsModal();
   else if(openState.type==="score") openScorecard(openState.no,true);
@@ -475,6 +485,7 @@ function openTeams(){
   openState={type:"teams",no:null};
   renderTeamsModal();
   document.getElementById("overlay").classList.add("open");
+  onOpenModal();
 }
 function renderTeamsModal(){
   document.getElementById("mTitle").textContent="🏆 Teams & Scores";
@@ -504,6 +515,7 @@ async function openScorecard(no,isRefresh){
   head+='<div class="rulesbox"><b>📋 Rules</b><br>'+esc(ruleText)+'</div>';
   if(!isRefresh) body.innerHTML=head+'<div class="empty">Loading scorecard…</div>';
   document.getElementById("overlay").classList.add("open");
+  if(!isRefresh) onOpenModal();
 
   // fetch scorecard tab
   let data;
