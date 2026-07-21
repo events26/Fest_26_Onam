@@ -9,19 +9,25 @@
   :root{--saffron:#ff6a00;--marigold:#ff8c00;--red:#d7263d;--green:#0b7a3b;--gold:#f4b400;--ink:#3a2600;--cream:#fff7e6}
   html,body{width:210mm;height:297mm;font-family:"Segoe UI",Arial,sans-serif;color:var(--ink)}
   .page{position:relative;width:210mm;height:297mm;overflow:hidden;
-    background:radial-gradient(circle at 50% 12%,#fff6e2 0,#ffedcf 55%,#ffe0c2 100%);}
+    background:
+      radial-gradient(circle at 12% 8%, #d6f0e0 0, transparent 42%),
+      radial-gradient(circle at 90% 10%, #d8eafb 0, transparent 46%),
+      linear-gradient(160deg,#f1fbf5 0%,#ffffff 50%,#edf5fd 100%);}
 
-  /* festive side image bands */
-  .side{position:absolute;top:0;bottom:0;width:24mm;overflow:hidden;}
-  .side::before{content:"";position:absolute;inset:-40px;background:url("bg.jpg") center/cover no-repeat;
-     filter:blur(10px) saturate(1.15);transform:scale(1.15);}
-  .side.left{left:0;} .side.right{right:0;transform:scaleX(-1);}
-  .side::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,140,0,.18),rgba(11,122,59,.20));}
-  .sideborder{position:absolute;top:0;bottom:0;width:5mm;background:repeating-linear-gradient(180deg,
-     var(--red) 0 8mm,var(--marigold) 8mm 16mm,var(--green) 16mm 24mm,var(--gold) 24mm 32mm);}
-  .sideborder.l{left:24mm;} .sideborder.r{right:24mm;}
+  /* soft green -> blue side accents */
+  .side{position:absolute;top:0;bottom:0;width:20mm;
+    background:linear-gradient(180deg,rgba(11,122,59,.12),rgba(61,151,214,.16));}
+  .side.left{left:0;} .side.right{right:0;}
+  .sideborder{position:absolute;top:0;bottom:0;width:3mm;background:linear-gradient(180deg,#0b7a3b,#3d93d4);}
+  .sideborder.l{left:20mm;} .sideborder.r{right:20mm;}
 
-  .content{position:absolute;left:34mm;right:34mm;top:0;bottom:24mm;padding:8mm 8mm 0;
+  /* round CAFS logo, top-left corner */
+  .logo{position:absolute;top:6mm;left:5mm;width:22mm;height:22mm;border-radius:50%;z-index:6;
+    background:radial-gradient(circle at 50% 38%,#5cb5ea,#3d8fd0);color:#fff;
+    display:flex;align-items:center;justify-content:center;font-weight:800;font-size:24px;
+    letter-spacing:.5px;box-shadow:0 2mm 5mm rgba(0,40,80,.28);border:3px solid #fff;font-family:Arial,sans-serif}
+
+  .content{position:absolute;left:27mm;right:27mm;top:0;bottom:24mm;padding:8mm 8mm 0;
     display:flex;flex-direction:column;align-items:center;text-align:center;}
 
   .crown{font-size:26px;letter-spacing:5px;margin-bottom:2mm}
@@ -57,6 +63,7 @@
 </head>
 <body>
   <div class="page">
+    <div class="logo">CAFS</div>
     <div class="side left"></div><div class="sideborder l"></div>
     <div class="side right"></div><div class="sideborder r"></div>
 
@@ -80,7 +87,8 @@
           <li>Open your phone <b>Camera</b> (or any QR scanner) and point it at the QR above.</li>
           <li>Tap the link — the <b>CAFS Onotsavam 2026</b> page opens in your browser.</li>
           <li>See all events, schedule, venues, live matches, scores &amp; winners — updated live.</li>
-          <li>Bookmark it and check back during the fest for <b>🔴 LIVE</b> updates.</li>
+          <li>A <b>🔴 LIVE pop-up</b> appears for the activity going on right now, so you always know what's live.</li>
+          <li>Bookmark it and check back during the fest for updates.</li>
         </ol>
       </div>
 
