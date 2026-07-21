@@ -271,25 +271,32 @@ function switchTab(btn){
 
 /* ---------- events dropdown ---------- */
 async function loadEvents(){
-  EVENTS = FALLBACK_EVENTS.slice();
+  let names = FALLBACK_EVENTS.slice();
   if(CONFIG.SHEET_ID){ try{
     const url="https://docs.google.com/spreadsheets/d/"+CONFIG.SHEET_ID+"/gviz/tq?tqx=out:json&headers=1&sheet="+encodeURIComponent(CONFIG.EVENTS_TAB)+"&t="+Date.now();
     const txt=await (await fetch(url)).text();
     const j=JSON.parse(txt.substring(txt.indexOf("{"),txt.lastIndexOf("}")+1));
-    const cols=j.table.cols.map(c=>c.label); const ei=cols.findIndex(c=>String(c).trim().toLowerCase()==='events');
-    if(ei>=0){ EVENTS=j.table.rows.map(r=>r.c[ei]?(r.c[ei].f||r.c[ei].v):'').filter(Boolean); }
+    const cols=j.table.cols.map(c=>String(c.label||"").trim().toLowerCase());
+    const ei=cols.indexOf('events'), pi=cols.findIndex(c=>c.indexOf('points')===0),
+          n1=cols.indexOf('winner1'), n2=cols.indexOf('winner2'), n3=cols.indexOf('winner3'), ni=cols.indexOf('sl no');
+    const cell=(r,i)=>i>=0&&r.c[i]?(r.c[i].f!=null?r.c[i].f:r.c[i].v):"";
+    const full=j.table.rows.map(r=>({no:cell(r,ni),name:String(cell(r,ei)).trim(),points:String(cell(r,pi)),
+      w1:String(cell(r,n1)).trim(),w2:String(cell(r,n2)).trim(),w3:String(cell(r,n3)).trim()})).filter(x=>x.name);
+    if(full.length){ EVENTSFULL=full; names=full.map(x=>x.name); }
   }catch(e){} }
-  const opts='<option value="">— select event —</option>'+EVENTS.map(n=>'<option>'+esc(n)+'</option>').join('');
+  EVENTS=names;
+  const opts='<option value="">— select event —</option>'+names.map(n=>'<option>'+esc(n)+'</option>').join('');
   $('f_event').innerHTML=opts;
   $('sportSel').innerHTML=opts;
-  $('filterEvent').innerHTML='<option value="">All events</option>'+EVENTS.map(n=>'<option>'+esc(n)+'</option>').join('');
+  $('filterEvent').innerHTML='<option value="">All events</option>'+names.map(n=>'<option>'+esc(n)+'</option>').join('');
 }
 
 /* ---------- master refresh ---------- */
 async function refreshAll(flash){
   try{
     const r=await dataGetAll();
-    TEAMS=r.teams||[]; PARTICIPANTS=r.participants||[]; MATCHES=r.matches||[]; GALLERY=r.gallery||[]; VIDEOS=r.videos||[]; EVENTSFULL=r.events||[];
+    TEAMS=r.teams||[]; PARTICIPANTS=r.participants||[]; MATCHES=r.matches||[]; GALLERY=r.gallery||[]; VIDEOS=r.videos||[];
+    if(Array.isArray(r.events)&&r.events.length) EVENTSFULL=r.events;   // prefer backend events if present; else keep gviz-loaded
     renderTeamlist(); renderList(); renderSport(); renderTeamsEditor(); renderGalleryAdmin(); renderVideosAdmin();
     if(flash) { /* noop visual */ }
   }catch(e){ console.error(e); }

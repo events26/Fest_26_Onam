@@ -183,8 +183,9 @@ function eventsData() {
   var values = s.getRange(1, 1, s.getLastRow(), s.getLastColumn()).getValues();
   var head = values[0].map(function (h) { return String(h).trim().toLowerCase(); });
   function ci(name) { return head.indexOf(name.toLowerCase()); }
+  function starts(pre) { for (var i = 0; i < head.length; i++) if (head[i].indexOf(pre) === 0) return i; return -1; }
   return { sheet:s, values:values, idx:{
-    no:ci('Sl No'), ev:ci('Events'), pts:ci('Points- 1st, 2nd, 3rd'),
+    no:ci('Sl No'), ev:ci('Events'), pts:starts('points'),
     w1:ci('Winner1'), w2:ci('Winner2'), w3:ci('Winner3') } };
 }
 function listEvents() {
