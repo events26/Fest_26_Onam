@@ -5,10 +5,10 @@
 <title>CAFS Onotsavam 2026 — Poster</title>
 <style>
   *{margin:0;padding:0;box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  @page{ size:A4 portrait; margin:0; }
+  @page{ size:210mm 237mm; margin:0; }
   :root{--saffron:#ff6a00;--marigold:#ff8c00;--red:#d7263d;--green:#0b7a3b;--gold:#f4b400;--ink:#3a2600;--cream:#fff7e6}
-  html,body{width:210mm;height:297mm;font-family:"Segoe UI",Arial,sans-serif;color:var(--ink)}
-  .page{position:relative;width:210mm;height:297mm;overflow:hidden;
+  html,body{width:210mm;font-family:"Segoe UI",Arial,sans-serif;color:var(--ink)}
+  .page{position:relative;width:210mm;min-height:237mm;overflow:hidden;
     background:
       linear-gradient(rgba(255,255,255,.70),rgba(255,255,255,.70)),
       url("poster/onambg.jpg") center/cover no-repeat #fff;}
@@ -19,7 +19,7 @@
     display:flex;align-items:center;justify-content:center;font-weight:800;font-size:24px;
     letter-spacing:.5px;box-shadow:0 2mm 5mm rgba(0,40,80,.28);border:3px solid #fff;font-family:Arial,sans-serif}
 
-  .content{position:absolute;left:18mm;right:18mm;top:0;bottom:24mm;padding:10mm 8mm 0;
+  .content{position:relative;padding:12mm 18mm 11mm;
     display:flex;flex-direction:column;align-items:center;text-align:center;}
 
   .crown{font-size:26px;letter-spacing:5px;margin-bottom:2mm}
@@ -36,9 +36,6 @@
   .qr{width:56mm;height:56mm;display:block;margin:0 auto}
   .url{margin-top:2mm;font-size:14px;font-weight:700;color:var(--saffron);word-break:break-all}
   .arrow{font-size:18px;color:var(--red);margin-top:0}
-  .clickhere{display:inline-block;color:var(--red);font-weight:900;font-size:20px;text-decoration:underline;
-    letter-spacing:.5px;margin:1mm 0;animation:flash 1s ease-in-out infinite}
-  @keyframes flash{0%,100%{opacity:1}50%{opacity:.2}}
 
   .instr{margin-top:4mm;width:134mm;background:#fff8e8;border:2px solid var(--gold);border-radius:5mm;padding:3mm 6mm;text-align:left}
   .instr b{color:var(--saffron);font-size:15px}
@@ -48,12 +45,7 @@
     font-size:12px;line-height:1.45}
   .wanote b{color:#ffe9a8}
 
-  .contacts{margin-top:auto;margin-bottom:9mm;font-size:14px;color:#3a2600;font-weight:800}
-
-  /* bottom Happy-Onam panorama band */
-  .panorama{position:absolute;left:0;right:0;bottom:0;height:26mm;
-    background:url("panorama.png") center/contain no-repeat #fff;
-    border-top:3px solid var(--gold)}
+  .contacts{margin-top:7mm;font-size:14px;color:#3a2600;font-weight:800}
 </style>
 </head>
 <body>
@@ -70,7 +62,6 @@
         <div class="scan">📱 Scan to open the Event Page</div>
         <img class="qr" src="poster/qr-main.png" alt="Event page QR">
         <div class="arrow">↓</div>
-        <a class="clickhere" href="https://events26.github.io/Fest_26_Onam/" target="_blank" rel="noopener">👉 CLICK HERE</a>
         <div class="url">events26.github.io/Fest_26_Onam</div>
       </div>
 
@@ -94,8 +85,6 @@
 
       <div class="contacts">Sports Committee — Anu Asok : 7012041423 &nbsp;•&nbsp; Manu B : 8714110477</div>
     </div>
-
-    <div class="panorama"></div>
   </div>
 </body>
 </html>
