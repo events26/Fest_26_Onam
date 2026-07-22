@@ -15,9 +15,7 @@
 
   /* round CAFS logo, top-left corner */
   .logo{position:absolute;top:6mm;left:5mm;width:22mm;height:22mm;border-radius:50%;z-index:6;
-    background:radial-gradient(circle at 50% 38%,#5cb5ea,#3d8fd0);color:#fff;
-    display:flex;align-items:center;justify-content:center;font-weight:800;font-size:24px;
-    letter-spacing:.5px;box-shadow:0 2mm 5mm rgba(0,40,80,.28);border:3px solid #fff;font-family:Arial,sans-serif}
+    object-fit:contain;background:#fff;box-shadow:0 2mm 5mm rgba(0,40,80,.28);border:3px solid #fff}
 
   .content{position:relative;padding:12mm 18mm 11mm;
     display:flex;flex-direction:column;align-items:center;text-align:center;}
@@ -50,7 +48,7 @@
 </head>
 <body>
   <div class="page">
-    <div class="logo">CAFS</div>
+    <img class="logo" src="poster/cafs-logo.jpg" alt="CAFS">
 
     <div class="content">
       <div class="kicker">CAFS presents</div>
