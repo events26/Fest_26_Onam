@@ -755,10 +755,6 @@ window.addEventListener("storage",e=>{ if(e.key===DB_KEY) loadAll(); });  // liv
 document.getElementById("pageQr").src=qr(location.href,200);
 loadAll();
 setInterval(loadAll, CONFIG.REFRESH_SECONDS*1000);
-if(!sessionStorage.getItem("luckyShown")){
-  sessionStorage.setItem("luckyShown","1");
-  setTimeout(openLucky, 1200);
-}
 </script>
 </body>
 </html>
