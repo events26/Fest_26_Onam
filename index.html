@@ -120,7 +120,7 @@
   @keyframes pulseBtn{0%,100%{box-shadow:0 0 0 0 rgba(215,38,61,.55)}50%{box-shadow:0 0 0 8px rgba(215,38,61,0)}}
   @keyframes blink{0%,100%{opacity:1}50%{opacity:.12}}
   .meta{font-size:14px;line-height:1.9}
-  .meta .k{display:inline-block;width:74px;color:#9a7326;font-weight:600}
+  .meta .k{display:inline-block;min-width:74px;margin-right:4px;color:#9a7326;font-weight:600}
   .tag{display:inline-block;background:#ffe8cc;color:#a1560a;border-radius:20px;padding:2px 10px;font-size:12px;font-weight:600;margin-top:6px}
   .pts{color:var(--green);font-weight:700}
   .winners{margin-top:10px;background:#fff6df;border:1px dashed var(--gold);border-radius:10px;padding:8px 10px}
@@ -219,18 +219,50 @@
   .blinktxt{animation:blink 1s infinite}
   #luckyFab{position:fixed;left:14px;bottom:18px;z-index:65;display:flex;flex-direction:column;
     align-items:center;cursor:pointer}
-  .lucky-mascot{background:var(--gold);border-radius:14px;padding:4px;border:3px solid #fff;
+  .lucky-mascot{background:var(--gold);border-radius:16px;padding:5px;border:3px solid #fff;
     box-shadow:0 6px 14px rgba(120,60,0,.45);animation:luckyBounce 1.8s ease-in-out infinite}
-  .lucky-mascot img{width:46px;height:auto;display:block;border-radius:9px}
-  .lucky-bubble{background:#fff;color:var(--red);font-weight:800;font-size:11px;padding:5px 10px;
+  .lucky-mascot img{width:58px;height:auto;display:block;border-radius:10px}
+  .lucky-bubble{background:#fff;color:var(--red);font-weight:800;font-size:12px;padding:5px 11px;
     border-radius:14px;box-shadow:0 6px 16px rgba(120,60,0,.3);margin-bottom:5px;white-space:nowrap;position:relative}
   .lucky-bubble::after{content:"";position:absolute;left:50%;bottom:-6px;transform:translateX(-50%);
     border-width:6px 6px 0;border-style:solid;border-color:#fff transparent transparent}
   @keyframes luckyBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
-  .luckymodal{border-top-color:var(--red)}
-  .lucky-top3{display:grid;gap:10px;margin:10px 0 6px}
-  .lucky-top3 div{background:#fff6df;border:1px dashed var(--gold);border-radius:12px;padding:10px 14px;font-size:15px}
-  .lucky-top3 b{color:var(--saffron);display:block;font-size:17px;margin-top:2px}
+  .luckymodal{border-top-color:var(--red);position:relative}
+  .lucky-close{position:absolute;top:14px;right:14px;z-index:3}
+  .lucky-body{padding-top:26px;text-align:center}
+  .lucky-presents{display:inline-block;background:var(--red);color:#fff;font-weight:800;font-size:12px;
+    letter-spacing:1px;padding:6px 16px;border-radius:20px;margin-bottom:8px}
+  .lucky-heading{margin:2px 0 14px;font-family:var(--font-display);font-weight:800;font-size:clamp(22px,5.5vw,30px);
+    background:linear-gradient(90deg,var(--red),var(--saffron),var(--gold));-webkit-background-clip:text;
+    background-clip:text;color:transparent}
+  .lucky-meta-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;border:2px dashed var(--red);
+    border-radius:14px;padding:10px 14px;margin-bottom:16px;background:#fffbe8}
+  .lucky-draw-date{font-weight:800;color:var(--red);font-size:13px;display:flex;align-items:center;gap:6px}
+  .lucky-ticket-price{background:var(--green);color:#fff;font-weight:800;font-size:13px;border-radius:20px;padding:6px 14px}
+  .lucky-mascot-center{position:relative;display:flex;justify-content:center;margin:6px 0 18px}
+  .lucky-mascot-center::before{content:"";position:absolute;inset:-24px;border-radius:50%;z-index:0;
+    background:radial-gradient(circle,rgba(244,180,0,.55),transparent 70%)}
+  .lucky-mascot-center img{position:relative;z-index:1;width:140px;border-radius:12px;box-shadow:0 10px 24px rgba(120,60,0,.3)}
+  .lucky-prizes-heading{font-family:var(--font-display);font-weight:700;color:var(--saffron);font-size:19px;margin-bottom:10px}
+  .lucky-prize-row{display:grid;grid-template-columns:1fr 1.15fr 1fr;gap:10px;align-items:stretch;margin-bottom:16px}
+  .lucky-prize-box{border:2px solid var(--gold);border-radius:14px;padding:12px 8px;background:var(--card);
+    font-size:12.5px;font-weight:800;color:#7a4d00}
+  .lucky-prize-box b{display:block;margin-top:4px;font-size:14px;color:var(--ink)}
+  .lucky-prize-box.gold{background:linear-gradient(160deg,#d7263d,#a3162a);color:#ffe9a8;border-color:#ffd76a;
+    transform:translateY(-6px);box-shadow:0 10px 22px rgba(167,20,40,.4)}
+  .lucky-prize-box.gold b{color:#fff}
+  @media(max-width:480px){ .lucky-prize-box.gold{transform:none} }
+
+  [hidden]{display:none !important}
+
+  /* language picker */
+  .langmodal{max-width:420px;text-align:center;padding:8px}
+  .langmodal h2{margin:6px 0 18px;font-size:19px;color:#7a4d00;font-family:var(--font-display)}
+  .langbtn{display:block;width:100%;background:var(--card);border:2px solid var(--gold);border-radius:14px;
+    padding:14px 16px;margin-bottom:10px;font-size:17px;font-weight:700;color:var(--ink);cursor:pointer;
+    transition:transform .15s,background .15s}
+  .langbtn:hover{transform:translateY(-2px);background:#fff6df}
+  .langbtn small{display:block;font-weight:500;font-size:12px;color:#9a7326;margin-top:2px}
 
   footer{text-align:center;color:#a07a3a;font-size:13px;margin-top:34px}
 
@@ -252,89 +284,110 @@
 <body>
 <div class="bgwrap"></div>
 
+<!-- language picker: shown on every page load -->
+<div class="overlay open" id="langOverlay">
+  <div class="modal langmodal">
+    <h2>Choose your language<br>ഭാഷ തിരഞ്ഞെടുക്കുക</h2>
+    <button class="langbtn" onclick="chooseLang('en')">English</button>
+    <button class="langbtn" onclick="chooseLang('ml')">മലയാളം<small>Malayalam</small></button>
+  </div>
+</div>
+
 
 <button id="menuBtn" onclick="event.stopPropagation();toggleMenu()" title="Menu" aria-label="Menu">☰</button>
 <div id="menuDrop">
-  <button class="menuitem" onclick="navTo('galSec')">📸 Gallery</button>
-  <button class="menuitem" onclick="navTo('vidSec')">📹 Videos</button>
+  <button class="menuitem" onclick="navTo('galSec')"><span class="i18n-en">📸 Gallery</span><span class="i18n-ml" hidden>📸 ഗാലറി</span></button>
+  <button class="menuitem" onclick="navTo('vidSec')"><span class="i18n-en">📹 Videos</span><span class="i18n-ml" hidden>📹 വീഡിയോകൾ</span></button>
 </div>
 
-<button id="teamsBtn" onclick="openTeams()">🏆 Teams &amp; Scores<span class="lead" id="leadPill"></span></button>
+<button id="teamsBtn" onclick="openTeams()"><span class="i18n-en">🏆 Teams &amp; Scores</span><span class="i18n-ml" hidden>🏆 ടീമുകളും സ്കോറും</span><span class="lead" id="leadPill"></span></button>
 
 <div id="luckyFab" onclick="openLucky()" title="Onotsavam Lucky Draw 2026">
-  <div class="lucky-bubble blinktxt">🎟️ Lucky Draw!</div>
+  <div class="lucky-bubble blinktxt"><span class="i18n-en">🎟️ Lucky Draw!</span><span class="i18n-ml" hidden>🎟️ ലക്കി ഡ്രോ!</span></div>
   <div class="lucky-mascot">
-    <img src="poster/maveli-mascot.png" alt="Onotsavam Lucky Draw 2026">
+    <img src="poster/mav-logo.jpg" alt="Onotsavam Lucky Draw 2026">
   </div>
 </div>
 
 <header>
-  <h1>CAFS Onam Sports Fiesta 2026</h1>
-  <p class="sub">Happy Onam! · Games · Fun · Team Spirit</p>
+  <h1><span class="i18n-en">CAFS Onam Sports Fiesta 2026</span><span class="i18n-ml" hidden>CAFS ഓണം കായിക മേള 2026</span></h1>
+  <p class="sub"><span class="i18n-en">Happy Onam! · Games · Fun · Team Spirit</span><span class="i18n-ml" hidden>ഓണാശംസകൾ! · കളികൾ · ആനന്ദം · ടീം സ്പിരിറ്റ്</span></p>
 </header>
 
 <div class="wrap">
   <div class="masterqr">
     <img id="pageQr" alt="Scan for this page">
-    <div class="t"><b>📱 Scan to open this page</b><br>
-      <span style="font-size:13px;color:#8a6a2a">Share this QR with all members</span></div>
+    <div class="t"><b><span class="i18n-en">📱 Scan to open this page</span><span class="i18n-ml" hidden>📱 ഈ പേജ് തുറക്കാൻ സ്കാൻ ചെയ്യുക</span></b><br>
+      <span style="font-size:13px;color:#8a6a2a"><span class="i18n-en">Share this QR with all members</span><span class="i18n-ml" hidden>എല്ലാ അംഗങ്ങളുമായി ഈ ക്യുആർ പങ്കിടുക</span></span></div>
     <button class="shareicon" onclick="sharePage()" title="Share link" aria-label="Share link">
       <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19c0-7 5-9 10-9"/><path d="M11 6l5 4-5 4"/></svg>
     </button>
   </div>
 
   <div id="liveBanner">
-    <div class="lbl">🔴 LIVE NOW</div>
+    <div class="lbl"><span class="i18n-en">🔴 LIVE NOW</span><span class="i18n-ml" hidden>🔴 തത്സമയം</span></div>
     <div id="liveList" style="margin-top:4px"></div>
   </div>
 
   <div class="notices">
-    <h2>📢 Important Notices</h2>
+    <h2><span class="i18n-en">📢 Important Notices</span><span class="i18n-ml" hidden>📢 പ്രധാന അറിയിപ്പുകൾ</span></h2>
     <ul>
-      <li>All events (except Onion Peeling) will be conducted during the <span class="hot">afternoon session, from 3 PM onwards</span>.</li>
-      <li><span class="hot">Onion Peeling</span> will be conducted by <b>11 AM</b>.</li>
-      <li><b>Badminton</b> and <b>5s Football</b> are conducted <b>outside CAFS premises</b> — Badminton at <b>Malu's Smash Indoor court, Josepuram</b> (Timing 2 PM – 6 PM), and 5s Football at <b>Calpanthers Turf, Avanamcode</b>. Scan the location QR on each event's card.</li>
-      <li>Team Captains &amp; Vice Captains can co-ordinate with the Sports Committee below.</li>
+      <li>
+        <span class="i18n-en">All events (except Onion Peeling) will be conducted during the <span class="hot">afternoon session, from 3 PM onwards</span>.</span>
+        <span class="i18n-ml" hidden>ഉള്ളി തൊലി കളയൽ ഒഴികെ എല്ലാ ഇനങ്ങളും <span class="hot">ഉച്ചയ്ക്ക് ശേഷം, 3 മണി മുതൽ</span> നടത്തും.</span>
+      </li>
+      <li>
+        <span class="i18n-en"><span class="hot">Onion Peeling</span> will be conducted by <b>11 AM</b>.</span>
+        <span class="i18n-ml" hidden><span class="hot">ഉള്ളി തൊലി കളയൽ</span> <b>രാവിലെ 11 മണിക്ക്</b> മുൻപ് നടത്തും.</span>
+      </li>
+      <li>
+        <span class="i18n-en"><b>Badminton</b> and <b>5s Football</b> are conducted <b>outside CAFS premises</b> — Badminton at <b>Malu's Smash Indoor court, Josepuram</b> (Timing 2 PM – 6 PM), and 5s Football at <b>Calpanthers Turf, Avanamcode</b>. Scan the location QR on each event's card.</span>
+        <span class="i18n-ml" hidden><b>ബാഡ്മിന്റൺ</b>-ഉം <b>5s ഫുട്ബോൾ</b>-ഉം <b>CAFS പരിസരത്തിന് പുറത്താണ്</b> നടത്തുന്നത് — ബാഡ്മിന്റൺ, <b>മാലൂസ് സ്മാഷ് ഇൻഡോർ കോർട്ട്, ജോസേപുരം</b>-ൽ (സമയം 2 PM – 6 PM), 5s ഫുട്ബോൾ, <b>കാൽപാന്തേഴ്സ് ടർഫ്, അവനംകോട്</b>-ൽ. ഓരോ ഇനത്തിന്റെയും കാർഡിലെ ലൊക്കേഷൻ ക്യുആർ സ്കാൻ ചെയ്യുക.</span>
+      </li>
+      <li>
+        <span class="i18n-en">Team Captains &amp; Vice Captains can co-ordinate with the Sports Committee below.</span>
+        <span class="i18n-ml" hidden>ടീം ക്യാപ്റ്റന്മാർക്കും വൈസ് ക്യാപ്റ്റന്മാർക്കും താഴെയുള്ള സ്പോർട്സ് കമ്മിറ്റിയുമായി ബന്ധപ്പെടാം.</span>
+      </li>
     </ul>
   </div>
 
   <div class="committee">
-    <div class="c"><div class="role">Sports Coordinator · Engineering Dept</div>
+    <div class="c"><div class="role"><span class="i18n-en">Sports Coordinator · Engineering Dept</span><span class="i18n-ml" hidden>സ്പോർട്സ് കോർഡിനേറ്റർ · എൻജിനീയറിംഗ് വിഭാഗം</span></div>
       <div class="nm">Mr. Anu Asok</div><a href="tel:7012041423">📞 7012041423</a></div>
-    <div class="c"><div class="role">Joint Coordinator · F&amp;B Service</div>
+    <div class="c"><div class="role"><span class="i18n-en">Joint Coordinator · F&amp;B Service</span><span class="i18n-ml" hidden>ജോയിന്റ് കോർഡിനേറ്റർ · എഫ്&amp;ബി സർവീസ്</span></div>
       <div class="nm">Mr. Manu B</div><a href="tel:8714110477">📞 8714110477</a></div>
   </div>
 
-  <button id="waFab" onclick="openWA()"><svg viewBox="0 0 32 32" width="22" height="22" fill="currentColor" aria-hidden="true"><path d="M16 3C9.4 3 4 8.4 4 15c0 2.1.6 4.1 1.6 5.9L4 29l8.3-1.6c1.7.9 3.6 1.4 5.7 1.4 6.6 0 12-5.4 12-12S22.6 3 16 3zm0 22c-1.8 0-3.5-.5-5-1.4l-.4-.2-3.7.7.7-3.6-.2-.4C6.5 18.6 6 16.8 6 15c0-5.5 4.5-10 10-10s10 4.5 10 10-4.5 10-10 10zm5.5-7.5c-.3-.2-1.8-.9-2-1s-.5-.2-.7.2-.8 1-1 1.2-.4.2-.7.1c-.3-.2-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1s0-.5.1-.6l.5-.6c.2-.2.2-.3.3-.5s0-.4 0-.6c0-.2-.7-1.7-1-2.3-.3-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4s-1 1-1 2.5 1.1 2.9 1.2 3.1c.2.2 2.1 3.2 5 4.5.7.3 1.2.5 1.7.6.7.2 1.3.2 1.8.1.6-.1 1.8-.7 2-1.4.3-.7.3-1.3.2-1.4-.1-.2-.3-.2-.6-.4z"/></svg> Join your Team's WhatsApp Group</button>
+  <button id="waFab" onclick="openWA()"><svg viewBox="0 0 32 32" width="22" height="22" fill="currentColor" aria-hidden="true"><path d="M16 3C9.4 3 4 8.4 4 15c0 2.1.6 4.1 1.6 5.9L4 29l8.3-1.6c1.7.9 3.6 1.4 5.7 1.4 6.6 0 12-5.4 12-12S22.6 3 16 3zm0 22c-1.8 0-3.5-.5-5-1.4l-.4-.2-3.7.7.7-3.6-.2-.4C6.5 18.6 6 16.8 6 15c0-5.5 4.5-10 10-10s10 4.5 10 10-4.5 10-10 10zm5.5-7.5c-.3-.2-1.8-.9-2-1s-.5-.2-.7.2-.8 1-1 1.2-.4.2-.7.1c-.3-.2-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1s0-.5.1-.6l.5-.6c.2-.2.2-.3.3-.5s0-.4 0-.6c0-.2-.7-1.7-1-2.3-.3-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4s-1 1-1 2.5 1.1 2.9 1.2 3.1c.2.2 2.1 3.2 5 4.5.7.3 1.2.5 1.7.6.7.2 1.3.2 1.8.1.6-.1 1.8-.7 2-1.4.3-.7.3-1.3.2-1.4-.1-.2-.3-.2-.6-.4z"/></svg> <span class="i18n-en">Join your Team's WhatsApp Group</span><span class="i18n-ml" hidden>നിങ്ങളുടെ ടീമിന്റെ വാട്സ്ആപ്പ് ഗ്രൂപ്പിൽ ചേരുക</span></button>
   <div id="waOverlay" onclick="if(event.target===this)closeWA()">
   <aside id="teamside">
     <button class="waClose" onclick="closeWA()">×</button>
-    <div class="tshead">CAFS ONOTSAVAM 2026 SPORTS GROUPS - WHATSAPP</div>
+    <div class="tshead"><span class="i18n-en">CAFS ONOTSAVAM 2026 SPORTS GROUPS - WHATSAPP</span><span class="i18n-ml" hidden>CAFS ഓണോത്സവം 2026 സ്പോർട്സ് ഗ്രൂപ്പുകൾ - വാട്സ്ആപ്പ്</span></div>
     <div class="tsinner">
-      <a class="tsbox" href="https://chat.whatsapp.com/D9fOdxD56Ss4h542QVxxsw?s=qt&amp;p=a&amp;mlu=0&amp;ilr=0&amp;amv=3" target="_blank" rel="noopener"><img src="wa/thiruvonam-titans-qr.png" alt="Team Thiruvonam Titan's"><div class="tsjoin">Join group <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19c0-7 5-9 10-9"/><path d="M11 6l5 4-5 4"/></svg></div></a>
-      <a class="tsbox" href="https://chat.whatsapp.com/EpFlHgffInuJxZ5rXV6UtS?s=qt&amp;p=a&amp;ilr=0&amp;amv=1" target="_blank" rel="noopener"><img src="wa/gajaveerans-qr.png" alt="Gajaveerans"><div class="tsjoin">Join group <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19c0-7 5-9 10-9"/><path d="M11 6l5 4-5 4"/></svg></div></a>
-      <a class="tsbox" href="https://chat.whatsapp.com/BjGq8EmHFudElXhpQ7JWKz?s=qt&amp;p=a&amp;ilr=4" target="_blank" rel="noopener"><img src="wa/pulikali-panthers-qr.png" alt="Pulikali Panthers"><div class="tsjoin">Join group <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19c0-7 5-9 10-9"/><path d="M11 6l5 4-5 4"/></svg></div></a>
-      <a class="tsbox" href="https://chat.whatsapp.com/EjHVspGk0uI1lggPVhOuWr?s=qt&amp;p=a&amp;ilr=1&amp;amv=2" target="_blank" rel="noopener"><img src="wa/onam-kombans-qr.png" alt="Onam Kombans"><div class="tsjoin">Join group <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19c0-7 5-9 10-9"/><path d="M11 6l5 4-5 4"/></svg></div></a>
-      <a class="tsbox" href="https://chat.whatsapp.com/JxugpYoo4OW9BGxNkrOSxr?s=qt&amp;p=a&amp;ilr=0" target="_blank" rel="noopener"><img src="wa/maveli-squad-qr.png" alt="Maveli Squad"><div class="tsjoin">Join group <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19c0-7 5-9 10-9"/><path d="M11 6l5 4-5 4"/></svg></div></a>
-      <a class="tsbox" href="https://chat.whatsapp.com/GOvJZsFv0g2KnJCRLYCA39" target="_blank" rel="noopener"><img src="wa/chenda-champions-qr.png" alt="Team Chenda Champions"><div class="tsjoin">Join group <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19c0-7 5-9 10-9"/><path d="M11 6l5 4-5 4"/></svg></div></a>
-      <a class="tsbox" href="https://chat.whatsapp.com/Iys5uqHJoIbHWMO08ZaJHs?s=qs&amp;p=i&amp;ilr=1" target="_blank" rel="noopener"><img src="wa/vallam-vikings-qr.png" alt="Team Vallam Vikings"><div class="tsjoin">Join group <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19c0-7 5-9 10-9"/><path d="M11 6l5 4-5 4"/></svg></div></a>
-      <a class="tsbox" href="https://chat.whatsapp.com/H1c44zh9sqY9e02hny2tmh?s=qt&amp;p=a&amp;ilr=4" target="_blank" rel="noopener"><img src="wa/kerala-vibes-qr.png" alt="Kerala vibes"><div class="tsjoin">Join group <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19c0-7 5-9 10-9"/><path d="M11 6l5 4-5 4"/></svg></div></a>
+      <a class="tsbox" href="https://chat.whatsapp.com/D9fOdxD56Ss4h542QVxxsw?s=qt&amp;p=a&amp;mlu=0&amp;ilr=0&amp;amv=3" target="_blank" rel="noopener"><img src="wa/thiruvonam-titans-qr.png" alt="Team Thiruvonam Titan's"><div class="tsjoin"><span class="i18n-en">Join group</span><span class="i18n-ml" hidden>ഗ്രൂപ്പിൽ ചേരുക</span> <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19c0-7 5-9 10-9"/><path d="M11 6l5 4-5 4"/></svg></div></a>
+      <a class="tsbox" href="https://chat.whatsapp.com/EpFlHgffInuJxZ5rXV6UtS?s=qt&amp;p=a&amp;ilr=0&amp;amv=1" target="_blank" rel="noopener"><img src="wa/gajaveerans-qr.png" alt="Gajaveerans"><div class="tsjoin"><span class="i18n-en">Join group</span><span class="i18n-ml" hidden>ഗ്രൂപ്പിൽ ചേരുക</span> <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19c0-7 5-9 10-9"/><path d="M11 6l5 4-5 4"/></svg></div></a>
+      <a class="tsbox" href="https://chat.whatsapp.com/BjGq8EmHFudElXhpQ7JWKz?s=qt&amp;p=a&amp;ilr=4" target="_blank" rel="noopener"><img src="wa/pulikali-panthers-qr.png" alt="Pulikali Panthers"><div class="tsjoin"><span class="i18n-en">Join group</span><span class="i18n-ml" hidden>ഗ്രൂപ്പിൽ ചേരുക</span> <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19c0-7 5-9 10-9"/><path d="M11 6l5 4-5 4"/></svg></div></a>
+      <a class="tsbox" href="https://chat.whatsapp.com/EjHVspGk0uI1lggPVhOuWr?s=qt&amp;p=a&amp;ilr=1&amp;amv=2" target="_blank" rel="noopener"><img src="wa/onam-kombans-qr.png" alt="Onam Kombans"><div class="tsjoin"><span class="i18n-en">Join group</span><span class="i18n-ml" hidden>ഗ്രൂപ്പിൽ ചേരുക</span> <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19c0-7 5-9 10-9"/><path d="M11 6l5 4-5 4"/></svg></div></a>
+      <a class="tsbox" href="https://chat.whatsapp.com/JxugpYoo4OW9BGxNkrOSxr?s=qt&amp;p=a&amp;ilr=0" target="_blank" rel="noopener"><img src="wa/maveli-squad-qr.png" alt="Maveli Squad"><div class="tsjoin"><span class="i18n-en">Join group</span><span class="i18n-ml" hidden>ഗ്രൂപ്പിൽ ചേരുക</span> <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19c0-7 5-9 10-9"/><path d="M11 6l5 4-5 4"/></svg></div></a>
+      <a class="tsbox" href="https://chat.whatsapp.com/GOvJZsFv0g2KnJCRLYCA39" target="_blank" rel="noopener"><img src="wa/chenda-champions-qr.png" alt="Team Chenda Champions"><div class="tsjoin"><span class="i18n-en">Join group</span><span class="i18n-ml" hidden>ഗ്രൂപ്പിൽ ചേരുക</span> <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19c0-7 5-9 10-9"/><path d="M11 6l5 4-5 4"/></svg></div></a>
+      <a class="tsbox" href="https://chat.whatsapp.com/Iys5uqHJoIbHWMO08ZaJHs?s=qs&amp;p=i&amp;ilr=1" target="_blank" rel="noopener"><img src="wa/vallam-vikings-qr.png" alt="Team Vallam Vikings"><div class="tsjoin"><span class="i18n-en">Join group</span><span class="i18n-ml" hidden>ഗ്രൂപ്പിൽ ചേരുക</span> <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19c0-7 5-9 10-9"/><path d="M11 6l5 4-5 4"/></svg></div></a>
+      <a class="tsbox" href="https://chat.whatsapp.com/H1c44zh9sqY9e02hny2tmh?s=qt&amp;p=a&amp;ilr=4" target="_blank" rel="noopener"><img src="wa/kerala-vibes-qr.png" alt="Kerala vibes"><div class="tsjoin"><span class="i18n-en">Join group</span><span class="i18n-ml" hidden>ഗ്രൂപ്പിൽ ചേരുക</span> <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19c0-7 5-9 10-9"/><path d="M11 6l5 4-5 4"/></svg></div></a>
     </div>
   </aside>
   </div>
 
-  <div class="section-title"><span>🏆 Event Schedule</span></div>
+  <div class="section-title"><span><span class="i18n-en">🏆 Event Schedule</span><span class="i18n-ml" hidden>🏆 ഇവന്റ് ഷെഡ്യൂൾ</span></span></div>
   <div class="status"><span class="dot"></span><span id="statusText">Loading…</span>
-    <button class="refresh-btn" onclick="loadAll()">Refresh</button></div>
-  <div style="text-align:center;color:#a07a3a;font-size:13px;margin:-8px 0 14px">👆 Tap any event to see its rules, team members &amp; scorecard</div>
+    <button class="refresh-btn" onclick="loadAll()"><span class="i18n-en">Refresh</span><span class="i18n-ml" hidden>പുതുക്കുക</span></button></div>
+  <div style="text-align:center;color:#a07a3a;font-size:13px;margin:-8px 0 14px"><span class="i18n-en">👆 Tap any event to see its rules, team members &amp; scorecard</span><span class="i18n-ml" hidden>👆 നിയമങ്ങൾ, ടീം അംഗങ്ങൾ, സ്കോർകാർഡ് കാണാൻ ഏതെങ്കിലും ഇനത്തിൽ ടാപ്പ് ചെയ്യുക</span></div>
   <div class="grid" id="eventGrid"></div>
 
-  <div class="section-title" id="galSec"><span>📸 Gallery</span></div>
-  <div id="galleryEmpty" style="text-align:center;color:#a07a3a;font-size:13px;margin:-6px 0 12px;display:none">No photos yet — check back during the fest! 📷</div>
+  <div class="section-title" id="galSec"><span><span class="i18n-en">📸 Gallery</span><span class="i18n-ml" hidden>📸 ഗാലറി</span></span></div>
+  <div id="galleryEmpty" style="text-align:center;color:#a07a3a;font-size:13px;margin:-6px 0 12px;display:none"><span class="i18n-en">No photos yet — check back during the fest! 📷</span><span class="i18n-ml" hidden>ഇതുവരെ ഫോട്ടോകൾ ഇല്ല — ഫെസ്റ്റിനിടെ വീണ്ടും നോക്കൂ! 📷</span></div>
   <div class="ggrid" id="galleryGrid"></div>
 
-  <div class="section-title" id="vidSec"><span>📹 Videos</span></div>
-  <div id="videoEmpty" style="text-align:center;color:#a07a3a;font-size:13px;margin:-6px 0 12px;display:none">No videos yet — check back during the fest! 🎥</div>
+  <div class="section-title" id="vidSec"><span><span class="i18n-en">📹 Videos</span><span class="i18n-ml" hidden>📹 വീഡിയോകൾ</span></span></div>
+  <div id="videoEmpty" style="text-align:center;color:#a07a3a;font-size:13px;margin:-6px 0 12px;display:none"><span class="i18n-en">No videos yet — check back during the fest! 🎥</span><span class="i18n-ml" hidden>ഇതുവരെ വീഡിയോകൾ ഇല്ല — ഫെസ്റ്റിനിടെ വീണ്ടും നോക്കൂ! 🎥</span></div>
   <div class="vgrid" id="videoGrid"></div>
 
   <div class="overlay" id="videoOverlay" onclick="if(event.target===this)closeVideo()">
@@ -343,8 +396,8 @@
         <iframe id="videoFrame" allow="autoplay" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:0"></iframe>
       </div>
       <div style="margin-top:12px">
-        <a id="videoOpen" class="btn-dl" target="_blank" rel="noopener">↗ Open in Drive</a>
-        <button class="btn-dl" style="background:#eee;color:#7a4d00;margin-left:8px" onclick="closeVideo()">Close</button>
+        <a id="videoOpen" class="btn-dl" target="_blank" rel="noopener"><span class="i18n-en">↗ Open in Drive</span><span class="i18n-ml" hidden>↗ ഡ്രൈവിൽ തുറക്കുക</span></a>
+        <button class="btn-dl" style="background:#eee;color:#7a4d00;margin-left:8px" onclick="closeVideo()"><span class="i18n-en">Close</span><span class="i18n-ml" hidden>അടയ്ക്കുക</span></button>
       </div>
     </div>
   </div>
@@ -353,15 +406,15 @@
     <div style="max-width:94vw;text-align:center;margin:auto">
       <img id="photoFull" alt="photo" style="max-width:94vw;max-height:78vh;border-radius:12px;box-shadow:0 12px 40px rgba(0,0,0,.5);background:#fff">
       <div style="margin-top:12px">
-        <a id="photoDl" class="btn-dl" download>⬇ Download</a>
-        <button class="btn-dl" style="background:#eee;color:#7a4d00;margin-left:8px" onclick="closePhoto()">Close</button>
+        <a id="photoDl" class="btn-dl" download><span class="i18n-en">⬇ Download</span><span class="i18n-ml" hidden>⬇ ഡൗൺലോഡ്</span></a>
+        <button class="btn-dl" style="background:#eee;color:#7a4d00;margin-left:8px" onclick="closePhoto()"><span class="i18n-en">Close</span><span class="i18n-ml" hidden>അടയ്ക്കുക</span></button>
       </div>
     </div>
   </div>
 
-  <footer>🌼 Onam Sports Fiesta 2026 · CAFS · Made with team spirit 🌼<br>
+  <footer><span class="i18n-en">🌼 Onam Sports Fiesta 2026 · CAFS · Made with team spirit 🌼</span><span class="i18n-ml" hidden>🌼 ഓണം സ്പോർട്സ് ഫെസ്റ്റ് 2026 · CAFS · ടീം സ്പിരിറ്റോടെ തയ്യാറാക്കിയത് 🌼</span><br>
     <small id="lastUpdated"></small><br>
-    <a href="register.html" style="color:#b98a3a;font-size:12px">🔐 Admin registration →</a></footer>
+    <a href="register.html" style="color:#b98a3a;font-size:12px"><span class="i18n-en">🔐 Admin registration →</span><span class="i18n-ml" hidden>🔐 അഡ്മിൻ രജിസ്ട്രേഷൻ →</span></a></footer>
 </div>
 
 <!-- reusable modal -->
@@ -379,19 +432,25 @@
 <!-- lucky draw popup -->
 <div class="overlay" id="luckyOverlay" onclick="if(event.target===this)closeLucky()">
   <div class="modal luckymodal">
-    <div class="mhead">
-      <h2 class="blinktxt">🎟️ ONOTSAVAM LUCKY DRAW 2026</h2>
-      <button class="close" onclick="closeLucky()">×</button>
-    </div>
-    <div class="mmeta">📅 Draw on 19 Aug 2026 &nbsp;·&nbsp; 🎫 ₹300 per ticket</div>
-    <div class="body">
-      <div class="lucky-top3">
-        <div>🥇 1st Prize <b>Sovereign Gold Coin (5gm)</b></div>
-        <div>🥈 2nd Prize <b>Split A/C (1.5 Ton)</b></div>
-        <div>🥉 3rd Prize <b>Washing Machine</b></div>
+    <button class="close lucky-close" onclick="closeLucky()">×</button>
+    <div class="body lucky-body">
+      <div class="lucky-presents"><span class="i18n-en">CAFS &amp; FSD PRESENTS</span><span class="i18n-ml" hidden>CAFS &amp; FSD അവതരിപ്പിക്കുന്നു</span></div>
+      <h2 class="lucky-heading blinktxt"><span class="i18n-en">ONOTSAVAM LUCKY DRAW</span><span class="i18n-ml" hidden>ഓണോത്സവം ലക്കി ഡ്രോ</span></h2>
+      <div class="lucky-meta-row">
+        <div class="lucky-draw-date">📅 <span class="i18n-en">DRAW ON: 19 AUGUST 2026</span><span class="i18n-ml" hidden>നറുക്കെടുപ്പ്: 19 ഓഗസ്റ്റ് 2026</span></div>
+        <div class="lucky-ticket-price"><span class="i18n-en">TICKET: ₹300</span><span class="i18n-ml" hidden>ടിക്കറ്റ്: ₹300</span></div>
       </div>
-      <p style="text-align:center;color:#7a4d00;font-weight:700;margin:12px 0">+ 12 more exciting prizes!</p>
-      <a class="btn-dl" style="display:block;text-align:center" href="luckydraw.html">🎟️ View Full Ticket &amp; All 15 Prizes →</a>
+      <div class="lucky-mascot-center"><img src="poster/mav-logo.jpg" alt="King Maveli"></div>
+      <div class="lucky-prizes-heading">🎁 <span class="i18n-en">MEGA BUMPER PRIZES</span><span class="i18n-ml" hidden>മെഗാ ബമ്പർ സമ്മാനങ്ങൾ</span> 🎁</div>
+      <div class="lucky-prize-row">
+        <div class="lucky-prize-box silver">🥈 <span class="i18n-en">2ND PRIZE</span><span class="i18n-ml" hidden>2-ാം സമ്മാനം</span>
+          <b><span class="i18n-en">Split A/C (1.5 Ton)</span><span class="i18n-ml" hidden>സ്പ്ലിറ്റ് എസി (1.5 ടൺ)</span></b></div>
+        <div class="lucky-prize-box gold">👑 <span class="i18n-en">1ST PRIZE</span><span class="i18n-ml" hidden>ഒന്നാം സമ്മാനം</span>
+          <b><span class="i18n-en">Sovereign Gold Coin (5gm)</span><span class="i18n-ml" hidden>സ്വർണ്ണ നാണയം (5 ഗ്രാം)</span></b></div>
+        <div class="lucky-prize-box bronze">🥉 <span class="i18n-en">3RD PRIZE</span><span class="i18n-ml" hidden>മൂന്നാം സമ്മാനം</span>
+          <b><span class="i18n-en">Washing Machine</span><span class="i18n-ml" hidden>വാഷിംഗ് മെഷീൻ</span></b></div>
+      </div>
+      <a class="btn-dl" style="display:block;text-align:center" href="luckydraw.html"><span class="i18n-en">🎟️ View Full Ticket &amp; All 15 Prizes →</span><span class="i18n-ml" hidden>🎟️ മുഴുവൻ ടിക്കറ്റും 15 സമ്മാനങ്ങളും കാണുക →</span></a>
     </div>
   </div>
 </div>
@@ -422,7 +481,7 @@ const SAMPLE_EVENTS=[
  ["3","30-07-2026","Thursday","3:00 PM onwards","Surprise Event","Group - No preference","2 per team","CAFS Indoor","","5, 3, 2","","","","","SC03",""],
  ["4","31-07-2026","Friday","3:00 PM onwards","Treasure Hunt","Group - No preference","2 per team","CAFS Premises","","5, 3, 2","","","","","SC04",""],
  ["5","03-08-2026","Monday","3:00 PM onwards","Cycle Slow Race","Individual - Gents","2 per team","CAFS Outdoor","","5, 3, 2","","","","","SC05",""],
- ["6","04-08-2026","Tuesday","3:00 PM onwards","IPL Fantasy League","Group - No preference","4 per team","CAFS Indoor","","10, 6, 4","","","","","SC06",""],
+ ["6","04-08-2026","Tuesday","3:00 PM onwards","IPL Fantasy League","Group - No preference","4 per team","CAFS Indoor","","10, 6, 4","","","","","SC06","Follow the attached PDF for rules: [Click here](https://drive.google.com/file/d/1JhxJVUCK3RJHNqKMDSd0CYTgUcosDdHW/view?usp=sharing)"],
  ["7","05-08-2026","Wednesday","3:00 PM onwards","Coconut Race","Individual - Gents","2 per team","CAFS Outdoor","","5, 3, 2","","","","","SC07",""],
  ["8","05-08-2026","Wednesday","3:00 PM onwards","Raise the Ball","Group - No preference","5 per team","CAFS Outdoor","","5, 3, 2","","","","","SC08",""],
  ["9","06-08-2026","Thursday","3:00 PM onwards","Kulam Kara","Individual - Ladies","2 per team","CAFS Outdoor","","5, 3, 2","","","","","SC09",""],
@@ -453,18 +512,129 @@ function dbEnsure(){ let db=dbLoad(); if(!db){ db=JSON.parse(JSON.stringify(SEED
   db.teams=db.teams||[]; db.participants=db.participants||[]; db.matches=db.matches||[]; return db; }
 const SAMPLE_SC={headers:[],rows:[]};
 
+/* ---------- language (event/team/venue names from the sheet always stay English) ---------- */
+let LANG="en";
+const I18N={
+  en:{
+    shareText:"Join the CAFS Onam Sports Fiesta 2026! Events, live scores & schedule 👉",
+    linkCopied:"Link copied!\n\n",
+    loading:"Loading…", liveFrom:"Live from Google Sheet · ", preview:"Preview (sample data) · ", updated:"updated ",
+    lastRefreshed:"Last refreshed: ", loadError:"Could not load data — check Sheet ID / sharing. Retrying…",
+    lblDate:"📅 Date", lblTime:"⏰ Time", lblVenue:"📍 Venue", lblTeam:"👥 Team", lblPoints:"🏅 Points",
+    registered:"registered", winners:"🏆 Winners", openMaps:"🗺️ Open location in Maps",
+    scanNav:"Scan the QR to navigate to the venue", cardFoot:"📋 Tap for rules & scorecard →",
+    teamsTitle:"🏆 Teams & Scores", teamsMeta:"Overall standings · updates live from the sheet",
+    thRank:"#", thTeam:"Team", thCaptain:"Captain", thViceCaptain:"Vice Captain", thPoints:"Points",
+    rulesLabel:"📋 Rules", defaultRules:"Will be announced before the game by the Sports Co-ordinator.",
+    matchesLabel:"⚔️ Matches & Results", noMatches:"No matches scheduled yet.",
+    thMatch:"Match", thScore:"Score", thStatus:"Status", thWinner:"Winner",
+    live:"LIVE", done:"Done", scheduled:"Scheduled",
+    partsLabel:"👥 Registered Participants", noParts:"No participants registered yet.",
+    thNo:"#", thName:"Name", thDept:"Dept",
+    noScores:"No scores entered yet."
+  },
+  ml:{
+    shareText:"CAFS ഓണം സ്പോർട്സ് ഫെസ്റ്റ് 2026-ൽ പങ്കുചേരൂ! ഇനങ്ങൾ, തത്സമയ സ്കോർ & ഷെഡ്യൂൾ 👉",
+    linkCopied:"ലിങ്ക് കോപ്പി ചെയ്തു!\n\n",
+    loading:"ലോഡ് ചെയ്യുന്നു…", liveFrom:"ഗൂഗിൾ ഷീറ്റിൽ നിന്ന് തത്സമയം · ", preview:"പ്രിവ്യൂ (സാമ്പിൾ ഡാറ്റ) · ", updated:"പുതുക്കിയത് ",
+    lastRefreshed:"അവസാനം പുതുക്കിയത്: ", loadError:"ഡാറ്റ ലോഡ് ചെയ്യാനായില്ല — ഷീറ്റ് ഐഡി / പങ്കിടൽ പരിശോധിക്കുക. വീണ്ടും ശ്രമിക്കുന്നു…",
+    lblDate:"📅 തീയതി", lblTime:"⏰ സമയം", lblVenue:"📍 സ്ഥലം", lblTeam:"👥 ടീം", lblPoints:"🏅 പോയിന്റ്",
+    registered:"രജിസ്റ്റർ ചെയ്തു", winners:"🏆 വിജയികൾ", openMaps:"🗺️ മാപ്പിൽ സ്ഥലം കാണുക",
+    scanNav:"സ്ഥലത്തേക്ക് പോകാൻ ക്യുആർ സ്കാൻ ചെയ്യുക", cardFoot:"📋 നിയമങ്ങളും സ്കോർകാർഡും കാണാൻ ടാപ്പ് ചെയ്യുക →",
+    teamsTitle:"🏆 ടീമുകളും സ്കോറും", teamsMeta:"മൊത്തം നിലവാരം · ഷീറ്റിൽ നിന്ന് തത്സമയം പുതുക്കുന്നു",
+    thRank:"#", thTeam:"ടീം", thCaptain:"ക്യാപ്റ്റൻ", thViceCaptain:"വൈസ് ക്യാപ്റ്റൻ", thPoints:"പോയിന്റ്",
+    rulesLabel:"📋 നിയമങ്ങൾ", defaultRules:"സ്പോർട്സ് കോർഡിനേറ്റർ ഗെയിമിന് മുൻപ് അറിയിക്കും.",
+    matchesLabel:"⚔️ മത്സരങ്ങളും ഫലങ്ങളും", noMatches:"ഇതുവരെ മത്സരങ്ങളൊന്നും ഷെഡ്യൂൾ ചെയ്തിട്ടില്ല.",
+    thMatch:"മത്സരം", thScore:"സ്കോർ", thStatus:"സ്ഥിതി", thWinner:"വിജയി",
+    live:"തത്സമയം", done:"കഴിഞ്ഞു", scheduled:"ഷെഡ്യൂൾ ചെയ്തു",
+    partsLabel:"👥 രജിസ്റ്റർ ചെയ്ത പങ്കാളികൾ", noParts:"ഇതുവരെ പങ്കാളികൾ രജിസ്റ്റർ ചെയ്തിട്ടില്ല.",
+    thNo:"#", thName:"പേര്", thDept:"വിഭാഗം",
+    noScores:"ഇതുവരെ സ്കോർ രേഖപ്പെടുത്തിയിട്ടില്ല."
+  }
+};
+function t(k){ return (I18N[LANG]&&I18N[LANG][k]!=null)?I18N[LANG][k]:I18N.en[k]; }
+/* fixed set of team names — translate only exact matches, so player/individual
+   winner names (which vary freely) safely pass through unchanged */
+const TEAM_ML={
+  "Thiruvonam Titan's":"തിരുവോണം ടൈറ്റൻസ്",
+  "Thiruvonam Titans":"തിരുവോണം ടൈറ്റൻസ്",
+  "Gajaveerans":"ഗജവീരൻസ്",
+  "Pulikali Panthers":"പുലികളി പാന്തേഴ്സ്",
+  "Onam Kombans":"ഓണം കൊമ്പൻസ്",
+  "Maveli Squad":"മാവേലി സ്ക്വാഡ്",
+  "Chenda Champions":"ചെണ്ട ചാമ്പ്യൻസ്",
+  "Vallam Vikings":"വള്ളം വൈക്കിംഗ്സ്",
+  "Kerala Vibes":"കേരള വൈബ്സ്"
+};
+function tn(name){ return (LANG==="ml"&&name&&TEAM_ML[name])?TEAM_ML[name]:name; }
+/* fixed set of event names — same exact-match approach; the untranslated
+   name is still used internally for matching against Matches/Participants sheets */
+const EVENT_ML={
+  "Badminton":"ബാഡ്മിന്റൺ",
+  "Carroms":"കാരംസ്",
+  "Surprise Event":"സർപ്രൈസ് ഇനം",
+  "Treasure Hunt":"ട്രഷർ ഹണ്ട്",
+  "Cycle Slow Race":"സൈക്കിൾ സ്ലോ റേസ്",
+  "IPL Fantasy League":"ഐപിഎൽ ഫാന്റസി ലീഗ്",
+  "Coconut Race":"തേങ്ങ റേസ്",
+  "Raise the Ball":"ബോൾ ഉയർത്തൽ",
+  "Kulam Kara":"കുളം കര",
+  "Fill the Bottle":"കുപ്പി നിറയ്ക്കൽ",
+  "Fruit Carving":"ഫ്രൂട്ട് കാർവിംഗ്",
+  "5s Football QFs + SFs":"5s ഫുട്ബോൾ ക്വാർട്ടർ & സെമി ഫൈനൽ",
+  "Shoot Out Competition":"ഷൂട്ട് ഔട്ട് മത്സരം",
+  "5s Football Final + L.Finals":"5s ഫുട്ബോൾ ഫൈനൽ & എൽ.ഫൈനൽസ്",
+  "Tug of War - Men":"വടംവലി - പുരുഷന്മാർ",
+  "Tug of War - Women":"വടംവലി - സ്ത്രീകൾ",
+  "Uriyadi":"ഉരിയാടി",
+  "The Perfect Slice":"പെർഫെക്റ്റ് സ്ലൈസ്",
+  "Musical Chair":"മ്യൂസിക്കൽ ചെയർ",
+  "Balloon the Pyramid":"ബലൂൺ പിരമിഡ്",
+  "Onion Peeling":"ഉള്ളി തൊലി കളയൽ",
+  "Quiz Challenge":"ക്വിസ് ചലഞ്ച്",
+  "Pookkalam":"പൂക്കളം",
+  "Photography":"ഫോട്ടോഗ്രഫി"
+};
+function trEvent(name){ return (LANG==="ml"&&name&&EVENT_ML[name])?EVENT_ML[name]:name; }
+function chooseLang(lang){
+  LANG=lang;
+  document.documentElement.lang=lang;
+  document.querySelectorAll(".i18n-en").forEach(el=>el.hidden=(lang==="ml"));
+  document.querySelectorAll(".i18n-ml").forEach(el=>el.hidden=(lang!=="ml"));
+  document.getElementById("langOverlay").classList.remove("open");
+  document.getElementById("statusText").textContent=t("loading");
+  loadAll();
+}
+
 /* ---------- helpers ---------- */
 function qr(d,s){ return "https://api.qrserver.com/v1/create-qr-code/?size="+s+"x"+s+"&data="+encodeURIComponent(d); }
 async function sharePage(){
   const url=location.href;
-  const data={title:"CAFS Onam Sports Fiesta 2026",
-    text:"Join the CAFS Onam Sports Fiesta 2026! Events, live scores & schedule 👉",url:url};
+  const data={title:"CAFS Onam Sports Fiesta 2026",text:t("shareText"),url:url};
   try{
     if(navigator.share){ await navigator.share(data); }
-    else { await navigator.clipboard.writeText(url); alert("Link copied!\n\n"+url); }
+    else { await navigator.clipboard.writeText(url); alert(t("linkCopied")+url); }
   }catch(e){ /* user dismissed the share sheet */ }
 }
 function esc(s){ return (s==null?"":String(s)).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+function linkifyUrls(s){
+  return s.split(/(https?:\/\/\S+)/g)
+    .map(part=>/^https?:\/\//.test(part)?'<a href="'+part.replace(/"/g,"")+'" target="_blank" rel="noopener">'+esc(part)+'</a>':esc(part))
+    .join("");
+}
+function linkify(s){
+  s=String(s==null?"":s);
+  // supports "[Custom Text](https://...)" for a custom link label, falling back to auto-linking bare URLs
+  const md=/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g;
+  let out="", last=0, m;
+  while((m=md.exec(s))){
+    out+=linkifyUrls(s.slice(last,m.index));
+    out+='<a href="'+m[2].replace(/"/g,"")+'" target="_blank" rel="noopener">'+esc(m[1])+'</a>';
+    last=md.lastIndex;
+  }
+  out+=linkifyUrls(s.slice(last));
+  return out;
+}
 function idx(h,n){ return h.findIndex(x=>String(x).trim().toLowerCase()===n.toLowerCase()); }
 const MONTH_ABBR=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 function formatGvizDate(v){
@@ -546,11 +716,11 @@ async function loadAll(){
     renderVideos();
     updateLeadPill();
     const now=new Date();
-    st.textContent=(live?"Live from Google Sheet · ":"Preview (sample data) · ")+"updated "+now.toLocaleTimeString();
-    document.getElementById("lastUpdated").textContent="Last refreshed: "+now.toLocaleString();
+    st.textContent=(live?t("liveFrom"):t("preview"))+t("updated")+now.toLocaleTimeString();
+    document.getElementById("lastUpdated").textContent=t("lastRefreshed")+now.toLocaleString();
     scCache={}; // clear so open scorecard re-fetches fresh
     refreshOpenModal();
-  }catch(e){ st.textContent="Could not load data — check Sheet ID / sharing. Retrying…"; console.error(e); }
+  }catch(e){ st.textContent=t("loadError"); console.error(e); }
 }
 
 function parseEvents(h,rows){
@@ -576,31 +746,31 @@ function renderEvents(){
     const hasWin=e.w1||e.w2||e.w3;
     let h='<div class="ev'+(evLive?" islive":"")+'" onclick="openScorecard(\''+esc(e.no)+'\')">';
     h+='<span class="no">'+esc(e.no)+'</span>';
-    if(evLive) h+='<span class="live-btn">LIVE</span>';
-    h+='<h3>'+esc(e.ev)+'</h3><div class="meta">';
-    h+='<div><span class="k">📅 Date</span> '+esc(e.date)+' ('+esc(e.day)+')</div>';
-    h+='<div><span class="k">⏰ Time</span> '+esc(e.time)+'</div>';
-    h+='<div><span class="k">📍 Venue</span> '+esc(e.ven)+'</div>';
-    h+='<div><span class="k">👥 Team</span> '+esc(e.pt)+'</div>';
-    h+='<div><span class="k">🏅 Points</span> <span class="pts">'+esc(e.pts)+'</span></div></div>';
+    if(evLive) h+='<span class="live-btn">'+t("live")+'</span>';
+    h+='<h3>'+esc(trEvent(e.ev))+'</h3><div class="meta">';
+    h+='<div><span class="k">'+t("lblDate")+'</span> '+esc(e.date)+' ('+esc(e.day)+')</div>';
+    h+='<div><span class="k">'+t("lblTime")+'</span> '+esc(e.time)+'</div>';
+    h+='<div><span class="k">'+t("lblVenue")+'</span> '+esc(e.ven)+'</div>';
+    h+='<div><span class="k">'+t("lblTeam")+'</span> '+esc(e.pt)+'</div>';
+    h+='<div><span class="k">'+t("lblPoints")+'</span> <span class="pts">'+esc(e.pts)+'</span></div></div>';
     h+='<div class="tag">'+esc(e.pm)+'</div>';
-    h+='<span class="regchip">👤 '+((PARTS[e.ev]||[]).length)+' registered</span>';
-    if(hasWin){ h+='<div class="winners"><b>🏆 Winners</b>';
-      if(e.w1)h+='<div class="w">🥇 '+esc(e.w1)+'</div>';
-      if(e.w2)h+='<div class="w">🥈 '+esc(e.w2)+'</div>';
-      if(e.w3)h+='<div class="w">🥉 '+esc(e.w3)+'</div>'; h+='</div>'; }
+    h+='<span class="regchip">👤 '+((PARTS[e.ev]||[]).length)+' '+t("registered")+'</span>';
+    if(hasWin){ h+='<div class="winners"><b>'+t("winners")+'</b>';
+      if(e.w1)h+='<div class="w">🥇 '+esc(tn(e.w1))+'</div>';
+      if(e.w2)h+='<div class="w">🥈 '+esc(tn(e.w2))+'</div>';
+      if(e.w3)h+='<div class="w">🥉 '+esc(tn(e.w3))+'</div>'; h+='</div>'; }
     if(e.map){ h+='<div class="maprow" onclick="event.stopPropagation()"><img src="'+qr(e.map,160)+'" alt="Location QR">'+
-      '<div><a href="'+esc(e.map)+'" target="_blank" rel="noopener">🗺️ Open location in Maps</a>'+
-      '<small>Scan the QR to navigate to the venue</small></div></div>'; }
-    h+='<div class="cardfoot">📋 Tap for rules &amp; scorecard →</div></div>';
+      '<div><a href="'+esc(e.map)+'" target="_blank" rel="noopener">'+t("openMaps")+'</a>'+
+      '<small>'+t("scanNav")+'</small></div></div>'; }
+    h+='<div class="cardfoot">'+t("cardFoot")+'</div></div>';
     grid.insertAdjacentHTML("beforeend",h);
   });
   const lb=document.getElementById("liveBanner");
   const liveMatches=MATCHES.filter(m=>String(m.status).toLowerCase()==='live');
   const items=[];
   liveNames.forEach(n=>{ const lm=liveMatches.filter(m=>m.event===n);
-    if(lm.length) lm.forEach(m=>items.push('<b>'+esc(n)+':</b> '+esc(m.teamA)+' vs '+esc(m.teamB)));
-    else items.push('<b>'+esc(n)+'</b>'); });
+    if(lm.length) lm.forEach(m=>items.push('<b>'+esc(trEvent(n))+':</b> '+esc(tn(m.teamA))+' vs '+esc(tn(m.teamB))));
+    else items.push('<b>'+esc(trEvent(n))+'</b>'); });
   if(items.length){ lb.style.display="block"; document.getElementById("liveList").innerHTML=items.join(" &nbsp;•&nbsp; "); }
   else lb.style.display="none";
 }
@@ -609,7 +779,7 @@ function updateLeadPill(){
   const c={t:idx(lastTeams.headers,"Team"),sc:idx(lastTeams.headers,"Total Points")};
   const arr=lastTeams.rows.filter(r=>r[c.t]&&String(r[c.t]).trim())
     .map(r=>({team:r[c.t],score:parseFloat(r[c.sc])||0})).sort((a,b)=>b.score-a.score);
-  document.getElementById("leadPill").textContent = arr.length && arr[0].score>0 ? "🥇 "+arr[0].team : "";
+  document.getElementById("leadPill").textContent = arr.length && arr[0].score>0 ? "🥇 "+tn(arr[0].team) : "";
 }
 
 /* ---------- modals ---------- */
@@ -644,16 +814,16 @@ function openTeams(){
   onOpenModal();
 }
 function renderTeamsModal(){
-  document.getElementById("mTitle").textContent="🏆 Teams & Scores";
-  document.getElementById("mMeta").innerHTML="Overall standings · updates live from the sheet";
+  document.getElementById("mTitle").textContent=t("teamsTitle");
+  document.getElementById("mMeta").innerHTML=t("teamsMeta");
   const c={t:idx(lastTeams.headers,"Team"),cap:idx(lastTeams.headers,"Captain"),
     vc:idx(lastTeams.headers,"Vice Captain"),sc:idx(lastTeams.headers,"Total Points")};
   const arr=lastTeams.rows.filter(r=>r[c.t]&&String(r[c.t]).trim())
     .map(r=>({team:r[c.t],cap:r[c.cap]||"",vc:r[c.vc]||"",raw:r[c.sc],score:parseFloat(r[c.sc])||0}))
     .sort((a,b)=>b.score-a.score);
   const m=["🥇","🥈","🥉"];
-  let h='<table class="sc"><thead><tr><th>#</th><th>Team</th><th>Captain</th><th>Vice Captain</th><th>Points</th></tr></thead><tbody>';
-  arr.forEach((t,i)=>{ h+='<tr><td class="rank">'+(m[i]||(i+1))+'</td><td><b>'+esc(t.team)+'</b></td><td>'+esc(t.cap)+'</td><td>'+esc(t.vc)+'</td><td class="score">'+esc(t.raw!=null&&String(t.raw).trim()!==""?t.raw:0)+'</td></tr>'; });
+  let h='<table class="sc"><thead><tr><th>'+t("thRank")+'</th><th>'+t("thTeam")+'</th><th>'+t("thCaptain")+'</th><th>'+t("thViceCaptain")+'</th><th>'+t("thPoints")+'</th></tr></thead><tbody>';
+  arr.forEach((tm,i)=>{ h+='<tr><td class="rank">'+(m[i]||(i+1))+'</td><td><b>'+esc(tn(tm.team))+'</b></td><td>'+esc(tm.cap)+'</td><td>'+esc(tm.vc)+'</td><td class="score">'+esc(tm.raw!=null&&String(tm.raw).trim()!==""?tm.raw:0)+'</td></tr>'; });
   h+='</tbody></table>';
   document.getElementById("mBody").innerHTML=h;
 }
@@ -661,15 +831,15 @@ function renderTeamsModal(){
 async function openScorecard(no,isRefresh){
   const e=EVENTS.find(x=>x.no==no); if(!e) return;
   openState={type:"score",no:no};
-  document.getElementById("mTitle").innerHTML=esc(e.ev)+(e.live?'<span class="live-inline">LIVE</span>':'');
+  document.getElementById("mTitle").innerHTML=esc(trEvent(e.ev))+(e.live?'<span class="live-inline">'+t("live")+'</span>':'');
   document.getElementById("mMeta").innerHTML=
     '📅 '+esc(e.date)+' ('+esc(e.day)+') &nbsp; ⏰ '+esc(e.time)+'<br>📍 '+esc(e.ven)+
     ' &nbsp; 🏅 '+esc(e.pts)+' &nbsp; 👥 '+esc(e.pt);
   const body=document.getElementById("mBody");
   let head="";
-  const ruleText=e.rules||"Will be announced before the game by the Sports Co-ordinator.";
-  head+='<div class="rulesbox"><b>📋 Rules</b><br>'+esc(ruleText)+'</div>';
-  if(!isRefresh) body.innerHTML=head+'<div class="empty">Loading scorecard…</div>';
+  const ruleText=e.rules||t("defaultRules");
+  head+='<div class="rulesbox"><b>'+t("rulesLabel")+'</b><br>'+linkify(ruleText)+'</div>';
+  if(!isRefresh) body.innerHTML=head+'<div class="empty">'+t("loading")+'</div>';
   document.getElementById("overlay").classList.add("open");
   if(!isRefresh) onOpenModal();
 
@@ -689,14 +859,14 @@ async function openScorecard(no,isRefresh){
 
 function renderMatches(ev){
   const list=MATCHES.filter(m=>m.event===ev);
-  let h='<div class="partsec"><div class="parthd">⚔️ Matches &amp; Results <span class="pcount">'+list.length+'</span></div>';
-  if(!list.length){ return h+'<div class="empty">No matches scheduled yet.</div></div>'; }
-  h+='<table class="sc"><thead><tr><th>Match</th><th>Score</th><th>Status</th><th>Winner</th></tr></thead><tbody>';
+  let h='<div class="partsec"><div class="parthd">'+t("matchesLabel")+' <span class="pcount">'+list.length+'</span></div>';
+  if(!list.length){ return h+'<div class="empty">'+t("noMatches")+'</div></div>'; }
+  h+='<table class="sc"><thead><tr><th>'+t("thMatch")+'</th><th>'+t("thScore")+'</th><th>'+t("thStatus")+'</th><th>'+t("thWinner")+'</th></tr></thead><tbody>';
   list.forEach(m=>{
     const st=String(m.status||'Scheduled').toLowerCase();
-    const tag = st==='live'?'<span class="live-inline">LIVE</span>' : st==='done'?'<span class="pill done">Done</span>' : '<span class="pill sched">Scheduled</span>';
+    const tag = st==='live'?'<span class="live-inline">'+t("live")+'</span>' : st==='done'?'<span class="pill done">'+t("done")+'</span>' : '<span class="pill sched">'+t("scheduled")+'</span>';
     const sc=(String(m.scoreA)!==''||String(m.scoreB)!=='')?esc(m.scoreA||'0')+' : '+esc(m.scoreB||'0'):'—';
-    h+='<tr><td><b>'+esc(m.teamA)+'</b> vs <b>'+esc(m.teamB)+'</b></td><td>'+sc+'</td><td>'+tag+'</td><td>'+(m.winner?'🏆 '+esc(m.winner):'—')+'</td></tr>';
+    h+='<tr><td><b>'+esc(tn(m.teamA))+'</b> vs <b>'+esc(tn(m.teamB))+'</b></td><td>'+sc+'</td><td>'+tag+'</td><td>'+(m.winner?'🏆 '+esc(tn(m.winner)):'—')+'</td></tr>';
   });
   h+='</tbody></table></div>';
   return h;
@@ -704,10 +874,10 @@ function renderMatches(ev){
 
 function renderParts(ev){
   const list=PARTS[ev]||[];
-  let h='<div class="partsec"><div class="parthd">👥 Registered Participants <span class="pcount">'+list.length+'</span></div>';
-  if(!list.length){ return h+'<div class="empty">No participants registered yet.</div></div>'; }
-  h+='<table class="sc"><thead><tr><th>#</th><th>Name</th><th>Dept</th><th>Team</th></tr></thead><tbody>';
-  list.forEach((p,i)=>{ h+='<tr><td>'+(i+1)+'</td><td><b>'+esc(p.name)+'</b></td><td>'+esc(p.dept)+'</td><td>'+esc(p.team)+'</td></tr>'; });
+  let h='<div class="partsec"><div class="parthd">'+t("partsLabel")+' <span class="pcount">'+list.length+'</span></div>';
+  if(!list.length){ return h+'<div class="empty">'+t("noParts")+'</div></div>'; }
+  h+='<table class="sc"><thead><tr><th>'+t("thNo")+'</th><th>'+t("thName")+'</th><th>'+t("thDept")+'</th><th>'+t("thTeam")+'</th></tr></thead><tbody>';
+  list.forEach((p,i)=>{ h+='<tr><td>'+(i+1)+'</td><td><b>'+esc(p.name)+'</b></td><td>'+esc(p.dept)+'</td><td>'+esc(tn(p.team))+'</td></tr>'; });
   h+='</tbody></table></div>';
   return h;
 }
@@ -759,7 +929,7 @@ document.addEventListener("click",e=>{ if(!e.target.closest("#menuDrop")&&!e.tar
 function renderScTable(d){
   // skip a leading title row (single non-empty first cell) if present
   let rows=d.rows.filter(r=>r.some(c=>String(c).trim()!==""));
-  if(!rows.length) return '<div class="empty">No scores entered yet.</div>';
+  if(!rows.length) return '<div class="empty">'+t("noScores")+'</div>';
   const scIdx=d.headers.findIndex(h=>/score/i.test(h));
   const rkIdx=d.headers.findIndex(h=>/rank/i.test(h));
   let h='<table class="sc"><thead><tr>';
