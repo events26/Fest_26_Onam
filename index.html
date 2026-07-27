@@ -194,6 +194,23 @@
     #teamside .tshead{font-size:9px;letter-spacing:-.2px;padding:11px 6px}
   }
 
+  /* lucky draw floating mascot + popup */
+  .blinktxt{animation:blink 1s infinite}
+  #luckyFab{position:fixed;left:14px;bottom:18px;z-index:65;display:flex;flex-direction:column;
+    align-items:center;cursor:pointer}
+  .lucky-mascot{background:var(--gold);border-radius:14px;padding:4px;border:3px solid #fff;
+    box-shadow:0 6px 14px rgba(120,60,0,.45);animation:luckyBounce 1.8s ease-in-out infinite}
+  .lucky-mascot img{width:46px;height:auto;display:block;border-radius:9px}
+  .lucky-bubble{background:#fff;color:var(--red);font-weight:800;font-size:11px;padding:5px 10px;
+    border-radius:14px;box-shadow:0 6px 16px rgba(120,60,0,.3);margin-bottom:5px;white-space:nowrap;position:relative}
+  .lucky-bubble::after{content:"";position:absolute;left:50%;bottom:-6px;transform:translateX(-50%);
+    border-width:6px 6px 0;border-style:solid;border-color:#fff transparent transparent}
+  @keyframes luckyBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+  .luckymodal{border-top-color:var(--red)}
+  .lucky-top3{display:grid;gap:10px;margin:10px 0 6px}
+  .lucky-top3 div{background:#fff6df;border:1px dashed var(--gold);border-radius:12px;padding:10px 14px;font-size:15px}
+  .lucky-top3 b{color:var(--saffron);display:block;font-size:17px;margin-top:2px}
+
   footer{text-align:center;color:#a07a3a;font-size:13px;margin-top:34px}
 
   /* ---------- mobile-specific ---------- */
@@ -222,6 +239,13 @@
 </div>
 
 <button id="teamsBtn" onclick="openTeams()">🏆 Teams &amp; Scores<span class="lead" id="leadPill"></span></button>
+
+<div id="luckyFab" onclick="openLucky()" title="Onotsavam Lucky Draw 2026">
+  <div class="lucky-bubble blinktxt">🎟️ Lucky Draw!</div>
+  <div class="lucky-mascot">
+    <img src="poster/maveli-mascot.png" alt="Onotsavam Lucky Draw 2026">
+  </div>
+</div>
 
 <header>
   <h1>CAFS Onam Sports Fiesta 2026</h1>
@@ -328,6 +352,26 @@
     </div>
     <div class="mmeta" id="mMeta"></div>
     <div class="body" id="mBody"></div>
+  </div>
+</div>
+
+<!-- lucky draw popup -->
+<div class="overlay" id="luckyOverlay" onclick="if(event.target===this)closeLucky()">
+  <div class="modal luckymodal">
+    <div class="mhead">
+      <h2 class="blinktxt">🎟️ ONOTSAVAM LUCKY DRAW 2026</h2>
+      <button class="close" onclick="closeLucky()">×</button>
+    </div>
+    <div class="mmeta">📅 Draw on 19 Aug 2026 &nbsp;·&nbsp; 🎫 ₹300 per ticket</div>
+    <div class="body">
+      <div class="lucky-top3">
+        <div>🥇 1st Prize <b>Sovereign Gold Coin (5gm)</b></div>
+        <div>🥈 2nd Prize <b>Split A/C (1.5 Ton)</b></div>
+        <div>🥉 3rd Prize <b>Washing Machine</b></div>
+      </div>
+      <p style="text-align:center;color:#7a4d00;font-weight:700;margin:12px 0">+ 12 more exciting prizes!</p>
+      <a class="btn-dl" style="display:block;text-align:center" href="luckydraw.html">🎟️ View Full Ticket &amp; All 15 Prizes →</a>
+    </div>
   </div>
 </div>
 
@@ -559,11 +603,14 @@ window.addEventListener("popstate",function(){
   document.getElementById("photoOverlay").classList.remove("open");
   var vf=document.getElementById("videoFrame"); if(vf) vf.src="";
   document.getElementById("videoOverlay").classList.remove("open");
+  document.getElementById("luckyOverlay").classList.remove("open");
   openState={type:null,no:null};
 });
 function closeModal(){ document.getElementById("overlay").classList.remove("open"); openState={type:null,no:null}; onCloseModal(); }
 function openWA(){ document.getElementById("waOverlay").classList.add("open"); onOpenModal(); }
 function closeWA(){ document.getElementById("waOverlay").classList.remove("open"); onCloseModal(); }
+function openLucky(){ document.getElementById("luckyOverlay").classList.add("open"); onOpenModal(); }
+function closeLucky(){ document.getElementById("luckyOverlay").classList.remove("open"); onCloseModal(); }
 function refreshOpenModal(){
   if(openState.type==="teams") renderTeamsModal();
   else if(openState.type==="score") openScorecard(openState.no,true);
@@ -703,11 +750,15 @@ function renderScTable(d){
   return h;
 }
 
-document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ closeModal(); closeWA(); closePhoto(); closeVideo(); closeMenu(); } });
+document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ closeModal(); closeWA(); closePhoto(); closeVideo(); closeLucky(); closeMenu(); } });
 window.addEventListener("storage",e=>{ if(e.key===DB_KEY) loadAll(); });  // live sync from admin page (demo mode)
 document.getElementById("pageQr").src=qr(location.href,200);
 loadAll();
 setInterval(loadAll, CONFIG.REFRESH_SECONDS*1000);
+if(!sessionStorage.getItem("luckyShown")){
+  sessionStorage.setItem("luckyShown","1");
+  setTimeout(openLucky, 1200);
+}
 </script>
 </body>
 </html>
