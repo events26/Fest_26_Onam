@@ -401,13 +401,27 @@ async function sharePage(){
 }
 function esc(s){ return (s==null?"":String(s)).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
 function idx(h,n){ return h.findIndex(x=>String(x).trim().toLowerCase()===n.toLowerCase()); }
+const MONTH_ABBR=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+function formatGvizDate(v){
+  // gviz encodes date cells as the raw literal "Date(y,m,d)" (month is 0-indexed),
+  // regardless of how the sheet's cell display format is set (e.g. weekday-only) —
+  // parse the raw value ourselves so the real date always shows.
+  const m=/^Date\((\d+),(\d+),(\d+)/.exec(v);
+  if(!m) return null;
+  const y=+m[1], mo=+m[2], d=+m[3];
+  return String(d).padStart(2,"0")+" "+MONTH_ABBR[mo]+" "+y;
+}
 async function fetchTab(tab){
   const url="https://docs.google.com/spreadsheets/d/"+CONFIG.SHEET_ID+
     "/gviz/tq?tqx=out:json&headers=1&sheet="+encodeURIComponent(tab)+"&t="+Date.now();
   const txt=await (await fetch(url)).text();
   const j=JSON.parse(txt.substring(txt.indexOf("{"),txt.lastIndexOf("}")+1));
   const headers=j.table.cols.map(c=>c.label||"");
-  const rows=j.table.rows.map(r=>r.c.map(c=>c?(c.f!=null?c.f:c.v):""));
+  const rows=j.table.rows.map(r=>r.c.map(c=>{
+    if(!c) return "";
+    if(typeof c.v==="string"){ const d=formatGvizDate(c.v); if(d) return d; }
+    return c.f!=null?c.f:c.v;
+  }));
   return {headers,rows};
 }
 
