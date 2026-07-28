@@ -255,17 +255,22 @@
 
   /* ---------- Path to Final: podium (event top 3) + bracket ---------- */
   .top3sec{margin-top:6px}
-  .podium{display:grid;grid-template-columns:1fr 1.15fr 1fr;gap:10px;align-items:end;margin:6px 0 4px}
-  .pod{border-radius:14px;padding:12px 8px;text-align:center;background:var(--card);border:2px solid var(--gold)}
-  .pod .medal{font-size:26px;display:block;line-height:1}
+  .podium{display:flex;align-items:flex-end;justify-content:center;gap:10px;margin:10px 0 4px}
+  .pod{flex:1 1 0;min-width:0;border-radius:14px;padding:12px 8px;text-align:center;
+    background:var(--card);border:2px solid var(--gold)}
+  .pod .medal{font-size:24px;display:block;line-height:1}
   .pod .plabel{font-size:11px;color:#9a7326;display:block;font-weight:700;margin-top:3px}
-  .pod .pteam{font-size:13px;margin-top:2px;color:var(--ink);display:block;font-weight:800}
-  .pod.p1{background:linear-gradient(160deg,#f4b400,#ff8c00);color:#5a2b00;border-color:#ffd76a;
-    transform:translateY(-8px);box-shadow:0 10px 22px rgba(244,180,0,.4)}
+  .pod .pteam{font-size:13px;margin-top:2px;color:var(--ink);display:block;font-weight:800;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .pod.p1{flex:1.35 1 0;padding:16px 10px;transform:translateY(-10px);
+    background:linear-gradient(160deg,#f4b400,#ff8c00);color:#5a2b00;border-color:#ffd76a;
+    box-shadow:0 10px 22px rgba(244,180,0,.4)}
+  .pod.p1 .medal{font-size:31px}
+  .pod.p1 .pteam{font-size:15px}
   .pod.p1 .plabel,.pod.p1 .pteam{color:#5a2b00}
   .pod.p2{background:linear-gradient(160deg,#eef1f5,#cdd6e0)}
   .pod.p3{background:linear-gradient(160deg,#f7ddc4,#e8b489)}
-  @media(max-width:480px){ .pod.p1{transform:none} }
+  @media(max-width:480px){ .pod.p1{transform:translateY(-6px)} }
 
   #bracketOverlay{z-index:110}
   .bracketmodal{max-width:1000px;border-top-color:var(--gold)}
@@ -319,13 +324,9 @@
     50%{transform:scale(1.03);box-shadow:0 0 0 8px rgba(215,38,61,0),0 8px 26px rgba(215,38,61,.7)}}
   .pathlink:active{transform:scale(.98)}
 
-  @media(max-width:820px){
-    .bracket{flex-direction:column;min-width:0;width:auto;align-items:stretch;gap:14px}
-    .btier{gap:12px}
-    .btier.qfL{order:1}.btier.qfR{order:2}.btier.sfL{order:3}.btier.sfR{order:4}.btier.fin{order:5}
-    .bmatch,.thirdwrap .bmatch{width:100%}
-    .bracket-scroll{overflow-x:visible}
-  }
+  /* keep the horizontally-scrollable bracket on mobile too (same as desktop);
+     just hint that it scrolls */
+  .bracket-scroll{scrollbar-width:thin}
 
   [hidden]{display:none !important}
 
