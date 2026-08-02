@@ -399,6 +399,7 @@ function openAuction(){ $("auctionModal").classList.add("open"); }
 function closeAuction(){ $("auctionModal").classList.remove("open"); }
 function pickPlayer(i){ showPlayer(i); openAuction(); }   // navigate + surface the enlarged card
 function boot(){
+  if(new URLSearchParams(location.search).has("view")){ enterAsViewer(); return; }   // card/rules link → straight to view screen
   try{ const c=JSON.parse(sessionStorage.getItem("onam_cred")); if(c&&c.user){ CRED=c; ROLE="admin"; enterApp(); return; } }catch(e){}
   if(sessionStorage.getItem("ipl_role")==="viewer"){ ROLE="viewer"; enterApp(); return; }
   $("loginView").hidden=false;

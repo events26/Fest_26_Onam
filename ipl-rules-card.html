@@ -100,9 +100,9 @@
   const abs = f => SITE_BASE ? SITE_BASE.replace(/\/?$/,'/') + f : new URL(f, location.href).href;
   const RULES_URL = abs("ipl-rules.html");
   const AUCTION_URL = abs("ipl-auction.html");
-  document.getElementById("auctionBig").href = AUCTION_URL;
+  document.getElementById("auctionBig").href = AUCTION_URL + "?view";
   document.getElementById("rulesLink").href = RULES_URL;
-  document.getElementById("auctionLinkText").textContent = AUCTION_URL;
+  document.getElementById("auctionLinkText").textContent = AUCTION_URL + "?view";
   // hide the Back button when rendering a shareable image (…?png)
   if(location.search.indexOf("png") >= 0){ document.querySelector(".back").style.display = "none"; }
 </script>
