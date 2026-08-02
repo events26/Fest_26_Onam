@@ -69,7 +69,11 @@
   <div class="qrbox"><img id="qr" alt="Scan for the updated IPL Fantasy rules"></div>
   <div class="scan">📲 Scan to open the updated rulebook</div>
 
-  <a class="btn" id="rulesLink" href="ipl-rules.html">📖 Open Updated Rules</a>
+  <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:2px">
+    <a class="btn" id="rulesLink" href="ipl-rules.html">📖 Updated Rules</a>
+    <a class="btn" id="auctionLink" href="ipl-auction.html"
+       style="background:var(--saffron);box-shadow:0 6px 16px rgba(255,106,0,.35)">📺 Live Auction</a>
+  </div>
   <span class="linktext" id="rulesLinkText"></span>
 
   <div class="notehint">
@@ -85,12 +89,13 @@
      Leave SITE_BASE = "" to auto-detect from this page's own address.
      To hardcode, set e.g. SITE_BASE = "https://your-onam-site.com/". */
   const SITE_BASE = "https://events26.github.io/Fest_26_Onam/";
-  const RULES_URL = SITE_BASE
-      ? SITE_BASE.replace(/\/?$/,'/') + "ipl-rules.html"
-      : new URL("ipl-rules.html", location.href).href;
+  const abs = f => SITE_BASE ? SITE_BASE.replace(/\/?$/,'/') + f : new URL(f, location.href).href;
+  const RULES_URL = abs("ipl-rules.html");
+  const AUCTION_URL = abs("ipl-auction.html");
   document.getElementById("qr").src =
       "https://api.qrserver.com/v1/create-qr-code/?size=260x260&margin=8&data=" + encodeURIComponent(RULES_URL);
   document.getElementById("rulesLink").href = RULES_URL;
+  document.getElementById("auctionLink").href = AUCTION_URL;
   document.getElementById("rulesLinkText").textContent = RULES_URL;
   // hide the Back button when rendering a shareable image (…?png)
   if(location.search.indexOf("png") >= 0){ document.querySelector(".back").style.display = "none"; }
