@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IPL Fantasy Auction — CAFS Onotsavam 2026</title>
+<style>
+  :root{
+    --marigold:#ff8c00; --saffron:#ff6a00; --red:#d7263d; --green:#0b7a3b;
+    --gold:#f4b400; --cream:#fff7e6; --ink:#3a2600; --card:#fffdf7;
+    --shadow:0 8px 24px rgba(120,60,0,.15);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--ink);
+    background:#fff3dc;min-height:100vh}
+  .bgwrap{position:fixed;inset:0;z-index:-2;overflow:hidden}
+  .bgwrap::before{content:"";position:absolute;inset:-30px;
+    background:url("bg.jpg") center/cover no-repeat;filter:blur(9px) saturate(1.05);transform:scale(1.08)}
+  .bgwrap::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,247,230,.55),rgba(255,247,230,.82))}
+
+  .back{position:fixed;top:14px;left:14px;z-index:20;background:var(--saffron);color:#fff;text-decoration:none;
+    border-radius:12px;padding:9px 15px;font-weight:800;font-size:14px;box-shadow:0 6px 18px rgba(255,106,0,.45)}
+
+  /* ---------- login ---------- */
+  .login{max-width:380px;margin:12vh auto;background:var(--card);border-radius:18px;box-shadow:var(--shadow);
+    padding:26px 24px;text-align:center}
+  .login h1{font-size:22px;margin:.2em 0 .1em;background:linear-gradient(90deg,var(--red),var(--saffron),var(--green));
+    -webkit-background-clip:text;background-clip:text;color:transparent}
+  .login p{color:#7a4d00;font-size:13px;margin:.3em 0 18px}
+  .login input{width:100%;padding:11px 13px;margin:7px 0;border:1px solid #e6cfa0;border-radius:10px;font-size:15px}
+  .btn{background:var(--green);color:#fff;border:none;border-radius:10px;padding:11px 16px;font-weight:800;
+    font-size:15px;cursor:pointer;box-shadow:0 6px 16px rgba(11,122,59,.35)}
+  .btn:active{transform:scale(.98)}
+  .btn.sec{background:#fff;color:var(--ink);border:1px solid #e6cfa0;box-shadow:none}
+  .btn.red{background:var(--red);box-shadow:0 6px 16px rgba(215,38,61,.35)}
+  .btn[disabled]{opacity:.5;cursor:not-allowed}
+  .msg{font-size:13px;margin-top:8px;min-height:18px}
+  .msg.err{color:var(--red)} .msg.ok{color:var(--green)}
+
+  /* ---------- app shell ---------- */
+  #app{max-width:1200px;margin:0 auto;padding:60px 14px 40px}
+  .apphead{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:10px;margin-bottom:6px}
+  .apphead h1{margin:0;font-size:clamp(20px,3.4vw,30px);text-align:center;
+    background:linear-gradient(90deg,var(--red),var(--saffron),var(--green));
+    -webkit-background-clip:text;background-clip:text;color:transparent}
+  .who{position:fixed;top:14px;right:14px;z-index:20;display:flex;gap:8px;align-items:center}
+  .who .lbl{background:var(--card);border-radius:20px;padding:7px 12px;font-size:12px;font-weight:700;box-shadow:var(--shadow)}
+
+  .layout{display:grid;grid-template-columns:1.15fr .85fr;gap:18px;margin-top:14px;align-items:start}
+  @media(max-width:860px){ .layout{grid-template-columns:1fr} }
+
+  .panel{background:var(--card);border-radius:16px;box-shadow:var(--shadow);padding:14px 14px 16px}
+  .panel h2{margin:0 0 10px;font-size:16px;color:#7a4d00;display:flex;align-items:center;gap:8px}
+  .refresh{margin-left:auto;background:none;border:1px solid #e6cfa0;border-radius:8px;padding:4px 9px;
+    font-size:12px;cursor:pointer;color:#7a4d00;font-weight:700}
+
+  /* ---------- dashboard table ---------- */
+  .dashwrap{overflow-x:auto}
+  table.dash{border-collapse:collapse;width:100%;font-size:12.5px;min-width:640px}
+  table.dash th,table.dash td{padding:7px 6px;text-align:center;border-bottom:1px solid #f0e2c4}
+  table.dash th{background:#fbeecb;color:#7a4d00;font-size:11px;position:sticky;top:0}
+  table.dash td.team{text-align:left;font-weight:800;white-space:nowrap}
+  table.dash td.money{font-weight:700;color:var(--green)}
+  table.dash td.score{font-weight:800;color:var(--red)}
+  table.dash td.bad{color:var(--red);font-weight:800}
+  table.dash td.good{color:var(--green);font-weight:700}
+  table.dash tr.full{background:#eafaf0}
+  table.dash{min-width:760px}
+  table.dash td.needok{color:var(--green);font-weight:800;white-space:nowrap}
+  table.dash td.needbad{color:var(--red);font-weight:800;white-space:nowrap}
+  table.dash td.needwarn{color:#b58a3a;font-weight:800;white-space:nowrap}
+  .dashfoot{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-top:10px;font-size:12.5px;font-weight:700;color:#7a4d00}
+  .dashfoot b{color:var(--red)}
+
+  /* ---------- player card ---------- */
+  .progress{display:flex;align-items:center;gap:10px;margin-bottom:10px;font-weight:800;color:#7a4d00;font-size:14px}
+  .progress .bar{flex:1;height:8px;background:#f0e2c4;border-radius:6px;overflow:hidden}
+  .progress .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--saffron),var(--green))}
+  .jump{margin-left:auto;display:flex;gap:5px;align-items:center;font-weight:600;font-size:12px;color:#7a4d00}
+  .jump input{width:56px;padding:4px 6px;border:1px solid #e6cfa0;border-radius:7px;font-size:13px;text-align:center}
+
+  .pcard{border:2px solid #f0e2c4;border-radius:16px;padding:16px;background:linear-gradient(180deg,#fffdf7,#fff7e6)}
+  .pcard.sold{border-color:var(--green)} .pcard.unsold{border-color:#bbb}
+  .ptop{display:flex;gap:14px;align-items:center}
+  .avatar{width:74px;height:74px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;
+    font-weight:800;font-size:26px;color:#fff;box-shadow:0 4px 12px rgba(0,0,0,.18);overflow:hidden;background:#999}
+  .avatar img{width:100%;height:100%;object-fit:cover;display:block}
+  .pname{font-size:20px;font-weight:800;line-height:1.15}
+  .ptier{font-size:12px;font-weight:700;color:#9a7326;margin-top:2px}
+  .badges{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}
+  .badge{border-radius:20px;padding:4px 11px;font-size:12px;font-weight:800;color:#fff}
+  .b-BAT{background:var(--red)} .b-BOWL{background:var(--green)}
+  .b-AR{background:#b5651d} .b-WK{background:#6a1b9a}
+  .badge.skill{background:#fff;color:var(--ink);border:1px solid #e6cfa0}
+  .badge.base{background:var(--gold);color:var(--ink)}
+  .soldnote{margin-top:10px;font-size:13px;font-weight:800}
+  .soldnote.s{color:var(--green)} .soldnote.u{color:#888}
+
+  .form{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+  @media(max-width:420px){ .form{grid-template-columns:1fr} }
+  .form label{font-size:12px;font-weight:800;color:#7a4d00;display:block;margin-bottom:4px}
+  .form select,.form input{width:100%;padding:10px 11px;border:1px solid #e6cfa0;border-radius:10px;font-size:15px;background:#fff}
+
+  .controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+  .controls .btn{flex:1;min-width:110px;justify-content:center}
+  .controls .nav{flex:0 0 auto;min-width:auto;padding:11px 14px}
+
+  .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;
+    padding:11px 18px;border-radius:24px;font-weight:700;font-size:14px;box-shadow:0 8px 24px rgba(0,0,0,.3);
+    opacity:0;pointer-events:none;transition:opacity .2s;z-index:40}
+  .toast.show{opacity:1}
+
+  /* ---------- SOLD! celebration overlay ---------- */
+  .soldOverlay{position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;
+    padding:18px;background:radial-gradient(circle at 50% 40%,rgba(11,122,59,.55),rgba(58,38,0,.82))}
+  .soldOverlay.open{display:flex;animation:fadeIn .2s ease}
+  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+  .soldcard{position:relative;background:linear-gradient(180deg,#fffef9,#fff3dc);border-radius:24px;
+    box-shadow:0 24px 70px rgba(0,0,0,.5);padding:26px 26px 20px;max-width:460px;width:100%;text-align:center;
+    border:4px solid var(--gold);animation:pop .35s cubic-bezier(.2,1.4,.4,1)}
+  @keyframes pop{from{transform:scale(.7);opacity:0}to{transform:scale(1);opacity:1}}
+  .soldclose{position:absolute;top:6px;right:8px;background:none;border:none;font-size:26px;line-height:1;
+    color:#b58a3a;cursor:pointer;padding:6px 11px;z-index:3;border-radius:10px}
+  .soldclose:active{background:rgba(0,0,0,.06)}
+  .eschint{position:absolute;top:17px;right:50px;font-size:11px;font-weight:400;color:#b58a3a;opacity:.65;
+    pointer-events:none;letter-spacing:.3px}
+  .soldbadge{font-family:var(--font-display,inherit);font-size:34px;font-weight:900;letter-spacing:1px;
+    color:var(--red);text-shadow:0 2px 0 #fff,0 4px 10px rgba(215,38,61,.4);animation:bang .5s ease}
+  @keyframes bang{0%{transform:scale(.4) rotate(-8deg)}60%{transform:scale(1.15)}100%{transform:scale(1)}}
+  .soldrow{display:flex;align-items:center;justify-content:center;gap:16px;margin:14px 0 6px}
+  .avatarL{width:104px;height:104px;font-size:38px}
+  .soldinfo{text-align:left}
+  .soldname{font-size:24px;font-weight:800;line-height:1.1}
+  .soldmeta{margin-top:8px;display:flex;gap:6px;flex-wrap:wrap}
+  .soldto{margin-top:12px;font-size:15px;font-weight:800;color:#7a4d00;letter-spacing:2px}
+  .soldto b{display:block;font-size:32px;letter-spacing:0;margin-top:4px;
+    background:linear-gradient(90deg,var(--saffron),var(--green));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .soldprice{font-size:20px;font-weight:800;color:var(--green);margin-top:4px}
+  .soldreplay{margin-top:16px;width:100%;background:var(--saffron);box-shadow:0 6px 16px rgba(255,106,0,.4)}
+
+  /* ---------- full player list & status ---------- */
+  table.plist td{cursor:pointer}
+  table.plist tr:hover{background:#fff5db}
+  table.plist tr.cur{background:#fdeec4;outline:2px solid var(--saffron);outline-offset:-2px}
+  .st-sold{color:var(--green);font-weight:800}
+  .st-unsold{color:#888;font-weight:700}
+  .st-pending{color:#b58a3a;font-weight:700}
+  .plsearch{margin-left:auto;padding:5px 10px;border:1px solid #e6cfa0;border-radius:8px;font-size:13px;max-width:170px}
+
+  /* ---------- auction workspace popup ---------- */
+  .auctionOverlay{position:fixed;inset:0;z-index:55;display:none;align-items:flex-start;justify-content:center;
+    padding:16px 10px;overflow:auto;-webkit-overflow-scrolling:touch;background:rgba(58,38,0,.55)}
+  .auctionOverlay.open{display:flex}
+  .auctionbox{position:relative;background:var(--card);border-radius:20px;box-shadow:0 22px 64px rgba(0,0,0,.45);
+    padding:46px 18px 18px;max-width:620px;width:100%;margin:auto;border-top:6px solid var(--gold);
+    animation:pop .28s cubic-bezier(.2,1.4,.4,1)}
+  /* bigger card + profile image */
+  .auctionbox .pcard{border-width:2px;padding:18px}
+  .auctionbox .avatar{width:120px;height:120px;font-size:46px}
+  .auctionbox .pname{font-size:clamp(22px,6vw,28px)}
+  .auctionbox .ptier{font-size:13px}
+  .auctionbox .badge{font-size:13px;padding:5px 12px}
+  /* smaller/compact admin input boxes so the card stays the focus */
+  .auctionbox #editArea{margin-top:10px}
+  .auctionbox #editArea .form{gap:8px}
+  .auctionbox #editArea label{font-size:11px;margin-bottom:2px}
+  /* compact height via padding, but keep 16px font so iOS doesn't zoom-on-focus */
+  .auctionbox #editArea input,.auctionbox #editArea select{padding:7px 10px !important;font-size:16px !important}
+  .auctionbox #editArea .btn{padding:9px 12px;font-size:14px}
+  .auctionbox .progress{padding-right:4px}
+
+  [hidden]{display:none !important}
+</style>
+</head>
+<body>
+<div class="bgwrap"></div>
+<a class="back" href="index.html">← Back</a>
+
+<!-- login -->
+<div id="loginView">
+  <div class="login">
+    <h1>🏏 IPL Fantasy Auction</h1>
+    <p>CAFS Onotsavam 2026</p>
+
+    <div id="roleChoice">
+      <button class="btn" style="width:100%" onclick="showAdminLogin()">👑 Login as Admin&nbsp;·&nbsp;can edit</button>
+      <button class="btn sec" style="width:100%;margin-top:10px" onclick="enterAsViewer()">👁 Login as Team Member&nbsp;·&nbsp;view only</button>
+      <p style="margin:14px 0 0">Team members can watch the live dashboard and every bid — no password needed.</p>
+    </div>
+
+    <div id="adminForm" hidden>
+      <input id="u" placeholder="Username" autocomplete="username" value="admin">
+      <input id="p" type="password" placeholder="Password" autocomplete="current-password"
+             onkeydown="if(event.key==='Enter')login()">
+      <button class="btn" style="width:100%;margin-top:8px" onclick="login()">Log in</button>
+      <button class="btn sec" style="width:100%;margin-top:8px" onclick="backToRole()">← Back</button>
+      <div class="msg" id="loginMsg"></div>
+    </div>
+  </div>
+</div>
+
+<!-- app -->
+<div id="app" hidden>
+  <div class="who">
+    <span class="lbl" id="whoLabel"></span>
+    <button class="btn sec" style="padding:7px 12px;font-size:12px" onclick="logout()">Log out</button>
+  </div>
+  <div class="apphead"><h1>🏏 IPL Fantasy Auction · Live Console</h1></div>
+
+  <!-- dashboard (full width) -->
+  <div class="panel">
+    <h2>📊 Live Team Dashboard
+      <button class="refresh" onclick="reloadFromSheet()">⟳ Refresh</button>
+      <button class="refresh" id="openAuctionBtn" style="display:none" onclick="openAuction()">🔨 Open Auction</button>
+    </h2>
+    <div class="dashwrap">
+      <table class="dash" id="dashTable"></table>
+    </div>
+    <div class="dashfoot" id="dashFoot"></div>
+  </div>
+
+  <!-- full player list + live status -->
+  <div class="panel" style="margin-top:16px">
+    <h2 style="flex-wrap:wrap">📋 Nomination Order &amp; Base Prices
+      <span style="margin-left:auto;display:flex;gap:8px;flex-wrap:wrap">
+        <select id="plfilter" onchange="renderPlayersTable()"
+          style="padding:6px 10px;border:1px solid #e6cfa0;border-radius:8px;font-size:13px;font-weight:600;color:#7a4d00;background:#fff">
+          <option value="all">All statuses</option>
+          <option value="pending">⏳ Pending</option>
+          <option value="sold">✅ Sold</option>
+          <option value="unsold">⚪ Unsold (re-auction)</option>
+        </select>
+        <input id="plsearch" placeholder="🔎 Search…" oninput="renderPlayersTable()"
+          style="padding:6px 10px;border:1px solid #e6cfa0;border-radius:8px;font-size:13px;max-width:150px">
+      </span>
+    </h2>
+    <div style="font-size:12px;color:#9a7326;margin:-4px 0 8px;font-weight:600">
+      Players are auctioned top → bottom (ID order). Share this screen with all teams before the game.</div>
+    <div class="dashwrap">
+      <table class="dash plist" id="plistTable"></table>
+    </div>
+  </div>
+</div>
+
+<!-- Auction workspace popup (admin) — enlarged player card + editable controls -->
+<div class="auctionOverlay" id="auctionModal">
+  <div class="auctionbox">
+    <span class="eschint">press Esc</span>
+    <button class="soldclose" onclick="closeAuction()">×</button>
+    <div class="progress">
+      <span id="progLabel">Player – of –</span>
+      <span class="bar"><i id="progBar" style="width:0%"></i></span>
+      <span class="jump">Go to ID
+        <input id="jumpId" type="number" min="1" onkeydown="if(event.key==='Enter')jumpTo()">
+        <button class="btn sec" style="padding:4px 8px;font-size:12px" onclick="jumpTo()">Go</button>
+      </span>
+    </div>
+
+    <div class="pcard" id="pcard"><!-- filled by JS --></div>
+
+    <!-- edit-only: hidden for view-only team members -->
+    <div id="editArea">
+      <div class="controls" style="margin-bottom:8px">
+        <input id="fcPrice" type="number" step="0.1" min="0" placeholder="Final call ₹ Cr"
+               style="flex:1;min-width:110px;padding:10px 11px;border:1px solid #e6cfa0;border-radius:10px;font-size:15px;background:#fff"
+               onkeydown="if(event.key==='Enter')finalCall()">
+        <button class="btn" style="flex:1;min-width:130px;background:#8a5a00;box-shadow:0 6px 16px rgba(138,90,0,.35)"
+                onclick="finalCall()">📣 Final Call</button>
+      </div>
+      <div class="form">
+        <div>
+          <label for="soldTo">Sold To</label>
+          <select id="soldTo"></select>
+        </div>
+        <div>
+          <label for="price">Final Price (₹ Cr)</label>
+          <input id="price" type="number" step="0.1" min="0" placeholder="e.g. 3.5"
+                 onkeydown="if(event.key==='Enter')confirmSale()">
+        </div>
+      </div>
+      <div class="controls">
+        <button class="btn sec" onclick="markUnsold()">Mark Unsold</button>
+        <button class="btn" id="confirmBtn" onclick="confirmSale()">✔ Confirm Sale</button>
+      </div>
+      <div class="controls" style="margin-top:8px">
+        <button class="btn red" onclick="clearStatus()">🗑 Clear Status → Pending</button>
+      </div>
+    </div>
+
+    <div class="controls" style="margin-top:10px">
+      <button class="btn sec nav" onclick="go(-1)">◀ Prev</button>
+      <button class="btn sec nav" onclick="go(1)">Next ▶</button>
+    </div>
+  </div>
+</div>
+
+<!-- SOLD! celebration -->
+<div class="soldOverlay" id="soldOverlay" onclick="if(event.target===this)closeSold()">
+  <div class="soldcard">
+    <button class="soldclose" id="soldClose" onclick="closeSold()">×</button>
+    <div id="soldBigBody"></div>
+    <button class="btn soldreplay" id="soldReplay" onclick="replaySold()">🔊 Play announcement again</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- player photos live here (in HTML, not the sheet); missing IDs fall back to initials -->
+<script src="player-images.js"></script>
+<script>
+/* =====================================================================
+   Reads the two IPL tabs live from the Google Sheet (public gviz read);
+   writes Sold To + Final Price back through the Apps Script web app
+   (admin-authenticated). The sheet's own formulas recompute the dashboard.
+   ===================================================================== */
+const CONFIG = {
+  SCRIPT_URL: "https://script.google.com/macros/s/AKfycbz3475oqZIIcYRhzqE0eI9qshSECJ6UxlI5ZSMbGMDM6S0NwJtVy4ui0uwdlrAlJzP4Kw/exec",
+  SHEET_ID:   "1Swb7T4g1t-PvuiT5Qc5qxhbW1mnihhtQhFCKijazap4",
+  PLAYERS_TAB: "IPL_FANTASY_PLAYER_DASH",
+  LIVE_TAB:    "IPL_FANTASY_LIV_DASH",
+  BUDGET: 40,      // ₹ Cr per team
+  ROSTER: 11,      // players per team
+  TEAMS: 8,
+  ROLE_CAPS: { WK:2, AR:2 }   // max of each scarce role per team (closes the cornering loophole)
+};
+
+let CRED = { user:"", pass:"" };
+let ROLE = "viewer";   // "admin" (can edit) | "viewer" (view only)
+let PLAYERS = [];   // {id,name,role,skill,base,soldTo,price,photo}
+let TEAMS   = [];   // team names (exact strings the dashboard formulas match on)
+let cur = 0;        // index into PLAYERS
+
+const $  = id => document.getElementById(id);
+const esc = s => String(s==null?"":s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const money = n => "₹"+(Number(n)||0).toFixed(2);
+
+/* ---------- backend ---------- */
+async function api(payload){
+  const res = await fetch(CONFIG.SCRIPT_URL,{method:"POST",redirect:"follow",
+    headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(payload)});
+  const txt = await res.text();
+  try{ return JSON.parse(txt); }
+  catch(e){
+    console.error("Non-JSON response from Apps Script:", res.status, txt.slice(0,300));
+    throw new Error("Server didn't return JSON (HTTP "+res.status+"). Redeploy the Apps Script (New version) and set access to 'Anyone'.");
+  }
+}
+async function fetchTab(tab){
+  const url="https://docs.google.com/spreadsheets/d/"+CONFIG.SHEET_ID+
+    "/gviz/tq?tqx=out:json&headers=1&sheet="+encodeURIComponent(tab)+"&t="+Date.now();
+  const txt=await (await fetch(url)).text();
+  const j=JSON.parse(txt.substring(txt.indexOf("{"),txt.lastIndexOf("}")+1));
+  const headers=j.table.cols.map(c=>c.label||"");
+  const rows=j.table.rows.map(r=>r.c.map(c=>c?c.v:null));   // raw values (not formatted)
+  return {headers,rows};
+}
+const col = (headers,needle)=>headers.findIndex(h=>String(h).toLowerCase().includes(needle));
+
+/* ---------- auth & roles ---------- */
+function showAdminLogin(){ $("roleChoice").hidden=true; $("adminForm").hidden=false; $("p").focus(); }
+function backToRole(){ $("adminForm").hidden=true; $("roleChoice").hidden=false; msg("loginMsg","",""); }
+function enterAsViewer(){ primeAudio(); ROLE="viewer"; CRED={user:"",pass:""}; sessionStorage.setItem("ipl_role","viewer"); enterApp(); }
+
+async function login(){
+  const u=$("u").value.trim(), p=$("p").value;
+  if(!u||!p){ msg("loginMsg","Enter username and password","err"); return; }
+  msg("loginMsg","Checking…","");
+  try{
+    const r=await api({action:"auth",user:u,pass:p});
+    if(r.ok){ CRED={user:u,pass:p}; ROLE="admin";
+      sessionStorage.setItem("onam_cred",JSON.stringify(CRED));
+      sessionStorage.setItem("ipl_role","admin"); enterApp(); }
+    else msg("loginMsg", r.error||"Invalid login","err");
+  }catch(e){ msg("loginMsg","Cannot reach server — check SCRIPT_URL. "+e.message,"err"); }
+}
+function logout(){
+  if(pollTimer){ clearInterval(pollTimer); pollTimer=null; }
+  CRED={user:"",pass:""}; ROLE="viewer";
+  sessionStorage.removeItem("onam_cred"); sessionStorage.removeItem("ipl_role");
+  $("app").hidden=true; $("loginView").hidden=false; backToRole();
+}
+async function enterApp(){
+  $("loginView").hidden=true; $("app").hidden=false;
+  applyRole();
+  document.addEventListener("pointerdown", primeAudio, {once:true});   // unlock sound on first tap (projector reloads)
+  await reloadFromSheet(true);
+  if(ROLE==="admin") openAuction();                               // start on the first player
+  if(pollTimer){ clearInterval(pollTimer); pollTimer=null; }
+  if(ROLE==="viewer") pollTimer=setInterval(pollForSales,3000);   // main-screen live sync
+}
+function applyRole(){
+  const admin = ROLE==="admin";
+  $("whoLabel").textContent = admin ? ("👑 "+CRED.user) : "👁 Team member · view only";
+  $("editArea").hidden = !admin;
+  $("openAuctionBtn").style.display = admin ? "" : "none";
+}
+// Admin: full editable workspace. View-only: opens on manual player selection to show status (read-only, editArea hidden).
+function openAuction(){ $("auctionModal").classList.add("open"); }
+function closeAuction(){ $("auctionModal").classList.remove("open"); }
+function pickPlayer(i){ showPlayer(i); openAuction(); }   // navigate + surface the enlarged card
+function boot(){
+  try{ const c=JSON.parse(sessionStorage.getItem("onam_cred")); if(c&&c.user){ CRED=c; ROLE="admin"; enterApp(); return; } }catch(e){}
+  if(sessionStorage.getItem("ipl_role")==="viewer"){ ROLE="viewer"; enterApp(); return; }
+  $("loginView").hidden=false;
+}
+
+/* ---------- data ---------- */
+function parsePlayers(pl){
+  const h=pl.headers;
+  const c={ id:col(h,"player id"), name:col(h,"player name"), role:col(h,"role"),
+    skill:col(h,"skill"), base:col(h,"base price"), sold:col(h,"sold to"),
+    price:col(h,"final price"), photo:col(h,"photo") };
+  return pl.rows.filter(r=>r[c.id]!=null&&String(r[c.id]).trim()!=="").map(r=>({
+    id:Number(r[c.id]), name:String(r[c.name]||""), role:String(r[c.role]||"").trim().toUpperCase(),
+    skill:Number(r[c.skill])||0, base:Number(r[c.base])||0,
+    soldTo:r[c.sold]!=null?String(r[c.sold]).trim():"",
+    price:(c.price>=0&&r[c.price]!=null&&String(r[c.price]).trim()!=="")?Number(r[c.price]):null,
+    photo:(c.photo>=0&&r[c.photo])?String(r[c.photo]).trim():""
+  })).sort((a,b)=>a.id-b.id);
+}
+async function reloadFromSheet(showPlayerToo){
+  try{
+    const [pl,lv]=await Promise.all([fetchTab(CONFIG.PLAYERS_TAB),fetchTab(CONFIG.LIVE_TAB)]);
+    const tCol=col(lv.headers,"team");
+    TEAMS=lv.rows.map(r=>r[tCol]).filter(x=>x!=null&&String(x).trim()!=="").map(String);
+    PLAYERS=parsePlayers(pl);
+    fillTeamSelect();
+    renderDash();
+    renderPlayersTable();
+    if(showPlayerToo){ showPlayer(cur); }
+    toast("Synced from sheet");
+  }catch(e){ toast("Load failed: "+e.message); }
+}
+
+/* ---------- view-only screen: keep the dashboard + player list live ---------- */
+let pollTimer=null, polling=false;
+async function pollForSales(){
+  if(ROLE!=="viewer" || $("app").hidden || polling) return;   // re-entrancy guard: never let two polls overlap
+  polling=true;
+  try{ PLAYERS=parsePlayers(await fetchTab(CONFIG.PLAYERS_TAB)); renderDash(); renderPlayersTable(); }catch(e){}
+  finally{ polling=false; }
+}
+
+/* ---------- team stats (mirrors the in-sheet formulas) ---------- */
+function teamStats(team, excludeId){
+  let budget=CONFIG.BUDGET, bought=0, bat=0, bowl=0, ar=0, wk=0, skill=0;
+  PLAYERS.forEach(p=>{
+    if(p.id===excludeId) return;
+    if(p.soldTo!==team) return;
+    bought++; skill+=p.skill; budget-=(p.price||0);
+    if(p.role==="BAT")bat++; else if(p.role==="BOWL")bowl++;
+    else if(p.role==="AR")ar++; else if(p.role==="WK")wk++;
+  });
+  const nopen=CONFIG.ROSTER-bought;
+  const maxbid=nopen<=0?0:budget-((nopen-1)*0.2);
+  const ok=(bought===CONFIG.ROSTER&&bat>=4&&bowl>=4&&ar>=1&&wk>=1);
+  const bonus=Math.min(3,0.2*budget);
+  const score=skill*(ok?1:0.8)+bonus;
+  return {team,budget,bought,bat,bowl,ar,wk,skill,maxbid,score,ok};
+}
+
+/* ---------- dashboard render ---------- */
+// Live mandatory-needs so no team accidentally finishes illegal (×0.8).
+function needsCell(r){
+  const open=CONFIG.ROSTER-r.bought;
+  const nb=Math.max(0,4-r.bat), nbo=Math.max(0,4-r.bowl), na=Math.max(0,1-r.ar), nw=Math.max(0,1-r.wk);
+  const mand=nb+nbo+na+nw;
+  if(r.bought>=CONFIG.ROSTER)
+    return r.ok ? '<td class="needok">✅ Legal XI</td>' : '<td class="needbad">❌ Illegal ×0.8</td>';
+  if(mand>open) return '<td class="needbad">🚨 Can\'t complete</td>';
+  const parts=[];
+  if(nb)parts.push(nb+' BAT'); if(nbo)parts.push(nbo+' BOWL'); if(na)parts.push(na+' AR'); if(nw)parts.push(nw+' WK');
+  let s=(parts.length?('Need '+parts.join(', ')):'✓ mins met')+' · '+open+' slot'+(open===1?'':'s');
+  const cls=(mand>0&&mand===open)?'needwarn':(parts.length?'':'needok');
+  if(mand>0&&mand===open) s='⚠️ '+s+' (all forced)';
+  return '<td class="'+cls+'">'+s+'</td>';
+}
+function renderDash(){
+  const rows=TEAMS.map(t=>teamStats(t,null));
+  let h='<thead><tr><th>Team</th><th>Budget<br>Left</th><th>Bought</th>'
+       +'<th>BAT<br>≥4</th><th>BOWL<br>≥4</th><th>AR<br>≥1</th><th>WK<br>≥1</th>'
+       +'<th>Skill</th><th>Score</th><th>Max<br>Bid</th><th>Status /<br>Needs</th></tr></thead><tbody>';
+  const min={bat:4,bowl:4,ar:1,wk:1};
+  rows.forEach(r=>{
+    const cell=(v,m)=>'<td class="'+(v>=m?'good':'bad')+'">'+v+'</td>';
+    h+='<tr class="'+(r.bought>=CONFIG.ROSTER?'full':'')+'">'
+      +'<td class="team">'+esc(r.team)+'</td>'
+      +'<td class="money">'+money(r.budget)+'</td>'
+      +'<td>'+r.bought+'/'+CONFIG.ROSTER+'</td>'
+      +cell(r.bat,min.bat)+cell(r.bowl,min.bowl)+cell(r.ar,min.ar)+cell(r.wk,min.wk)
+      +'<td>'+r.skill.toFixed(1)+'</td>'
+      +'<td class="score">'+r.score.toFixed(2)+'</td>'
+      +'<td class="money">'+money(r.maxbid)+'</td>'
+      +needsCell(r)+'</tr>';
+  });
+  h+='</tbody>';
+  $("dashTable").innerHTML=h;
+
+  const sold=PLAYERS.filter(p=>p.soldTo&&p.soldTo.toUpperCase()!=="UNSOLD").length;
+  const unsold=PLAYERS.filter(p=>p.soldTo&&p.soldTo.toUpperCase()==="UNSOLD").length;
+  const target=CONFIG.TEAMS*CONFIG.ROSTER;
+  $("dashFoot").innerHTML="🟢 Sold: <b>"+sold+" / "+target+"</b>"
+    +" &nbsp;·&nbsp; ⚪ Unsold: <b>"+unsold+"</b>"
+    +" &nbsp;·&nbsp; 📋 Auctioned: <b>"+(sold+unsold)+" / "+PLAYERS.length+"</b>";
+}
+
+/* ---------- player card ---------- */
+const TIER = b => b>=2?"Tier 1 · Marquee" : b>=1?"Tier 2 · Gold" : b>=0.5?"Tier 3 · Silver" : "Tier 4 · Bronze";
+// photo priority: in-HTML PLAYER_IMAGES map (by id) → optional sheet Photo URL → none (initials)
+function playerPhoto(p){
+  const m=(typeof PLAYER_IMAGES!=="undefined") ? PLAYER_IMAGES[p.id] : null;
+  return m || p.photo || "";
+}
+function avatarHtml(p){
+  const src=playerPhoto(p);
+  if(src) return '<div class="avatar"><img src="'+esc(src)+'" alt="'+esc(p.name)+'" '
+    +'onerror="this.parentNode.innerHTML=\''+initials(p.name)+'\';this.parentNode.style.background=\''+hue(p.name)+'\'"></div>';
+  return '<div class="avatar" style="background:'+hue(p.name)+'">'+initials(p.name)+'</div>';
+}
+function initials(name){
+  const w=String(name||"").trim().split(/\s+/);
+  return ((w[0]||" ")[0]+(w[1]?w[1][0]:"")).toUpperCase();
+}
+function hue(name){ let s=0; for(const ch of String(name)) s=(s*31+ch.charCodeAt(0))%360; return "hsl("+s+",55%,45%)"; }
+
+function fillTeamSelect(){
+  const sel=$("soldTo");
+  sel.innerHTML='<option value="">— select team —</option>'
+    +TEAMS.map(t=>'<option value="'+esc(t)+'">'+esc(t)+'</option>').join("")
+    +'<option value="UNSOLD">⚪ UNSOLD</option>';
+}
+function showPlayer(i){
+  if(!PLAYERS.length) return;
+  cur=Math.max(0,Math.min(i,PLAYERS.length-1));
+  const p=PLAYERS[cur];
+  const soldToTeam=p.soldTo&&p.soldTo.toUpperCase()!=="UNSOLD";
+  const isUnsold=p.soldTo&&p.soldTo.toUpperCase()==="UNSOLD";
+
+  let note="";
+  if(soldToTeam) note='<div class="soldnote s">✅ Sold to '+esc(p.soldTo)+' for '+money(p.price)+' Cr</div>';
+  else if(isUnsold) note='<div class="soldnote u">⚪ Marked UNSOLD</div>';
+
+  $("pcard").className="pcard"+(soldToTeam?" sold":isUnsold?" unsold":"");
+  $("pcard").innerHTML=
+    '<div class="ptop">'+avatarHtml(p)
+    +'<div><div class="pname">'+esc(p.name)+'</div><div class="ptier">🆔 '+p.id+' · '+TIER(p.base)+'</div>'
+    +'<div class="badges"><span class="badge b-'+p.role+'">'+esc(p.role)+'</span>'
+    +'<span class="badge skill">⭐ Skill '+p.skill.toFixed(1)+'</span>'
+    +'<span class="badge base">Base '+money(p.base)+'</span></div></div></div>'+note;
+
+  // prefill form from current sale
+  $("soldTo").value = isUnsold ? "UNSOLD" : (soldToTeam ? p.soldTo : "");
+  $("price").value  = (p.price!=null) ? p.price : "";
+  if($("fcPrice")) $("fcPrice").value = "";   // reset final-call price for the new player
+
+  $("progLabel").textContent="Player "+(cur+1)+" of "+PLAYERS.length+"  (ID "+p.id+")";
+  $("progBar").style.width=((cur+1)/PLAYERS.length*100).toFixed(1)+"%";
+  $("confirmBtn").textContent = (soldToTeam||isUnsold) ? "✔ Update Sale" : "✔ Confirm Sale";
+  renderPlayersTable();   // keep the current-row highlight in sync
+}
+
+/* ---------- navigation ---------- */
+function go(d){ pickPlayer(cur+d); }
+function jumpTo(){
+  const id=parseInt($("jumpId").value,10);
+  const i=PLAYERS.findIndex(p=>p.id===id);
+  if(i<0){ toast("No player with ID "+id); return; }
+  pickPlayer(i); $("jumpId").value="";
+}
+
+/* ---------- save ---------- */
+async function save(team,price){
+  if(ROLE!=="admin"){ toast("View only — admin login required to edit"); return; }
+  const p=PLAYERS[cur];
+  $("confirmBtn").disabled=true;
+  try{
+    const r=await api({action:"iplSell",user:CRED.user,pass:CRED.pass,
+      p:{playerId:p.id,soldTo:team,price:price}});
+    if(!r.ok){ toast("❌ "+(r.error||"Save failed"),6000); console.error("Save error:",r); return; }
+    p.soldTo=team; p.price=(price===""?null:Number(price));
+    renderDash(); renderPlayersTable();
+    if(team && team!=="UNSOLD") showSold(p,team,p.price);   // popup + sound on the admin console
+    else toast("Saved");
+    if(cur<PLAYERS.length-1) showPlayer(cur+1); else showPlayer(cur);
+  }catch(e){ toast("❌ "+e.message,6000); console.error(e); }
+  finally{ $("confirmBtn").disabled=false; }
+}
+async function confirmSale(){
+  primeAudio();
+  const team=$("soldTo").value;
+  if(team==="UNSOLD"){ return save("UNSOLD",""); }
+  if(team===""){        // clearing a sale
+    if(!confirm("Clear this player's sale (put back for auction)?")) return;
+    return save("","");
+  }
+  const price=parseFloat($("price").value);
+  if(isNaN(price)||price<=0){ toast("Enter a valid final price"); return; }
+  const p=PLAYERS[cur];
+  const s=teamStats(team,p.id);          // team state excluding this player
+  // hard rule: cap scarce roles (WK/AR) per team
+  const cap=CONFIG.ROLE_CAPS[p.role];
+  if(cap!=null){
+    const have=(p.role==="WK")?s.wk:(p.role==="AR")?s.ar:0;
+    if(have>=cap){ toast("🚫 "+team+" already has "+cap+" "+p.role+" (max "+cap+" per team). Pick another team.",6000); return; }
+  }
+  const warn=[];
+  if(price<p.base) warn.push("Price "+money(price)+" is below base "+money(p.base)+".");
+  if(price>s.budget) warn.push(team+" only has "+money(s.budget)+" Cr left.");
+  else if(s.maxbid>0 && price>s.maxbid) warn.push("Above "+team+"'s max bid "+money(s.maxbid)+" (needs ₹0.20 Cr for each remaining slot).");
+  if(s.bought>=CONFIG.ROSTER) warn.push(team+" already has "+CONFIG.ROSTER+" players.");
+  if(warn.length && !confirm(warn.join("\n")+"\n\nSave anyway?")) return;
+  save(team,price);
+}
+function markUnsold(){ primeAudio(); $("soldTo").value="UNSOLD"; $("price").value=""; save("UNSOLD",""); }
+// Reset an accidentally-added Sold/Unsold status back to Pending (blank Sold To + Final Price).
+function clearStatus(){
+  const p=PLAYERS[cur];
+  if(!p.soldTo){ toast("Already Pending — nothing to clear"); return; }
+  const was=p.soldTo.toUpperCase()==="UNSOLD" ? "Unsold" : ("sold to "+p.soldTo);
+  if(!confirm("Reset "+p.name+" back to Pending? (removes "+was+")")) return;
+  $("soldTo").value=""; $("price").value="";
+  save("","");
+}
+
+/* ---------- audio: gavel chime + spoken "Sold to <team>" ---------- */
+let audioCtx;
+function getCtx(){ try{ audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} return audioCtx; }
+// Called from a click (Confirm / Unsold) to unlock audio + speech on mobile browsers.
+function primeAudio(){
+  const c=getCtx(); if(c&&c.state==="suspended"){ try{c.resume();}catch(e){} }
+  try{ if(window.speechSynthesis){ const u=new SpeechSynthesisUtterance(" "); u.volume=0; speechSynthesis.speak(u); } }catch(e){}
+}
+// One wooden gavel knock = a short filtered-noise "crack" + a low "thump" body.
+function gavelHit(ctx, t0, vol){
+  vol = vol || 1;
+  // crack: white-noise burst with a fast exponential decay (the wood-on-wood impact)
+  const dur = 0.13, n = Math.floor(ctx.sampleRate*dur);
+  const buf = ctx.createBuffer(1, n, ctx.sampleRate), d = buf.getChannelData(0);
+  for(let i=0;i<n;i++){ d[i] = (Math.random()*2-1) * Math.pow(1 - i/n, 3); }
+  const noise = ctx.createBufferSource(); noise.buffer = buf;
+  const bp = ctx.createBiquadFilter(); bp.type="bandpass"; bp.frequency.value=1100; bp.Q.value=0.7;
+  const ng = ctx.createGain(); ng.gain.value = 0.9*vol;
+  noise.connect(bp); bp.connect(ng); ng.connect(ctx.destination);
+  noise.start(t0); noise.stop(t0+dur);
+  // thump: a quick low pitch-drop for the desk "knock" body
+  const o = ctx.createOscillator(); o.type="triangle";
+  o.frequency.setValueAtTime(190, t0); o.frequency.exponentialRampToValueAtTime(90, t0+0.09);
+  const og = ctx.createGain();
+  og.gain.setValueAtTime(0.0001, t0);
+  og.gain.exponentialRampToValueAtTime(0.75*vol, t0+0.005);
+  og.gain.exponentialRampToValueAtTime(0.0001, t0+0.12);
+  o.connect(og); og.connect(ctx.destination);
+  o.start(t0); o.stop(t0+0.14);
+}
+// Gavel: a double bang, like an auctioneer's hammer on the desk.
+function chime(){
+  const ctx=getCtx(); if(!ctx) return; const now=ctx.currentTime;
+  gavelHit(ctx, now,      1.0);
+  gavelHit(ctx, now+0.17, 0.9);
+}
+function speak(text){
+  if(!window.speechSynthesis) return;
+  try{ speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(text); u.rate=0.95; u.pitch=1.05; u.volume=1;
+    speechSynthesis.speak(u);
+  }catch(e){}
+}
+function stopSpeak(){ try{ if(window.speechSynthesis) speechSynthesis.cancel(); }catch(e){} }
+// Announce exactly once: clear any pending/lingering speech first so a new
+// announcement (next player) can't overlap or restart the previous one.
+let announceTimer=null;
+function announce(name,team,price){
+  if(announceTimer){ clearTimeout(announceTimer); announceTimer=null; }
+  stopSpeak();
+  chime();
+  const cr=(price!=null&&price!=="")?(" for "+Number(price)+" crore"):"";
+  announceTimer=setTimeout(()=>{ stopSpeak(); speak(name+", sold to "+team+cr); }, 650);   // let the bell ring first
+}
+// Auctioneer's final call before the hammer — audio only, no popup.
+function finalCall(){
+  primeAudio();
+  const p=PLAYERS[cur];
+  const price=parseFloat($("fcPrice").value);
+  if(isNaN(price)||price<=0){ toast("Enter the final-call price first"); return; }
+  $("price").value=price;                       // prefill the sale price so Confirm is one click
+  if(announceTimer){ clearTimeout(announceTimer); announceTimer=null; }
+  stopSpeak(); chime();
+  announceTimer=setTimeout(()=>{ stopSpeak();
+    speak("Final call for "+p.name+" at "+Number(price)+" crore. Going once, going twice!"); }, 650);
+  toast("📣 Final call: "+p.name+" · ₹"+price+" Cr");
+}
+
+/* ---------- SOLD! celebration popup (stays until admin closes) ---------- */
+let lastTeam="", lastName="", lastPrice=null;
+function avatarBig(p){
+  const src=playerPhoto(p);
+  if(src) return '<div class="avatar avatarL"><img src="'+esc(src)+'" alt="'+esc(p.name)+'" '
+    +'onerror="this.parentNode.textContent=\''+initials(p.name)+'\';this.parentNode.style.background=\''+hue(p.name)+'\'"></div>';
+  return '<div class="avatar avatarL" style="background:'+hue(p.name)+'">'+initials(p.name)+'</div>';
+}
+function showSold(p,team,price){
+  lastTeam=team;
+  $("soldBigBody").innerHTML=
+    '<div class="soldbadge">🔨 SOLD!</div>'
+    +'<div class="soldrow">'+avatarBig(p)
+    +'<div class="soldinfo"><div class="soldname">'+esc(p.name)+'</div>'
+    +'<div class="soldmeta"><span class="badge b-'+p.role+'">'+esc(p.role)+'</span>'
+    +'<span class="badge skill">⭐ '+p.skill.toFixed(1)+'</span></div></div></div>'
+    +'<div class="soldto">SOLD TO<b>'+esc(team)+'</b></div>'
+    +'<div class="soldprice">for '+money(price)+' Cr</div>';
+  lastName=p.name; lastPrice=price;
+  $("soldReplay").hidden=false;
+  $("soldClose").hidden=false;
+  $("soldOverlay").classList.add("open");
+  announce(p.name,team,price);                  // popup + sound, on the admin console
+}
+// Popup stays open until the admin closes it.
+function closeSold(){ $("soldOverlay").classList.remove("open"); stopSpeak(); }
+function replaySold(){ announce(lastName,lastTeam,lastPrice); }
+
+/* ---------- full player list + status ---------- */
+function renderPlayersTable(){
+  const q=(($("plsearch")&&$("plsearch").value)||"").toLowerCase();
+  const f=(($("plfilter")&&$("plfilter").value))||"all";
+  let h='<thead><tr><th>ID</th><th>Player</th><th>Role</th><th>Skill</th><th>Base</th><th>Status</th></tr></thead><tbody>';
+  let shown=0;
+  PLAYERS.forEach((p,i)=>{
+    const st = p.soldTo ? (p.soldTo.toUpperCase()==="UNSOLD"?"unsold":"sold") : "pending";
+    if(f!=="all" && f!==st) return;
+    if(q && !p.name.toLowerCase().includes(q)) return;
+    shown++;
+    let status,cls;
+    if(st==="unsold"){ status="⚪ Unsold"; cls="st-unsold"; }
+    else if(st==="sold"){ status="✅ "+esc(p.soldTo)+" · "+money(p.price)+" Cr"; cls="st-sold"; }
+    else { status="⏳ Pending"; cls="st-pending"; }
+    h+='<tr class="'+(i===cur?"cur ":"")+'" onclick="pickPlayer('+i+')">'
+      +'<td>'+p.id+'</td><td class="team">'+esc(p.name)+'</td>'
+      +'<td><span class="badge b-'+p.role+'" style="font-size:10px;padding:2px 7px">'+esc(p.role)+'</span></td>'
+      +'<td>'+p.skill.toFixed(1)+'</td><td>'+money(p.base)+'</td>'
+      +'<td class="'+cls+'">'+status+'</td></tr>';
+  });
+  if(!shown) h+='<tr><td colspan="6" style="text-align:center;color:#9a7326;padding:14px">No players match this filter.</td></tr>';
+  h+='</tbody>'; $("plistTable").innerHTML=h;
+}
+
+/* ---------- misc ---------- */
+function msg(id,text,cls){ const el=$(id); el.textContent=text; el.className="msg"+(cls?" "+cls:""); }
+let toastT;
+function toast(text,ms){ const el=$("toast"); el.textContent=text; el.classList.add("show");
+  clearTimeout(toastT); toastT=setTimeout(()=>el.classList.remove("show"),ms||2200); }
+
+document.addEventListener("keydown",e=>{
+  if($("app").hidden) return;
+  if(e.key==="Escape"){
+    if($("soldOverlay").classList.contains("open")) closeSold();
+    else closeAuction();
+    return;
+  }
+  if(e.target.tagName==="INPUT"||e.target.tagName==="SELECT") return;
+  if(e.key==="ArrowLeft") go(-1);
+  else if(e.key==="ArrowRight") go(1);
+});
+
+/* ---------- boot ---------- */
+boot();
+</script>
+</body>
+</html>
