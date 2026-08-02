@@ -35,9 +35,15 @@
     text-align:left;margin:10px 0 16px;font-weight:600;color:#7a2230}
   .changes span{display:block;margin:3px 0}
 
-  .qrbox{background:#fff;border-radius:16px;padding:14px;display:inline-block;box-shadow:0 6px 16px rgba(120,60,0,.18);border:2px solid #f0e2c4}
-  .qrbox img{display:block;width:230px;height:230px}
   .scan{font-size:13px;font-weight:800;color:#7a4d00;margin:12px 0 4px}
+  .bigbtn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
+    width:240px;height:240px;margin:4px auto 0;border-radius:20px;text-decoration:none;
+    background:linear-gradient(135deg,var(--saffron),var(--red));color:#fff;
+    box-shadow:0 12px 30px rgba(215,38,61,.42);border:4px solid #fff}
+  .bigbtn:active{transform:scale(.98)}
+  .bb-emoji{font-size:54px;line-height:1}
+  .bb-text{font-weight:900;font-size:25px;line-height:1.15;letter-spacing:.5px;text-align:center}
+  .bb-arrow{font-size:32px;font-weight:900;line-height:1}
 
   .btn{display:inline-block;margin-top:6px;background:var(--green);color:#fff;text-decoration:none;font-weight:800;
     font-size:15px;padding:11px 20px;border-radius:26px;box-shadow:0 6px 16px rgba(11,122,59,.35)}
@@ -66,15 +72,17 @@
     <span>🧤 Max <b>2 Wicket-Keepers</b> &amp; <b>2 All-Rounders</b> per team</span>
   </div>
 
-  <div class="qrbox"><img id="qr" alt="Scan for the updated IPL Fantasy rules"></div>
-  <div class="scan">📲 Scan to open the updated rulebook</div>
+  <a class="bigbtn" id="auctionBig" href="ipl-auction.html">
+    <span class="bb-emoji">🏏</span>
+    <span class="bb-text">GO TO<br>AUCTION PAGE</span>
+    <span class="bb-arrow">→</span>
+  </a>
+  <div class="scan">👆 Tap to enter the live auction (choose “view only”)</div>
 
-  <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:2px">
+  <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:6px">
     <a class="btn" id="rulesLink" href="ipl-rules.html">📖 Updated Rules</a>
-    <a class="btn" id="auctionLink" href="ipl-auction.html"
-       style="background:var(--saffron);box-shadow:0 6px 16px rgba(255,106,0,.35)">📺 Live Auction</a>
   </div>
-  <span class="linktext" id="rulesLinkText"></span>
+  <span class="linktext" id="auctionLinkText"></span>
 
   <div class="notehint">
     <span class="dot"></span> You can also tap the blinking <b>“Rules updated”</b> notice in the
@@ -92,11 +100,9 @@
   const abs = f => SITE_BASE ? SITE_BASE.replace(/\/?$/,'/') + f : new URL(f, location.href).href;
   const RULES_URL = abs("ipl-rules.html");
   const AUCTION_URL = abs("ipl-auction.html");
-  document.getElementById("qr").src =
-      "https://api.qrserver.com/v1/create-qr-code/?size=260x260&margin=8&data=" + encodeURIComponent(RULES_URL);
+  document.getElementById("auctionBig").href = AUCTION_URL;
   document.getElementById("rulesLink").href = RULES_URL;
-  document.getElementById("auctionLink").href = AUCTION_URL;
-  document.getElementById("rulesLinkText").textContent = RULES_URL;
+  document.getElementById("auctionLinkText").textContent = AUCTION_URL;
   // hide the Back button when rendering a shareable image (…?png)
   if(location.search.indexOf("png") >= 0){ document.querySelector(".back").style.display = "none"; }
 </script>
