@@ -44,6 +44,8 @@ const VIDEO_HEAD  = ['ID','Timestamp','FileId','Caption','AddedBy'];   // videos
 const TAB_IPL_PLAYERS = 'IPL_FANTASY_PLAYER_DASH';   // A:ID B:Name C:Role D:Skill E:Base F:SoldTo G:FinalPrice (H:PhotoURL optional)
 const IPL_COL_SOLDTO  = 6;   // column F
 const IPL_COL_PRICE   = 7;   // column G
+const TAB_IPL_SIGNAL  = 'IPL_FANTASY_SIGNAL';        // one data row the view screen polls to know when to announce
+const IPL_SIGNAL_HEAD = ['Counter','PlayerId','Announce'];
 
 function doGet(e)  { return handle({ action: 'all' }); }
 function doPost(e) {
@@ -69,6 +71,7 @@ function handle(d) {
     else if (a === 'delVideo')    out = need(d) || (delVideo(d.rowId),               { ok: true, videos: listVideos() });
     else if (a === 'setResult')   out = need(d) || (setResult(d.p || {}),            { ok: true, events: listEvents(), teams: listTeams() });
     else if (a === 'iplSell')     out = need(d) || iplSell(d.p || {});
+    else if (a === 'iplAnnounce') out = need(d) || iplAnnounce(d.p || {});
     else out = { ok: false, error: 'Unknown action' };
   } catch (err) { out = { ok: false, error: String(err) }; }
   return ContentService.createTextOutput(JSON.stringify(out)).setMimeType(ContentService.MimeType.JSON);
@@ -266,6 +269,17 @@ function iplSell(p) {
     }
   }
   throw new Error('Player ID not found: ' + pid);
+}
+
+// Bumps a counter that the view-only screen polls; when it changes, that
+// screen shows the SOLD popup + audio for PlayerId. Lets the admin trigger
+// (or re-trigger) the on-screen announcement on demand. Auto-creates the tab.
+function iplAnnounce(p) {
+  var s = tab(TAB_IPL_SIGNAL, IPL_SIGNAL_HEAD);
+  var cur = Number(s.getRange(2, 1).getValue()) || 0;
+  var next = cur + 1;
+  s.getRange(2, 1, 1, 3).setValues([[next, Number(p.playerId) || '', p.text || '']]);
+  return { ok: true, counter: next };
 }
 
 /* ---------- shared ---------- */
