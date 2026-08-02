@@ -38,6 +38,13 @@ const GALLERY_FOLDER_NAME = 'CAFS Onam Gallery';   // Drive folder auto-created 
 const TAB_VIDEO   = 'Videos';
 const VIDEO_HEAD  = ['ID','Timestamp','FileId','Caption','AddedBy'];   // videos are Drive links (not uploaded files)
 
+// IPL Fantasy Auction — the auction page (ipl-auction.html) writes the two
+// admin-entered fields into the player table; the dashboard tab recomputes
+// budget/score itself via its own in-sheet formulas.
+const TAB_IPL_PLAYERS = 'IPL_FANTASY_PLAYER_DASH';   // A:ID B:Name C:Role D:Skill E:Base F:SoldTo G:FinalPrice (H:PhotoURL optional)
+const IPL_COL_SOLDTO  = 6;   // column F
+const IPL_COL_PRICE   = 7;   // column G
+
 function doGet(e)  { return handle({ action: 'all' }); }
 function doPost(e) {
   var d = {}; try { d = JSON.parse(e.postData.contents); } catch (err) {}
@@ -61,6 +68,7 @@ function handle(d) {
     else if (a === 'addVideo')    out = need(d) || (addVideo(d.p || {}, d.user),     { ok: true, videos: listVideos() });
     else if (a === 'delVideo')    out = need(d) || (delVideo(d.rowId),               { ok: true, videos: listVideos() });
     else if (a === 'setResult')   out = need(d) || (setResult(d.p || {}),            { ok: true, events: listEvents(), teams: listTeams() });
+    else if (a === 'iplSell')     out = need(d) || iplSell(d.p || {});
     else out = { ok: false, error: 'Unknown action' };
   } catch (err) { out = { ok: false, error: String(err) }; }
   return ContentService.createTextOutput(JSON.stringify(out)).setMimeType(ContentService.MimeType.JSON);
@@ -233,6 +241,31 @@ function recomputeTotals() {
     if (name) vals[i][3] = totals[name] || 0;
   }
   rng.setValues(vals);
+}
+
+/* ---------- IPL Fantasy auction ---------- */
+// Writes 'Sold To' (F) and 'Final Price' (G) into the player row matched by
+// Player ID (A). The dashboard tab (IPL_FANTASY_LIV_DASH) has its own formulas
+// that read these two columns, so nothing else needs to be computed here.
+//   soldTo  : exact team name, or 'UNSOLD', or '' to clear the sale
+//   price   : number (Cr), or '' / null to clear
+function iplSell(p) {
+  var s = ss().getSheetByName(TAB_IPL_PLAYERS);
+  if (!s) throw new Error('Sheet "' + TAB_IPL_PLAYERS + '" not found');
+  var last = s.getLastRow(); if (last < 2) throw new Error('No players in ' + TAB_IPL_PLAYERS);
+  var pid = Number(p.playerId);
+  if (!pid) throw new Error('Missing playerId');
+  var ids = s.getRange(2, 1, last - 1, 1).getValues();
+  for (var i = 0; i < ids.length; i++) {
+    if (Number(ids[i][0]) === pid) {
+      var row = i + 2;
+      var price = (p.price === '' || p.price == null) ? '' : Number(p.price);
+      s.getRange(row, IPL_COL_SOLDTO).setValue(p.soldTo || '');
+      s.getRange(row, IPL_COL_PRICE ).setValue(price);
+      return { ok: true, playerId: pid, soldTo: p.soldTo || '', price: price };
+    }
+  }
+  throw new Error('Player ID not found: ' + pid);
 }
 
 /* ---------- shared ---------- */
