@@ -116,7 +116,7 @@
   .soldOverlay.open{display:flex;animation:fadeIn .2s ease}
   @keyframes fadeIn{from{opacity:0}to{opacity:1}}
   .soldcard{position:relative;background:linear-gradient(180deg,#fffef9,#fff3dc);border-radius:24px;
-    box-shadow:0 24px 70px rgba(0,0,0,.5);padding:26px 26px 20px;max-width:460px;width:100%;text-align:center;
+    box-shadow:0 24px 70px rgba(0,0,0,.5);padding:32px 30px 24px;max-width:560px;width:100%;text-align:center;
     border:4px solid var(--gold);animation:pop .35s cubic-bezier(.2,1.4,.4,1)}
   @keyframes pop{from{transform:scale(.7);opacity:0}to{transform:scale(1);opacity:1}}
   .soldclose{position:absolute;top:6px;right:8px;background:none;border:none;font-size:26px;line-height:1;
@@ -124,19 +124,27 @@
   .soldclose:active{background:rgba(0,0,0,.06)}
   .eschint{position:absolute;top:17px;right:50px;font-size:11px;font-weight:400;color:#b58a3a;opacity:.65;
     pointer-events:none;letter-spacing:.3px}
-  .soldbadge{font-family:var(--font-display,inherit);font-size:34px;font-weight:900;letter-spacing:1px;
+  .soldbadge{font-family:var(--font-display,inherit);font-size:44px;font-weight:900;letter-spacing:1px;
     color:var(--red);text-shadow:0 2px 0 #fff,0 4px 10px rgba(215,38,61,.4);animation:bang .5s ease}
   @keyframes bang{0%{transform:scale(.4) rotate(-8deg)}60%{transform:scale(1.15)}100%{transform:scale(1)}}
-  .soldrow{display:flex;align-items:center;justify-content:center;gap:16px;margin:14px 0 6px}
-  .avatarL{width:104px;height:104px;font-size:38px}
+  .soldrow{display:flex;align-items:center;justify-content:center;gap:22px;margin:16px 0 6px}
+  .avatarL{width:150px;height:150px;font-size:54px}
   .soldinfo{text-align:left}
-  .soldname{font-size:24px;font-weight:800;line-height:1.1}
-  .soldmeta{margin-top:8px;display:flex;gap:6px;flex-wrap:wrap}
-  .soldto{margin-top:12px;font-size:15px;font-weight:800;color:#7a4d00;letter-spacing:2px}
-  .soldto b{display:block;font-size:32px;letter-spacing:0;margin-top:4px;
+  .soldname{font-size:30px;font-weight:800;line-height:1.1}
+  .soldmeta{margin-top:10px;display:flex;gap:7px;flex-wrap:wrap}
+  .soldcard .badge{font-size:14px;padding:6px 14px}
+  .soldto{margin-top:16px;font-size:18px;font-weight:800;color:#7a4d00;letter-spacing:2px}
+  .soldto b{display:block;font-size:42px;letter-spacing:0;margin-top:6px;
     background:linear-gradient(90deg,var(--saffron),var(--green));-webkit-background-clip:text;background-clip:text;color:transparent}
-  .soldprice{font-size:20px;font-weight:800;color:var(--green);margin-top:4px}
+  .soldprice{font-size:26px;font-weight:800;color:var(--green);margin-top:6px}
   .soldreplay{margin-top:16px;width:100%;background:var(--saffron);box-shadow:0 6px 16px rgba(255,106,0,.4)}
+  @media(max-width:430px){
+    .soldrow{flex-direction:column;gap:12px}
+    .soldinfo{text-align:center}
+    .soldmeta{justify-content:center}
+    .avatarL{width:132px;height:132px;font-size:48px}
+    .soldto b{font-size:36px}
+  }
 
   /* ---------- full player list & status ---------- */
   table.plist td{cursor:pointer}
