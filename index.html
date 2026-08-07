@@ -331,6 +331,10 @@
   .ipllink{background:linear-gradient(135deg,#0b7a3b,#0e9d4c);
     box-shadow:0 6px 18px rgba(11,122,59,.5)}
   .ipllink:hover{filter:brightness(1.05)}
+  /* rulebook launcher — same shape, but calm (no blinking) so it doesn't fight the Path-to-Final button */
+  .rulelink{background:linear-gradient(135deg,#ff8c00,#e06a00);
+    box-shadow:0 6px 18px rgba(224,106,0,.45);animation:none}
+  .rulelink:hover{filter:brightness(1.05)}
 
   /* keep the horizontally-scrollable bracket on mobile too (same as desktop);
      just hint that it scrolls */
@@ -635,7 +639,7 @@ const I18N={
     noScores:"No scores entered yet.",
     top3Label:"🏆 Top 3", firstPlace:"1st", secondPlace:"2nd", thirdPlace:"3rd",
     pathToFinal:"Path to Final", pathToCrown:"Path to",
-    iplAuction:"Go to IPL Fantasy Auction",
+    iplAuction:"Go to IPL Fantasy Auction", rulebook:"Read the full rulebook",
     bracketSub:"Quarterfinals · Semifinals · Final · 3rd Place",
     rQF:"Quarterfinals", rSF1:"Semifinal 1", rSF2:"Semifinal 2",
     rFinal:"Championship Final", r3rd:"3rd Place Play-off",
@@ -661,7 +665,7 @@ const I18N={
     noScores:"ഇതുവരെ സ്കോർ രേഖപ്പെടുത്തിയിട്ടില്ല.",
     top3Label:"🏆 ടോപ് 3", firstPlace:"ഒന്നാം", secondPlace:"രണ്ടാം", thirdPlace:"മൂന്നാം",
     pathToFinal:"ഫൈനലിലേക്കുള്ള വഴി", pathToCrown:"കിരീടത്തിലേക്ക്",
-    iplAuction:"ഐപിഎൽ ഫാന്റസി ലേലത്തിലേക്ക് പോകുക",
+    iplAuction:"ഐപിഎൽ ഫാന്റസി ലേലത്തിലേക്ക് പോകുക", rulebook:"പൂർണ്ണ നിയമാവലി വായിക്കുക",
     bracketSub:"ക്വാർട്ടർ · സെമി · ഫൈനൽ · മൂന്നാം സ്ഥാനം",
     rQF:"ക്വാർട്ടർ ഫൈനൽ", rSF1:"സെമിഫൈനൽ 1", rSF2:"സെമിഫൈനൽ 2",
     rFinal:"ചാമ്പ്യൻഷിപ് ഫൈനൽ", r3rd:"മൂന്നാം സ്ഥാന മത്സരം",
@@ -957,6 +961,7 @@ function openScorecard(no,isRefresh){
     ' &nbsp; 🏅 '+esc(e.pts)+' &nbsp; 👥 '+esc(e.pt);
   const ruleText=e.rules||t("defaultRules");
   let h='<div class="rulesbox"><b>'+t("rulesLabel")+'</b><br>'+linkify(ruleText)+'</div>';
+  h+=rulebookLinkHtml(e); // "Read the full rulebook" for events with a rules page on this site
   h+=renderTop3(e);      // event Top 3 (replaces the old empty Members/Score/Rank table)
   h+=pathLinkHtml(e);    // blinking "Path to Final" launcher for bracket events
   h+=iplLinkHtml(e);     // "Go to IPL Fantasy Auction" launcher for the IPL event
@@ -1052,6 +1057,16 @@ function pathLinkHtml(e){
 function iplLinkHtml(e){
   if(!String(e.ev||"").toLowerCase().includes("ipl fantasy")) return "";
   return '<a class="pathlink ipllink" href="ipl-auction.html">'+t("iplAuction")+' <span class="crownbig">🏏</span> →</a>';
+}
+/* Events whose rules live in a full page on this site rather than a PDF attachment. */
+const RULEBOOKS=[
+  {re:/fruit\s*carving/i, page:"fruit-carving-rules.html", icon:"🍉"},
+  {re:/football/i,        page:"football-rules.html",      icon:"⚽"},
+  {re:/ipl\s*fantasy/i,   page:"ipl-rules.html",           icon:"🏏"}
+];
+function rulebookLinkHtml(e){
+  const rb=RULEBOOKS.find(r=>r.re.test(String(e.ev||""))); if(!rb) return "";
+  return '<a class="pathlink rulelink" href="'+rb.page+'">'+t("rulebook")+' <span class="crownbig">'+rb.icon+'</span> →</a>';
 }
 let bracketNo=null;
 function openBracket(no){ bracketNo=no; renderBracket(no); document.getElementById("bracketOverlay").classList.add("open"); }
