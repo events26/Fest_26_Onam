@@ -196,8 +196,13 @@ function eventsData() {
   function ci(name) { return head.indexOf(name.toLowerCase()); }
   function starts(pre) { for (var i = 0; i < head.length; i++) if (head[i].indexOf(pre) === 0) return i; return -1; }
   return { sheet:s, values:values, idx:{
-    no:ci('Sl No'), ev:ci('Events'), pts:starts('points'),
+    no:ci('Sl No'), dt:ci('Date'), ev:ci('Events'), pts:starts('points'),
     w1:ci('Winner1'), w2:ci('Winner2'), w3:ci('Winner3') } };
+}
+// the Events sheet stores dates as dd/MM/yyyy text or as real Dates — send both as dd/MM/yyyy
+function fmtDate(v) {
+  if (v instanceof Date) return Utilities.formatDate(v, Session.getScriptTimeZone(), 'dd/MM/yyyy');
+  return String(v || '').trim();
 }
 function listEvents() {
   var e = eventsData(); if (!e) return [];
@@ -206,6 +211,7 @@ function listEvents() {
     var row = e.values[r], name = e.idx.ev>=0 ? String(row[e.idx.ev]).trim() : '';
     if (!name) continue;
     out.push({ no: e.idx.no>=0?row[e.idx.no]:'', name:name,
+      date: e.idx.dt>=0?fmtDate(row[e.idx.dt]):'',
       points: e.idx.pts>=0?String(row[e.idx.pts]):'',
       w1: e.idx.w1>=0?String(row[e.idx.w1]).trim():'',
       w2: e.idx.w2>=0?String(row[e.idx.w2]).trim():'',

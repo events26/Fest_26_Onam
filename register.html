@@ -278,9 +278,11 @@ async function loadEvents(){
     const j=JSON.parse(txt.substring(txt.indexOf("{"),txt.lastIndexOf("}")+1));
     const cols=j.table.cols.map(c=>String(c.label||"").trim().toLowerCase());
     const ei=cols.indexOf('events'), pi=cols.findIndex(c=>c.indexOf('points')===0),
-          n1=cols.indexOf('winner1'), n2=cols.indexOf('winner2'), n3=cols.indexOf('winner3'), ni=cols.indexOf('sl no');
+          n1=cols.indexOf('winner1'), n2=cols.indexOf('winner2'), n3=cols.indexOf('winner3'),
+          ni=cols.indexOf('sl no'), di=cols.indexOf('date');
     const cell=(r,i)=>i>=0&&r.c[i]?(r.c[i].f!=null?r.c[i].f:r.c[i].v):"";
     const full=j.table.rows.map(r=>({no:cell(r,ni),name:String(cell(r,ei)).trim(),points:String(cell(r,pi)),
+      date:String(cell(r,di)).trim(),
       w1:String(cell(r,n1)).trim(),w2:String(cell(r,n2)).trim(),w3:String(cell(r,n3)).trim()})).filter(x=>x.name);
     if(full.length){ EVENTSFULL=full; names=full.map(x=>x.name); }
   }catch(e){} }
@@ -296,10 +298,16 @@ async function refreshAll(flash){
   try{
     const r=await dataGetAll();
     TEAMS=r.teams||[]; PARTICIPANTS=r.participants||[]; MATCHES=r.matches||[]; GALLERY=r.gallery||[]; VIDEOS=r.videos||[];
-    if(Array.isArray(r.events)&&r.events.length) EVENTSFULL=r.events;   // prefer backend events if present; else keep gviz-loaded
+    if(Array.isArray(r.events)&&r.events.length) EVENTSFULL=mergeEvents(r.events);   // prefer backend events; else keep gviz-loaded
     renderTeamlist(); renderList(); renderSport(); renderTeamsEditor(); renderGalleryAdmin(); renderVideosAdmin();
     if(flash) { /* noop visual */ }
   }catch(e){ console.error(e); }
+}
+/* Backend events win, but keep the gviz-loaded date when an older Apps Script
+   deployment doesn't send one — the podium rule below needs it. */
+function mergeEvents(list){
+  const dateBy={}; EVENTSFULL.forEach(x=>{ if(x.date) dateBy[x.name]=x.date; });
+  return list.map(x=>Object.assign({},x,{date:x.date||dateBy[x.name]||''}));
 }
 function renderTeamlist(){
   const sel=$('f_team'); if(!sel) return;
@@ -360,6 +368,9 @@ function renderSport(){
   const pp=parsePointsClient(ef.points);
   h+='<h2 style="margin-top:20px">🏅 Result — Podium &amp; Points</h2>';
   h+='<p class="hint">Points for this sport → 🥇 '+pp[0]+' · 🥈 '+pp[1]+' · 🥉 '+pp[2]+'. Saving auto-updates the cumulative points table.</p>';
+  h+= allowsSameTeamTwice(ev)
+      ? '<p class="hint">👥 Individual event — the <b>same team may take more than one place</b> (e.g. 1st and 2nd both Vallam Vikings).</p>'
+      : '<p class="hint">🛡️ Team event — each place must go to a <b>different team</b>.</p>';
   h+='<div class="matchrow"><span class="vs" style="flex:0 0 40px">🥇 1st</span><select id="r1">'+teamOptsSel(ef.w1)+'</select><b>('+pp[0]+' pts)</b></div>';
   h+='<div class="matchrow"><span class="vs" style="flex:0 0 40px">🥈 2nd</span><select id="r2">'+teamOptsSel(ef.w2)+'</select><b>('+pp[1]+' pts)</b></div>';
   h+='<div class="matchrow"><span class="vs" style="flex:0 0 40px">🥉 3rd</span><select id="r3">'+teamOptsSel(ef.w3)+'</select><b>('+pp[2]+' pts)</b></div>';
@@ -367,13 +378,34 @@ function renderSport(){
   box.innerHTML=h;
 }
 function parsePointsClient(str){ const a=String(str||'').split(/[,\/]/).map(x=>parseFloat(x.trim())||0); return [a[0]||0,a[1]||0,a[2]||0]; }
+
+/* ---------- who may take two/three podium places ----------
+   Events from 6 Aug 2026 onwards are individual contests, so one team can
+   win more than one place (1st AND 2nd, etc.). The genuine team events —
+   football, tug of war, pookkalam — still need three different teams. */
+const MULTI_WINNER_FROM = new Date(2026,7,6);            // 6 August 2026
+const TEAM_ONLY_EVENTS  = /football|tug\s*of\s*war|pookk?alam/i;
+function eventDate(str){
+  const s=String(str||'').trim(); if(!s) return null;
+  const m=s.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})$/);   // dd/mm/yyyy as the sheet stores it
+  if(m) return new Date(+m[3], +m[2]-1, +m[1]);
+  const d=new Date(s); return isNaN(d.getTime())?null:d;
+}
+function allowsSameTeamTwice(ev){
+  if(TEAM_ONLY_EVENTS.test(ev)) return false;
+  const e=EVENTSFULL.find(x=>x.name===ev); if(!e) return false;
+  const d=eventDate(e.date);
+  return !!d && d>=MULTI_WINNER_FROM;                    // unknown date → keep the old strict rule
+}
+
 async function saveResult(ev){
   if(DEMO){ alert('Results need the live backend (deploy the Apps Script).'); return; }
   const w1=$('r1').value, w2=$('r2').value, w3=$('r3').value;
   const chosen=[w1,w2,w3].filter(Boolean);
-  if(new Set(chosen).size!==chosen.length){ alert('The same team is picked for more than one position — please fix.'); return; }
+  if(!allowsSameTeamTwice(ev) && new Set(chosen).size!==chosen.length){
+    alert('The same team is picked for more than one position — please fix.'); return; }
   try{ const r=await api({action:'setResult',user:CRED.user,pass:CRED.pass,p:{event:ev,w1:w1,w2:w2,w3:w3}});
-    if(r.ok){ EVENTSFULL=r.events||EVENTSFULL; TEAMS=r.teams||TEAMS; renderSport(); renderTeamsEditor(); alert('✅ '+ev+' result saved — cumulative points updated.'); }
+    if(r.ok){ if(r.events) EVENTSFULL=mergeEvents(r.events); TEAMS=r.teams||TEAMS; renderSport(); renderTeamsEditor(); alert('✅ '+ev+' result saved — cumulative points updated.'); }
     else alert(r.error||'Could not save result');
   }catch(e){ alert('Error: '+e.message); }
 }
