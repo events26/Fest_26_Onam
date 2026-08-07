@@ -150,6 +150,7 @@
   .modal .body{padding:14px 20px 22px}
   .rulesbox{background:#fff4d6;border:1px solid var(--gold);border-radius:12px;padding:12px 14px;margin:8px 0 14px;white-space:pre-wrap;line-height:1.6}
   .rulesbox b{color:var(--saffron)}
+  .rulesbox .ruleslink{display:inline-block;margin-top:2px;color:var(--saffron);font-weight:800;text-decoration:underline}
   .live-inline{display:inline-block;background:var(--red);color:#fff;font-size:12px;font-weight:800;
     padding:4px 11px 4px 22px;border-radius:20px;position:relative;margin-left:8px;vertical-align:middle}
   .live-inline::before{content:"";position:absolute;left:9px;top:50%;transform:translateY(-50%);width:8px;height:8px;border-radius:50%;background:#fff;animation:blink .8s infinite}
@@ -640,6 +641,7 @@ const I18N={
     top3Label:"🏆 Top 3", firstPlace:"1st", secondPlace:"2nd", thirdPlace:"3rd",
     pathToFinal:"Path to Final", pathToCrown:"Path to",
     iplAuction:"Go to IPL Fantasy Auction", rulebook:"Read the full rulebook",
+    rulesHere:"Full rulebook for this event — tap to read",
     bracketSub:"Quarterfinals · Semifinals · Final · 3rd Place",
     rQF:"Quarterfinals", rSF1:"Semifinal 1", rSF2:"Semifinal 2",
     rFinal:"Championship Final", r3rd:"3rd Place Play-off",
@@ -666,6 +668,7 @@ const I18N={
     top3Label:"🏆 ടോപ് 3", firstPlace:"ഒന്നാം", secondPlace:"രണ്ടാം", thirdPlace:"മൂന്നാം",
     pathToFinal:"ഫൈനലിലേക്കുള്ള വഴി", pathToCrown:"കിരീടത്തിലേക്ക്",
     iplAuction:"ഐപിഎൽ ഫാന്റസി ലേലത്തിലേക്ക് പോകുക", rulebook:"പൂർണ്ണ നിയമാവലി വായിക്കുക",
+    rulesHere:"ഈ ഇനത്തിന്റെ പൂർണ്ണ നിയമാവലി — വായിക്കാൻ ടാപ്പ് ചെയ്യുക",
     bracketSub:"ക്വാർട്ടർ · സെമി · ഫൈനൽ · മൂന്നാം സ്ഥാനം",
     rQF:"ക്വാർട്ടർ ഫൈനൽ", rSF1:"സെമിഫൈനൽ 1", rSF2:"സെമിഫൈനൽ 2",
     rFinal:"ചാമ്പ്യൻഷിപ് ഫൈനൽ", r3rd:"മൂന്നാം സ്ഥാന മത്സരം",
@@ -959,8 +962,13 @@ function openScorecard(no,isRefresh){
   document.getElementById("mMeta").innerHTML=
     '📅 '+esc(e.date)+' ('+esc(e.day)+') &nbsp; ⏰ '+esc(e.time)+'<br>📍 '+esc(e.ven)+
     ' &nbsp; 🏅 '+esc(e.pts)+' &nbsp; 👥 '+esc(e.pt);
-  const ruleText=e.rules||t("defaultRules");
-  let h='<div class="rulesbox"><b>'+t("rulesLabel")+'</b><br>'+linkify(ruleText)+'</div>';
+  /* An event with its own rules page never shows the "will be announced" fallback —
+     the box links straight to that page instead. */
+  const rb=rulebookFor(e);
+  const ruleText=e.rules||(rb?"":t("defaultRules"));
+  let h='<div class="rulesbox"><b>'+t("rulesLabel")+'</b><br>'+
+    (ruleText?linkify(ruleText)
+             :'<a class="ruleslink" href="'+rb.page+'">'+rb.icon+' '+t("rulesHere")+' →</a>')+'</div>';
   h+=rulebookLinkHtml(e); // "Read the full rulebook" for events with a rules page on this site
   h+=renderTop3(e);      // event Top 3 (replaces the old empty Members/Score/Rank table)
   h+=pathLinkHtml(e);    // blinking "Path to Final" launcher for bracket events
@@ -1064,8 +1072,9 @@ const RULEBOOKS=[
   {re:/football/i,        page:"football-rules.html",      icon:"⚽"},
   {re:/ipl\s*fantasy/i,   page:"ipl-rules.html",           icon:"🏏"}
 ];
+function rulebookFor(e){ return RULEBOOKS.find(r=>r.re.test(String(e.ev||"")))||null; }
 function rulebookLinkHtml(e){
-  const rb=RULEBOOKS.find(r=>r.re.test(String(e.ev||""))); if(!rb) return "";
+  const rb=rulebookFor(e); if(!rb) return "";
   return '<a class="pathlink rulelink" href="'+rb.page+'">'+t("rulebook")+' <span class="crownbig">'+rb.icon+'</span> →</a>';
 }
 let bracketNo=null;
