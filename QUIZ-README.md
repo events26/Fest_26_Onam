@@ -11,9 +11,18 @@ only by typing the URL.
 
 ## Running it
 
+On Windows, **double-click `start-quiz.bat`**. It checks Python is there, tells
+you where to get it if not, and leaves the window open showing the join URL.
+Closing that window stops the quiz.
+
+Everywhere else, or if you prefer a terminal:
+
 ```
 python quiz-server.py
 ```
+
+Only the host laptop needs Python. Everyone else just opens a URL — there is
+nothing to install on a phone.
 
 It prints the three URLs. Open them:
 
