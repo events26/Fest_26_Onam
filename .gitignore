@@ -4,3 +4,7 @@ quiz-state.json
 
 __pycache__/
 *.pyc
+
+# Portable Python, if a host drops one in to run without admin rights.
+# Roughly 25 MB unzipped, and each host downloads their own.
+python-embed/

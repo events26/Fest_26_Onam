@@ -1,0 +1,89 @@
+RUNNING THE QUIZ WITHOUT ADMIN RIGHTS
+=====================================
+
+If your work laptop will not let you install Python, you do not need to. There
+is a portable version that is just a ZIP file — no installer, nothing written
+to Program Files, no registry changes, no admin password. It only ever touches
+the folder you put it in.
+
+This takes about three minutes.
+
+
+STEP 1 — Download the portable Python
+-------------------------------------
+Open this link in your browser:
+
+  https://www.python.org/ftp/python/3.12.7/python-3.12.7-embed-amd64.zip
+
+It downloads a file of about 11 MB called
+
+  python-3.12.7-embed-amd64.zip
+
+This is the official python.org download — the "Windows embeddable package".
+It is not an installer and will not ask for any permissions.
+
+
+STEP 2 — Unzip it into the quiz folder
+--------------------------------------
+1. Right-click the downloaded ZIP and choose "Extract All..."
+2. When it asks where to put the files, choose the quiz folder — the same one
+   that has start-quiz.bat in it.
+3. Rename the extracted folder to exactly:
+
+     python-embed
+
+You should end up with this layout:
+
+  Fest_26_Onam-main\
+      start-quiz.bat
+      quiz-server.py
+      python-embed\
+          python.exe          <-- this file must be here
+          python312.dll
+          ...
+
+The important thing is that python-embed\python.exe sits directly inside the
+quiz folder. If you opened python-embed and found another folder inside it with
+the same name, move the inner one up a level.
+
+
+STEP 3 — Start the quiz
+-----------------------
+Double-click start-quiz.bat as normal.
+
+It checks for python-embed first, so it will say
+
+  Using the portable Python in this folder.
+
+and then print the three web addresses. Everything else works exactly as the
+main guide describes.
+
+
+IF IT STILL SAYS PYTHON WAS NOT FOUND
+-------------------------------------
+The folder is in the wrong place or has the wrong name. Open the quiz folder
+and check that going into python-embed shows python.exe straight away, not
+another folder. The name must be python-embed, with the hyphen, all lowercase.
+
+
+OTHER OPTIONS IF THAT DOES NOT WORK
+-----------------------------------
+1. Try the Microsoft Store. Search it for "Python 3.12" and install from there.
+   Store apps often install per-user and do not need admin rights, though some
+   workplaces block the Store entirely.
+
+2. Use someone else's laptop. Only the one machine driving the projector needs
+   any of this. A personal laptop works fine, and everyone playing just opens a
+   web page on their phone regardless.
+
+3. Ask Sanjay. If none of the above is possible, this can be rebuilt to run
+   without any local server at all — but that needs setting up in advance, so
+   raise it early rather than on the day.
+
+
+A NOTE ON SECURITY
+------------------
+None of this weakens anything. The portable Python is the same official build
+from python.org as the installer version; it simply does not integrate itself
+into Windows. There is no reason to relax any password to make this work — the
+two are unrelated.
