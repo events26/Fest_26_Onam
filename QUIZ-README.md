@@ -29,6 +29,16 @@ python3 quiz-server.py      # macOS and Linux
 The server itself is plain standard-library Python and runs anywhere; only the
 launchers are platform-specific.
 
+**Locked-down laptop?** Two ways round it, both needing no admin rights:
+
+- Cannot install Python — see `NO-ADMIN-SETUP.txt`. The embeddable build is a
+  plain ZIP with no installer, and `start-quiz.bat` picks it up automatically
+  from a `python-embed` folder beside it.
+- Phones cannot reach the laptop at all, because opening the firewall needs
+  admin — see `PHONE-SERVER-SETUP.txt`. Run the whole thing from an Android
+  phone over Termux instead. The laptop then only browses to the display page,
+  which no policy blocks.
+
 Only the host laptop needs Python. Everyone else just opens a URL — there is
 nothing to install on a phone.
 

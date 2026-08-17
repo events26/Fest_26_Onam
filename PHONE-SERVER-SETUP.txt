@@ -1,0 +1,164 @@
+RUNNING THE QUIZ FROM AN ANDROID PHONE
+======================================
+
+If the laptop is locked down and will not let phones connect to it, run the
+quiz from a phone instead. One Android phone does everything: it shares the
+hotspot, runs the server, and shows your quizmaster controls.
+
+The laptop is then only a web browser pointed at the phone. Browsing OUT is
+always allowed, so none of the firewall or admin restrictions apply any more.
+
+  Android phone  ->  hotspot + quiz server + your admin page
+  Laptop         ->  joins the hotspot, opens the display page, projects it
+  Team phones    ->  join the hotspot, open the join page
+
+You need an ANDROID phone for this. See the note at the bottom about iPhones.
+
+
+BEFORE YOU START
+----------------
+Do this the day before, not on the day. Downloading Python on the phone takes
+a few minutes and needs a working internet connection.
+
+Plug the phone into a charger. Running a hotspot and a server together drains
+a battery quickly.
+
+
+STEP 1 - Install Termux
+-----------------------
+Termux is a free terminal app for Android.
+
+Do NOT install it from the Play Store. That version is outdated and will fail
+on step 3. Get it from the official releases page instead:
+
+  https://github.com/termux/termux-app/releases
+
+Scroll to the newest release, open "Assets", and download
+
+  termux-app_...._universal.apk
+
+Android will warn about installing from an unknown source. Allow it for your
+browser when prompted - this is a normal phone setting and does not need any
+special permissions or an administrator.
+
+
+STEP 2 - Open Termux and update it
+----------------------------------
+Open the app. You get a black screen with a prompt. Type this and press Enter:
+
+  pkg update -y && pkg upgrade -y
+
+If it asks any questions, press Enter to accept the default. This takes a
+couple of minutes.
+
+
+STEP 3 - Install Python and git
+-------------------------------
+  pkg install -y python git
+
+When it finishes, check it worked:
+
+  python --version
+
+It should print something like Python 3.12.
+
+
+STEP 4 - Download the quiz
+--------------------------
+  git clone https://github.com/events26/Fest_26_Onam.git
+  cd Fest_26_Onam
+
+That is everything downloaded. You will not need internet again except to sign
+in as quizmaster.
+
+
+STEP 5 - Turn the hotspot on FIRST
+----------------------------------
+Leave Termux open, switch to Settings and turn on your phone's hotspot, then
+come back to Termux.
+
+Do this before starting the server. The server works out its address when it
+starts, so if the hotspot is off it will print the wrong one.
+
+
+STEP 6 - Stop Android from killing it
+-------------------------------------
+  termux-wake-lock
+
+This stops Android suspending Termux to save battery. Without it the quiz
+freezes as soon as the screen turns off, which is not obvious when it happens -
+phones simply stop responding.
+
+Also worth doing: in Android Settings, find Termux under Apps and set its
+battery usage to Unrestricted.
+
+
+STEP 7 - Start the quiz
+-----------------------
+  python quiz-server.py
+
+It prints the addresses. On an Android hotspot the join address is almost
+always:
+
+  http://192.168.43.1:8000/
+
+If it printed something different, use what it printed. If it printed more than
+one, try them in order.
+
+LEAVE TERMUX OPEN AND THE SCREEN ON. You can dim the screen, but do not close
+the app or restart the phone.
+
+
+STEP 8 - Connect everyone
+-------------------------
+Everyone joins the phone's hotspot, then:
+
+  Laptop        http://192.168.43.1:8000/display
+                connect the projector, press Full screen, click Turn on sound
+
+  Your controls open the phone's own browser at
+                http://127.0.0.1:8000/admin
+                (127.0.0.1 means "this phone" - it works even with no signal)
+
+  Team phones   http://192.168.43.1:8000/
+
+From here everything works exactly as the main setup guide describes: set the
+team codes, read them out, arm the buzzers.
+
+
+IF SOMETHING GOES WRONG
+-----------------------
+"pkg: command not found"
+    Termux came from the Play Store. Uninstall it and use the APK from step 1.
+
+The address does not load on other phones
+    Check the hotspot is actually on and they are connected to it, not to the
+    office wifi. Then close the server with Ctrl-C, check the hotspot again,
+    and run python quiz-server.py once more so it re-reads its address.
+
+Everything freezes when the screen goes off
+    termux-wake-lock was not run, or Android is still restricting the app.
+    Run it, and set battery usage to Unrestricted in Android Settings.
+
+The laptop cannot open the display page
+    The laptop must join the phone's hotspot like everyone else. It is only
+    browsing a web page, which no firewall policy blocks.
+
+Termux was closed by accident
+    Reopen it, then:
+      cd Fest_26_Onam
+      termux-wake-lock
+      python quiz-server.py
+    Team names, codes and scores are all saved, so nothing is lost. Teams just
+    open the join page again.
+
+
+ABOUT IPHONES
+-------------
+This does not work reliably on an iPhone. iOS stops apps running in the
+background, so the server dies as soon as you switch away or the screen locks -
+in the middle of a quiz that is worse than not starting at all.
+
+If everyone has an iPhone, borrow any Android phone in the room. It only has to
+sit on a charger running Termux; it does not need to belong to the quizmaster,
+and the person lending it can still use their own phone as a team buzzer.

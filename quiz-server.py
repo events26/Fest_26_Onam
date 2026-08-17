@@ -709,22 +709,44 @@ class QuizServer(ThreadingHTTPServer):
         super().handle_error(request, client_address)
 
 
-def lan_ip():
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    try:
-        s.connect(("8.8.8.8", 80))            # no packets leave; just picks a route
-        return s.getsockname()[0]
-    except OSError:
-        pass
-    finally:
-        s.close()
+def lan_ips():
+    """Local addresses worth trying, most likely first.
+
+    A single lookup is not enough. On a phone sharing its hotspot the default
+    route points at mobile data, so asking "how would I reach the internet"
+    returns the cellular address, which no one on the hotspot can use. Probing
+    each likely network separately makes the OS name the matching interface.
+    """
+    seen, out = set(), []
+
+    def add(ip):
+        if (ip and ip not in seen
+                and not ip.startswith("127.")
+                and not ip.startswith("169.254.")):   # self-assigned: no network
+            seen.add(ip)
+            out.append(ip)
+
+    for target in ("192.168.43.1",      # Android hotspot gateway
+                   "172.20.10.1",       # iPhone hotspot gateway
+                   "192.168.1.1",       # common home router
+                   "10.0.0.1",
+                   "8.8.8.8"):          # whatever the default route is
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        try:
+            s.connect((target, 80))     # no packets leave; this only picks a route
+            add(s.getsockname()[0])
+        except OSError:
+            pass
+        finally:
+            s.close()
+
     try:
         for ip in socket.gethostbyname_ex(socket.gethostname())[2]:
-            if not ip.startswith("127."):
-                return ip
+            add(ip)
     except OSError:
         pass
-    return "127.0.0.1"
+
+    return out or ["127.0.0.1"]
 
 
 def main():
@@ -737,7 +759,8 @@ def main():
     if QUESTIONS:
         set_question(0)
 
-    ip = lan_ip()
+    ips = lan_ips()
+    ip = ips[0]
     STATE["join_url"] = "http://%s:%d/" % (ip, PORT)
 
     print("")
@@ -749,6 +772,12 @@ def main():
     print("  Teams join  http://%s:%d/" % (ip, PORT))
     print("  Projector   http://localhost:%d/display" % PORT)
     print("  Quizmaster  http://%s:%d/admin" % (ip, PORT))
+    if len(ips) > 1:
+        print("")
+        print("  This device has more than one address. If the one above does")
+        print("  not work, try these instead:")
+        for other in ips[1:]:
+            print("      http://%s:%d/" % (other, PORT))
     print("")
     if ADMIN_TOKENS:
         print("  Already signed in from an earlier run.")
