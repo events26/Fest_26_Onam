@@ -66,7 +66,9 @@
     font-family:Consolas,"Cascadia Mono",monospace; font-size:9.3pt;
     background:#f4efe2; border:1px solid var(--rule); border-radius:3px;
     padding:1px 5px; color:var(--saffron); font-weight:600;
-    word-break:break-all;
+    /* break-word, not break-all: an address short enough to fit moves to the
+       next line whole instead of splitting mid-number as 192.1 / 68.1.42 */
+    overflow-wrap:break-word; word-break:normal;
   }
   .urlbig{
     display:block; font-family:Consolas,monospace; font-size:10.5pt; font-weight:700;
@@ -88,6 +90,27 @@
     background:#f3f6fa; border:1px solid #ccd8e6; border-left:4px solid #3a6ea5;
     border-radius:4px; padding:8px 11px; margin:6px 0 0; font-size:9.6pt;
   }
+  /* a small mock of the buzz order as it appears on the quizmaster's phone */
+  .queue{margin:7px 0 0; border:1px solid var(--rule); border-radius:5px; overflow:hidden}
+  .qrow{
+    display:flex; align-items:center; gap:8px; padding:5px 9px;
+    border-bottom:1px solid var(--rule); font-size:9.4pt; background:#fff;
+  }
+  .qrow:last-child{border-bottom:0}
+  .qrow .p{
+    flex:none; width:15px; height:15px; border-radius:50%;
+    background:#e8ded0; color:var(--mute); font-weight:700; font-size:7.6pt;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .qrow .t{flex:1; font-weight:600}
+  .qrow .ms{font-family:Consolas,monospace; font-size:8.6pt; color:var(--mute)}
+  .qrow.now{background:#fff6e8}
+  .qrow.now .p{background:var(--marigold); color:#fff}
+  .qrow .tag{
+    font-size:7.4pt; font-weight:700; text-transform:uppercase; letter-spacing:.07em;
+    color:#fff; background:var(--marigold); padding:2px 6px; border-radius:20px;
+  }
+
   .mac .lbl{
     display:inline-block; background:#3a6ea5; color:#fff; font-size:7.6pt;
     font-weight:700; letter-spacing:.09em; text-transform:uppercase;
@@ -117,8 +140,8 @@
   <h1>Onotsavam<br>Quiz Buzzer</h1>
   <div class="sub">
     <b>Setup guide for the host</b><br>
-    Teams buzz in from their own phones.<br>
-    You need one laptop and about 15 minutes.
+    Teams buzz in from their own phones, and<br>
+    you get the full order they buzzed in.
   </div>
 </div>
 
@@ -321,17 +344,35 @@
   <div class="n">13</div>
   <div class="body">
     <h3>Run each question</h3>
-    <p>Read the question aloud from your phone, then:</p>
+    <p>Read the question aloud from your phone, then tap <b>Arm buzzers</b>. Every phone
+       lights up and starts pulsing.</p>
+    <p>Teams tap to buzz. The first one takes the floor and the big screen fills with their
+       colour — and <b>everyone who buzzes after them lines up behind them</b>, in the order
+       they tapped. Your phone shows the whole running order:</p>
+
+    <div class="queue">
+      <div class="qrow now"><span class="p">1</span><span class="t">Maveli Squad</span><span class="ms">0.41s</span><span class="tag">answering</span></div>
+      <div class="qrow"><span class="p">2</span><span class="t">Gajaveerans</span><span class="ms">0.63s</span></div>
+      <div class="qrow"><span class="p">3</span><span class="t">Vallam Vikings</span><span class="ms">0.88s</span></div>
+      <div class="qrow"><span class="p">4</span><span class="t">Onam Kombans</span><span class="ms">1.12s</span></div>
+    </div>
+
+    <p style="margin-top:7px">Then:</p>
     <ul>
-      <li><b>Arm buzzers</b> — every phone lights up and starts pulsing</li>
-      <li>The first team to tap wins; everyone else locks out instantly and the big screen
-          fills with the winning team's colour</li>
-      <li><b>Correct</b> gives them 10 points, or <b>Wrong — pass it on</b> locks them out
-          and reopens the buzzers for everyone else</li>
+      <li><b>Correct</b> gives them 10 points and closes the question</li>
+      <li><b>Wrong — next team</b> crosses them off and passes the floor straight to
+          number 2, then 3, and so on down the list</li>
+      <li>Or <b>tap any team in the list</b> to jump straight to them, if you would rather
+          not step through one at a time</li>
       <li><b>Show the answer on screen</b> highlights the right option on the projector</li>
       <li><b>Next question</b></li>
     </ul>
-    <p style="margin-top:5px"><b>Reset this question</b> starts a question over completely,
+    <div class="tip">
+      <b>The buzzers stay open all the way through.</b> A team that hesitated can still tap
+      and join the end of the queue. If everyone who buzzed gets it wrong, the big screen
+      says so and keeps waiting for someone else.
+    </div>
+    <p style="margin-top:6px"><b>Reset this question</b> starts a question over completely,
        for when one has to be thrown out.</p>
   </div>
 </div>
@@ -349,7 +390,7 @@
     <td>Phones cannot open the page, but the laptop can</td>
     <td>Almost always the firewall. Right-click the Start button, choose
         <b>Terminal (Admin)</b>, and paste this in, then press Enter:
-        <span class="urlbig" style="font-size:8.6pt">New-NetFirewallRule -DisplayName "Onam Quiz" -Direction Inbound -Protocol TCP -LocalPort 8000 -Action Allow -Profile Private,Public</span>
+        <span class="urlbig" style="font-size:8.2pt;white-space:nowrap;word-break:normal">New-NetFirewallRule -DisplayName "Onam Quiz" -LocalPort 8000 -Protocol TCP -Action Allow</span>
         If that does not fix it, the Wi-Fi is separating devices — switch to a phone hotspot.</td>
   </tr>
   <tr>
@@ -395,6 +436,13 @@
     <td>The laptop restarted mid-quiz</td>
     <td>Nothing is lost. Team names, codes, scores and your sign-in are all saved. Start
         the launcher again; teams re-open the join page.</td>
+  </tr>
+  <tr>
+    <td>Everyone buzzes instantly, just to grab a good place in the order</td>
+    <td>Give a wrong buzz a penalty. Open <code>quiz-server.py</code> in Notepad, find the
+        line <code>POINTS_WRONG = 0</code> near the top, change it to
+        <code>POINTS_WRONG = -5</code> and save. Restart the launcher. Guessing usually
+        stops within one round of the first penalty.</td>
   </tr>
   <tr>
     <td>No sound from the projector</td>
