@@ -21,7 +21,16 @@ It prints the three URLs. Open them:
 |---|---|
 | Teams | `http://<your-ip>:8000/` |
 | Projector | `http://localhost:8000/display` |
-| Quizmaster | `http://<your-ip>:8000/admin` — PIN `onam26` |
+| Quizmaster | `http://<your-ip>:8000/admin` |
+
+The quizmaster signs in with the **same username and password as the Onam admin
+page**. There is no separate quiz password, and no password is stored in this
+repo — the server asks the Apps Script whether the pair is valid, exactly the
+way `register.html` does, then issues its own session token.
+
+That check needs internet, so **sign in before the quiz starts**. Once you are
+in you stay in: the session survives a connection drop and a server restart, so
+losing the network mid-quiz costs you nothing.
 
 ## Finding your IP so other people can open the page
 
@@ -70,7 +79,8 @@ If that phone loads the page, every phone will.
 3. Put `/display` on the projector, press **Full screen**, then **Turn on
    sound** once. Browsers block audio until someone clicks, so this has to
    happen before the first question.
-4. Open `/admin` on your own phone and enter the PIN.
+4. Open `/admin` on your own phone and sign in with the Onam admin login.
+   Do this while you still have internet.
 5. Under **Teams & codes**, set the team names, then either type a code for
    each or tap **Generate codes**. Save.
 6. Read each code out to **one person per team**. That phone holds the buzzer.
@@ -141,15 +151,20 @@ question has to be thrown out.
 Team names and codes are set from the admin panel. Everything else is at the top
 of `quiz-server.py`:
 
-- `ADMIN_PIN` — change it, especially if you are pushing this to GitHub.
+- `SCRIPT_URL` — the Apps Script that checks the quizmaster's login. Point this
+  at your own deployment if you are running a different event.
+- `EMERGENCY_PIN` — blank by default, which means there is no password anywhere
+  in this repo. Set it only if you need a way in without internet, and treat
+  whatever you set as public the moment you push it.
 - `POINTS_CORRECT` — 10 by default.
 - `POINTS_WRONG` — 0. Set it negative (say `-5`) if speculative buzzing becomes
   a problem; it usually stops within one round of the first penalty.
 - `PORT` — 8000.
 
-Team names, codes and scores are written to `quiz-state.json` so a crash or a
-restart mid-event does not cost you anything. That file is gitignored, because
-it holds the codes — every host generates their own.
+Team names, codes, scores and the quizmaster's session are written to
+`quiz-state.json` so a crash or a restart mid-event does not cost you anything.
+That file is gitignored, because it holds the codes — every host generates their
+own. It stores a session token, never a password.
 
 ## About "who was actually first"
 

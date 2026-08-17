@@ -36,7 +36,19 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 # ---------------------------------------------------------------- config ----
 
 PORT = 8000
-ADMIN_PIN = "onam26"        # keeps a bored participant off the scoring controls
+
+# The quizmaster signs in with the same username and password as the main Onam
+# admin page. The password is never stored here - this server just asks the
+# Apps Script whether the pair is valid, exactly as register.html does, and
+# then issues its own session token.
+SCRIPT_URL = ("https://script.google.com/macros/s/"
+              "AKfycbz3475oqZIIcYRhzqE0eI9qshSECJ6UxlI5ZSMbGMDM6S0NwJtVy4ui0uwdlrAlJzP4Kw/exec")
+
+# Signing in needs internet, because the check goes to Google. Set this to give
+# yourself an offline way in if the venue has no connection; leave it blank and
+# there is no password in this file at all. Once signed in you stay signed in,
+# so a connection drop mid-quiz costs you nothing.
+EMERGENCY_PIN = ""
 
 # Google Sheet holding the questions. Share it as "anyone with the link can
 # view", then paste the id from the sheet URL between /d/ and /edit. Leave it
@@ -78,6 +90,7 @@ SUBSCRIBERS = []            # list[queue.Queue] - one per open SSE stream
 
 CODES = {}                  # team -> join code. Never broadcast.
 TOKENS = {}                 # team -> secret token of the one signed-in phone
+ADMIN_TOKENS = set()        # session tokens handed out after a successful login
 QUESTIONS = []              # [{q, options[], answer_index, answer_text}]
 
 STATE = {
@@ -116,6 +129,9 @@ def save():
                 "scores": STATE["scores"],
                 "sheet_id": SHEET_ID,
                 "sheet_tab": SHEET_TAB,
+                # Session tokens, not passwords. Kept so a restart does not
+                # force a fresh sign-in, which would need internet.
+                "admin_tokens": sorted(ADMIN_TOKENS),
             }, fh, indent=2, ensure_ascii=False)
     except OSError as exc:
         print("  ! could not save state: %s" % exc)
@@ -133,6 +149,7 @@ def load_saved():
     set_teams(teams, d.get("codes") or {}, d.get("scores") or {})
     SHEET_ID = d.get("sheet_id", SHEET_ID)
     SHEET_TAB = d.get("sheet_tab", SHEET_TAB)
+    ADMIN_TOKENS.update(d.get("admin_tokens") or [])
 
 
 def set_teams(names, codes, scores=None):
@@ -278,6 +295,55 @@ def broadcast():
             q.put_nowait(payload)
         except queue.Full:
             pass
+
+
+# ----------------------------------------------------------------- login ----
+
+def script_auth(user, password):
+    """Ask the Apps Script whether these credentials are good, the same way
+    register.html does. Google's /exec intermittently answers a POST with an
+    HTML error page instead of the script's JSON, so this retries - the auth
+    action is read-only, so a repeat is harmless."""
+    payload = json.dumps({"action": "auth", "user": user, "pass": password}).encode("utf-8")
+    last = ""
+    for attempt in range(3):
+        if attempt:
+            time.sleep(0.5 * attempt)
+        try:
+            req = urllib.request.Request(SCRIPT_URL, data=payload, headers={
+                "Content-Type": "text/plain;charset=utf-8",
+                "User-Agent": "Mozilla/5.0",
+            })
+            with urllib.request.urlopen(req, timeout=15) as r:
+                return json.loads(r.read().decode("utf-8", "replace"))
+        except json.JSONDecodeError:
+            last = "Google answered with a page instead of data"
+        except Exception as exc:                      # noqa: BLE001
+            last = "could not reach the login service (%s)" % type(exc).__name__
+    return {"ok": False, "error": last}
+
+
+def do_login(user, password):
+    if EMERGENCY_PIN and password == EMERGENCY_PIN:
+        return _issue_admin()
+    if not SCRIPT_URL:
+        return {"ok": False, "error": "No login configured on this server."}
+    r = script_auth(user, password)
+    if r.get("ok"):
+        return _issue_admin()
+    return {"ok": False, "error": r.get("error") or "Wrong username or password."}
+
+
+def _issue_admin():
+    token = secrets.token_urlsafe(18)
+    with LOCK:
+        ADMIN_TOKENS.add(token)
+    save()
+    return {"ok": True, "token": token}
+
+
+def is_admin(token):
+    return bool(token) and token in ADMIN_TOKENS
 
 
 # ------------------------------------------------------------------ join -----
@@ -507,9 +573,10 @@ class Handler(BaseHTTPRequestHandler):
             return self.sse()
 
         if path == "/api/teams":
-            # Codes live here, behind the PIN, so they never reach a phone.
-            if self.headers.get("X-Pin") != ADMIN_PIN:
-                return self._json({"ok": False, "reason": "bad_pin"}, 403)
+            # Codes and answers live here, behind the admin session, so they
+            # never reach a phone or the projector.
+            if not is_admin(self.headers.get("X-Token")):
+                return self._json({"ok": False, "reason": "unauthorised"}, 403)
             return self._json({
                 "ok": True,
                 "teams": STATE["teams"],
@@ -540,9 +607,12 @@ class Handler(BaseHTTPRequestHandler):
         if path == "/api/ping":
             return self._json({"ok": True})       # opens the socket before it matters
 
+        if path == "/api/login":
+            return self._json(do_login(body.get("user", ""), body.get("pass", "")))
+
         if path == "/api/admin":
-            if body.get("pin") != ADMIN_PIN:
-                return self._json({"ok": False, "reason": "bad_pin"}, 403)
+            if not is_admin(body.get("token")):
+                return self._json({"ok": False, "reason": "unauthorised"}, 403)
             return self._json(do_admin(body.get("action", ""), body))
 
         return self._json({"ok": False, "reason": "not_found"}, 404)
@@ -644,7 +714,15 @@ def main():
     print("")
     print("  Teams join  http://%s:%d/" % (ip, PORT))
     print("  Projector   http://localhost:%d/display" % PORT)
-    print("  Quizmaster  http://%s:%d/admin   PIN %s" % (ip, PORT, ADMIN_PIN))
+    print("  Quizmaster  http://%s:%d/admin" % (ip, PORT))
+    print("")
+    if ADMIN_TOKENS:
+        print("  Already signed in from an earlier run.")
+    elif EMERGENCY_PIN:
+        print("  Sign in with the Onam admin login, or the emergency PIN.")
+    else:
+        print("  Sign in with the same username and password as the Onam")
+        print("  admin page. That check needs internet - do it early.")
     print("  " + "=" * 54)
     print("  If phones cannot reach it, allow Python through the Windows")
     print("  firewall on private networks, and check everyone is on the")

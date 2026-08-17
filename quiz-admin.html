@@ -85,12 +85,17 @@
   </div>
 
   <div id="gate" class="card">
-    <label class="eyebrow" for="pin">Quizmaster PIN</label>
-    <div style="height:8px"></div>
-    <input type="password" id="pin" autocomplete="off" placeholder="PIN">
+    <label class="eyebrow" for="user">Username</label>
+    <div style="height:6px"></div>
+    <input type="text" id="user" autocomplete="username" autocapitalize="off" spellcheck="false">
+    <div style="height:10px"></div>
+    <label class="eyebrow" for="pw">Password</label>
+    <div style="height:6px"></div>
+    <input type="password" id="pw" autocomplete="current-password" placeholder="••••••••">
     <div style="height:11px"></div>
-    <button class="btn primary" id="pinGo" style="width:100%">Unlock controls</button>
-    <p class="hint" id="pinMsg">Keeps the scoring out of reach of anyone else on the hotspot.</p>
+    <button class="btn primary" id="pinGo" style="width:100%">Sign in</button>
+    <p class="hint" id="pinMsg">Same login as the Onam admin page. Checking it needs
+      internet, so sign in before the quiz starts — once you're in, you stay in.</p>
   </div>
 
   <div id="panel" class="hide">
@@ -203,13 +208,14 @@
 <script>
 const $ = id => document.getElementById(id);
 const KEYS = ["A","B","C","D"];
-let PIN = localStorage.getItem("onam.quiz.pin") || "";
+let TOKEN = localStorage.getItem("onam.quiz.admin") || "";
 let S = null, QS = [], CODES = {};
 
 /* ------------------------------------------------------------------ gate -- */
 
-async function loadPrivate(pin){
-  const res = await fetch("/api/teams", { headers: { "X-Pin": pin } });
+/* Loads everything the hall must never see: team codes and the answer key. */
+async function loadPrivate(token){
+  const res = await fetch("/api/teams", { headers: { "X-Token": token } });
   if (!res.ok) return false;
   const d = await res.json();
   QS = d.questions || [];
@@ -217,8 +223,8 @@ async function loadPrivate(pin){
   $("sheetId").value = d.sheet_id || "";
   $("sheetTab").value = d.sheet_tab || "Quiz";
   $("sourceLbl").textContent = d.source || "";
-  PIN = pin;
-  localStorage.setItem("onam.quiz.pin", pin);
+  TOKEN = token;
+  localStorage.setItem("onam.quiz.admin", token);
   $("gate").classList.remove("on");
   $("panel").classList.remove("hide");
   renderTeamRows(d.teams || [], CODES);
@@ -228,18 +234,32 @@ async function loadPrivate(pin){
 }
 
 $("pinGo").addEventListener("click", async () => {
-  if (!await loadPrivate($("pin").value.trim()))
-    $("pinMsg").textContent = "That PIN didn't work. Check the terminal the server is running in.";
+  const u = $("user").value.trim(), p = $("pw").value;
+  if (!u || !p) { $("pinMsg").textContent = "Enter your username and password."; return; }
+  $("pinGo").disabled = true;
+  $("pinMsg").textContent = "Checking…";
+  const r = await postJSON("/api/login", { user: u, pass: p });
+  $("pinGo").disabled = false;
+  if (r.ok && await loadPrivate(r.token)){
+    $("pw").value = "";                    // don't leave it sitting in the field
+  } else {
+    $("pinMsg").textContent = r.error || "Couldn't sign in.";
+  }
 });
-$("pin").addEventListener("keydown", e => { if (e.key === "Enter") $("pinGo").click(); });
+["user","pw"].forEach(id =>
+  $(id).addEventListener("keydown", e => { if (e.key === "Enter") $("pinGo").click(); }));
 
 (async () => {
-  if (!PIN || !await loadPrivate(PIN)) { $("gate").classList.add("on"); $("panel").classList.add("hide"); }
+  if (!TOKEN || !await loadPrivate(TOKEN)){
+    localStorage.removeItem("onam.quiz.admin");
+    $("gate").classList.add("on");
+    $("panel").classList.add("hide");
+  }
 })();
 
 /* --------------------------------------------------------------- actions -- */
 
-const send = (action, extra) => postJSON("/api/admin", Object.assign({ action, pin: PIN }, extra || {}));
+const send = (action, extra) => postJSON("/api/admin", Object.assign({ action, token: TOKEN }, extra || {}));
 
 $("arm").addEventListener("click", () => send(S && S.phase === "armed" ? "reset" : "arm"));
 $("correct").addEventListener("click", () => send("correct"));
@@ -259,13 +279,13 @@ $("reload").addEventListener("click", async () => {
   $("sourceLbl").textContent = "Loading…";
   const r = await send("reload");
   $("sourceLbl").textContent = r.source || "";
-  await loadPrivate(PIN);
+  await loadPrivate(TOKEN);
 });
 $("saveSheet").addEventListener("click", async () => {
   $("sourceLbl").textContent = "Loading…";
   const r = await send("sheet", { sheet_id: $("sheetId").value.trim(), sheet_tab: $("sheetTab").value.trim() });
   $("sourceLbl").textContent = r.source || "";
-  await loadPrivate(PIN);
+  await loadPrivate(TOKEN);
 });
 
 /* ------------------------------------------------------------ team setup -- */
@@ -312,7 +332,7 @@ $("saveTeams").addEventListener("click", async () => {
   });
   if (!names.length) return alert("Add at least one team.");
   await send("teams", { names, codes });
-  await loadPrivate(PIN);
+  await loadPrivate(TOKEN);
   alert("Saved. Read each code out to one person per team.");
 });
 
@@ -320,7 +340,7 @@ $("saveTeams").addEventListener("click", async () => {
 
 function render(s){
   S = s;
-  if (!PIN) return;
+  if (!TOKEN) return;
 
   $("qno").textContent = s.q_index >= 0 ? "Q " + (s.q_index + 1) + " / " + s.q_total : "off-list";
   $("q").textContent = s.question || "Nothing on the projector yet";
