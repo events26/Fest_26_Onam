@@ -1,0 +1,8 @@
+# Shell scripts must keep Unix line endings. A .command file checked out with
+# CRLF fails on macOS with "bad interpreter: /bin/bash^M", which gives no hint
+# about the real cause.
+*.command text eol=lf
+*.sh      text eol=lf
+
+# Batch files are the mirror image: they need CRLF on Windows.
+*.bat     text eol=crlf

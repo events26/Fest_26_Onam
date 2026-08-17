@@ -11,15 +11,23 @@ only by typing the URL.
 
 ## Running it
 
-On Windows, **double-click `start-quiz.bat`**. It checks Python is there, tells
-you where to get it if not, and leaves the window open showing the join URL.
-Closing that window stops the quiz.
+Double-click **`start-quiz.bat`** on Windows, or **`start-quiz.command`** on a
+Mac. Either one checks Python is there, says where to get it if not, and leaves
+a window open showing the join URL. Closing that window stops the quiz.
 
-Everywhere else, or if you prefer a terminal:
+On a Mac the *first* launch needs **right-click → Open** rather than a
+double-click — macOS blocks downloaded scripts, and a double-click just refuses
+without offering a way through.
+
+Or from a terminal:
 
 ```
-python quiz-server.py
+python quiz-server.py       # Windows
+python3 quiz-server.py      # macOS and Linux
 ```
+
+The server itself is plain standard-library Python and runs anywhere; only the
+launchers are platform-specific.
 
 Only the host laptop needs Python. Everyone else just opens a URL — there is
 nothing to install on a phone.

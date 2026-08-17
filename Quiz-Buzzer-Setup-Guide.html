@@ -84,6 +84,15 @@
     border-radius:4px; padding:8px 11px; margin:6px 0 0; font-size:9.6pt;
   }
   .tip b{color:var(--green)}
+  .mac{
+    background:#f3f6fa; border:1px solid #ccd8e6; border-left:4px solid #3a6ea5;
+    border-radius:4px; padding:8px 11px; margin:6px 0 0; font-size:9.6pt;
+  }
+  .mac .lbl{
+    display:inline-block; background:#3a6ea5; color:#fff; font-size:7.6pt;
+    font-weight:700; letter-spacing:.09em; text-transform:uppercase;
+    padding:2px 7px; border-radius:20px; margin-right:6px; vertical-align:1px;
+  }
 
   /* ---- troubleshooting ---- */
   table{width:100%; border-collapse:collapse; font-size:9.5pt; margin-top:4px}
@@ -117,6 +126,9 @@
   <b>Only your laptop needs anything installed.</b> Everyone playing just opens a
   web page on their phone — nothing to download, no app, no accounts. Work through
   “Before the day” once, in advance, so nothing is a surprise on the day itself.
+  <br><br>
+  Written for Windows. <b>On a Mac</b>, follow the same steps and read the blue boxes
+  where they appear — everything else is identical.
 </div>
 
 <h2><span class="when">Before the day</span> Get it working once, in advance</h2>
@@ -139,6 +151,9 @@
     <p>Find the downloaded file (usually in <b>Downloads</b>), right-click it and choose
        <b>Extract All…</b>, then <b>Extract</b>. You now have a folder called
        <code>Fest_26_Onam-main</code>. Keep it somewhere easy, like your Desktop.</p>
+    <div class="mac"><span class="lbl">On a Mac</span>
+      Just double-click the ZIP — it unpacks itself into the same folder.
+    </div>
   </div>
 </div>
 
@@ -154,6 +169,12 @@
       clicking Install Now. If you miss it, nothing later will work, and the error message
       will not tell you why. If you are unsure, run the installer again and check.
     </div>
+    <div class="mac"><span class="lbl">On a Mac</span>
+      There is no PATH box to worry about. Open <b>Terminal</b> (press <b>⌘ Space</b>, type
+      Terminal, press Enter) and run <code>python3 --version</code>. If it prints a version
+      number you are done. If it offers to install developer tools, click <b>Install</b> and
+      wait. Otherwise download Python from the same site above.
+    </div>
   </div>
 </div>
 
@@ -167,7 +188,18 @@
       <b>If it says Python is not installed</b>, go back to step 3 — the PATH box was
       almost certainly missed. Close the window and try again after reinstalling.
     </div>
-    <p style="margin-top:6px">Leave that black window open and go to step 5 to confirm
+    <div class="mac"><span class="lbl">On a Mac</span>
+      Use <code>start-quiz.command</code> instead. The <b>first</b> time, do not double-click
+      it: <b>right-click it and choose Open</b>, then click <b>Open</b> again on the warning
+      about an unidentified developer. macOS blocks downloaded scripts otherwise, and a plain
+      double-click just refuses with no way forward. After that first time, double-clicking
+      works normally.
+      <br><br>
+      If it still will not open, use Terminal instead: type <code>cd </code> (with a space),
+      drag the folder from step 2 into the Terminal window, press Enter, then run
+      <code>python3 quiz-server.py</code>.
+    </div>
+    <p style="margin-top:6px">Leave that window open and go to step 5 to confirm
        it really works. Closing the window stops the quiz.</p>
   </div>
 </div>
@@ -182,6 +214,11 @@
       <b>If you click Cancel, phones will not be able to connect</b> and there will be no
       other clue what went wrong. If you have already dismissed it, see the troubleshooting
       table on the next page.
+    </div>
+    <div class="mac"><span class="lbl">On a Mac</span>
+      You may get a box asking whether <b>Python</b> should accept incoming network
+      connections. Click <b>Allow</b>. Many Macs have the firewall switched off and will not
+      ask at all — that is fine, carry on.
     </div>
   </div>
 </div>
@@ -218,7 +255,8 @@
   <div class="n">8</div>
   <div class="body">
     <h3>Start the quiz</h3>
-    <p>Double-click <code>start-quiz.bat</code> again. Note the <b>Teams join</b> address —
+    <p>Double-click <code>start-quiz.bat</code> again — or
+       <code>start-quiz.command</code> on a Mac. Note the <b>Teams join</b> address —
        you will read this out to everyone.</p>
   </div>
 </div>
@@ -320,6 +358,24 @@
         <code>start-quiz.bat</code> again and leave the window open.</td>
   </tr>
   <tr>
+    <td><b>Mac:</b> “start-quiz.command cannot be opened because it is from an
+        unidentified developer”</td>
+    <td>Right-click the file and choose <b>Open</b>, then click <b>Open</b> on the warning.
+        Only needed once. If it still refuses, open Terminal, type <code>cd </code>, drag the
+        folder in, press Enter, then run <code>python3 quiz-server.py</code>.</td>
+  </tr>
+  <tr>
+    <td><b>Mac:</b> the file opens in a text editor instead of running</td>
+    <td>Its permissions were lost while unzipping. In Terminal, type
+        <code>chmod +x </code> then drag <code>start-quiz.command</code> in and press Enter.
+        Or just run <code>python3 quiz-server.py</code> from the folder.</td>
+  </tr>
+  <tr>
+    <td><b>Mac:</b> phones cannot connect</td>
+    <td>Open <b>System Settings → Network → Firewall</b>. Either switch it off for the
+        event, or open <b>Options…</b> and set Python to <b>Allow incoming connections</b>.</td>
+  </tr>
+  <tr>
     <td>The address does not work on phones</td>
     <td>Check you typed the numbers from <i>your</i> window, including
         <code>:8000</code> at the end. Also check the phone is on Wi-Fi and has not
@@ -338,7 +394,7 @@
   <tr>
     <td>The laptop restarted mid-quiz</td>
     <td>Nothing is lost. Team names, codes, scores and your sign-in are all saved. Start
-        <code>start-quiz.bat</code> again; teams re-open the join page.</td>
+        the launcher again; teams re-open the join page.</td>
   </tr>
   <tr>
     <td>No sound from the projector</td>
