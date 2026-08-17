@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1a0d02">
+<title>Quizmaster — Onotsavam Quiz</title>
+<link rel="stylesheet" href="quiz-kit.css">
+<style>
+  /* Deliberately plain: the pookkalam belongs to the surfaces the hall sees.
+     This one just has to be unmissable under stage lights, one-handed. */
+  .layer{max-width:560px;margin:0 auto;padding:0 16px calc(28px + env(safe-area-inset-bottom))}
+  .bar{display:flex;align-items:baseline;gap:10px;padding:calc(16px + env(safe-area-inset-top)) 2px 14px}
+  .bar .mark{font-family:var(--font-display);font-weight:800;font-size:18px;color:var(--gold)}
+  .bar .qno{margin-left:auto}
+
+  .card{background:rgba(255,247,230,.055);border:1px solid rgba(255,247,230,.12);
+        border-radius:16px;padding:16px 17px;margin-bottom:12px}
+
+  .qtext{font-family:var(--font-display);font-weight:700;font-size:21px;line-height:1.3;margin:6px 0 0}
+  .optline{display:flex;gap:9px;align-items:baseline;margin-top:9px;font-size:15px;line-height:1.35}
+  .optline .k{font-family:var(--font-display);font-weight:800;color:rgba(255,247,230,.45);flex:none;width:1.2em}
+  .optline.right{color:var(--gold);font-weight:700}
+  .optline.right .k{color:var(--gold)}
+  .ans{margin-top:14px;padding-top:13px;border-top:1px dashed rgba(255,247,230,.18)}
+  .ans .v{color:var(--gold);font-weight:700;font-size:17px;margin-top:4px;line-height:1.35}
+
+  .big{width:100%;font-family:var(--font-display);font-weight:800;font-size:26px;
+       padding:22px;border-radius:16px;border:0;cursor:pointer;color:#fff;
+       background:linear-gradient(135deg,var(--marigold),#e05a00);letter-spacing:.02em}
+  .big:disabled{background:rgba(255,247,230,.09);color:rgba(255,247,230,.35);cursor:not-allowed}
+  .big.live{background:linear-gradient(135deg,#e3253f,#a3132a)}
+
+  .whoBox{display:flex;align-items:center;gap:13px;margin-bottom:13px}
+  .whoBox .dot{width:30px;height:30px;border-radius:50%;flex:none;box-shadow:0 0 18px currentColor}
+  .whoBox b{font-family:var(--font-display);font-weight:800;font-size:23px;line-height:1.1}
+  .whoBox i{font-style:normal;display:block;font-size:13px;color:rgba(255,247,230,.55);font-weight:600}
+
+  .row{display:flex;gap:9px}
+  .row .btn{flex:1}
+
+  .teamRow{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+  .teamRow .dot{width:13px;height:13px;border-radius:50%;flex:none}
+  .teamRow input.nm{flex:1;min-width:0}
+  .teamRow input.cd{width:88px;flex:none;font-family:var(--font-num);
+                    text-align:center;letter-spacing:.12em}
+  .teamRow .x{flex:none;background:none;border:0;color:rgba(255,247,230,.35);
+              font-size:20px;cursor:pointer;padding:4px 6px;line-height:1}
+
+  .scoreRow{display:flex;align-items:center;gap:11px;padding:9px 0;
+            border-bottom:1px solid rgba(255,247,230,.07)}
+  .scoreRow:last-child{border-bottom:0}
+  .scoreRow .dot{width:14px;height:14px;border-radius:50%;flex:none}
+  .scoreRow .n{flex:1;min-width:0;font-weight:600;font-size:15px;
+               overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .scoreRow .v{font-family:var(--font-num);font-weight:700;font-size:17px;min-width:2.6em;text-align:right}
+  .scoreRow .btn{padding:5px 12px;font-size:16px;line-height:1}
+  .scoreRow .n.out{opacity:.42;text-decoration:line-through}
+  .live-dot{width:8px;height:8px;border-radius:50%;flex:none;background:#12a05a}
+  .live-dot.off{background:rgba(255,247,230,.16)}
+
+  summary{cursor:pointer;font-weight:700;font-size:15px;color:rgba(255,247,230,.7);
+          list-style:none;padding:2px 0}
+  summary::-webkit-details-marker{display:none}
+  summary::before{content:"▸ ";color:var(--marigold)}
+  details[open] summary::before{content:"▾ "}
+
+  input[type=text],input[type=password],textarea{
+    width:100%;background:rgba(0,0,0,.32);border:1px solid rgba(255,247,230,.2);
+    border-radius:11px;color:var(--cream);font-family:var(--font-body);
+    font-size:16px;padding:11px 12px}
+  .hint{font-size:13px;color:rgba(255,247,230,.45);margin:9px 0 0;line-height:1.5}
+  .warn{color:var(--gold)}
+  #gate{display:none}
+  #gate.on{display:block}
+  #panel.hide{display:none}
+</style>
+</head>
+<body>
+<div class="layer">
+
+  <div class="bar">
+    <span class="mark">QUIZMASTER</span>
+    <span class="eyebrow qno num" id="qno"></span>
+  </div>
+
+  <div id="gate" class="card">
+    <label class="eyebrow" for="pin">Quizmaster PIN</label>
+    <div style="height:8px"></div>
+    <input type="password" id="pin" autocomplete="off" placeholder="PIN">
+    <div style="height:11px"></div>
+    <button class="btn primary" id="pinGo" style="width:100%">Unlock controls</button>
+    <p class="hint" id="pinMsg">Keeps the scoring out of reach of anyone else on the hotspot.</p>
+  </div>
+
+  <div id="panel" class="hide">
+
+    <!-- ---------- before the game ---------- -->
+    <div class="card">
+      <details id="setupBox">
+        <summary>Teams &amp; codes — set these before you start</summary>
+        <div style="height:10px"></div>
+        <div id="teamRows"></div>
+        <div class="row" style="margin-top:10px">
+          <button class="btn" id="addTeam" type="button">Add team</button>
+          <button class="btn" id="genCodes" type="button">Generate codes</button>
+        </div>
+        <div style="height:9px"></div>
+        <button class="btn primary" id="saveTeams" type="button" style="width:100%">Save teams &amp; codes</button>
+        <p class="hint">Read each code out to one person per team — that phone holds the buzzer.
+          A blank code lets anyone join as that team.
+          <span class="warn">Renaming a team resets its score.</span></p>
+      </details>
+    </div>
+
+    <div class="card">
+      <details>
+        <summary>Question sheet</summary>
+        <div style="height:10px"></div>
+        <label class="eyebrow" for="sheetId">Google Sheet ID</label>
+        <div style="height:6px"></div>
+        <input type="text" id="sheetId" placeholder="paste the id from the sheet URL" spellcheck="false">
+        <div style="height:8px"></div>
+        <label class="eyebrow" for="sheetTab">Tab name</label>
+        <div style="height:6px"></div>
+        <input type="text" id="sheetTab" placeholder="Quiz" spellcheck="false">
+        <div style="height:10px"></div>
+        <div class="row">
+          <button class="btn" id="saveSheet" type="button">Save &amp; load</button>
+          <button class="btn" id="reload" type="button">Reload questions</button>
+        </div>
+        <p class="hint" id="sourceLbl"></p>
+        <p class="hint">Columns: <b>Question, Option A, Option B, Option C, Option D, Answer</b>.
+          The answer cell takes a letter (A–D) or the full option text. Share the sheet as
+          “anyone with the link can view”, or the server cannot read it.</p>
+      </details>
+    </div>
+
+    <!-- ---------- during the game ---------- -->
+    <div class="card">
+      <span class="eyebrow">On the projector now</span>
+      <div class="qtext" id="q">—</div>
+      <div id="opts"></div>
+      <div class="ans">
+        <span class="eyebrow">Answer — only on this screen</span>
+        <div class="v" id="a">—</div>
+      </div>
+    </div>
+
+    <button class="big" id="arm" type="button">Arm buzzers</button>
+    <div style="height:12px"></div>
+
+    <div class="card" id="resultCard" style="display:none">
+      <div class="whoBox">
+        <span class="dot" id="wDot"></span>
+        <span><b id="wName"></b><i id="wTime"></i></span>
+      </div>
+      <div class="row">
+        <button class="btn good" id="correct" type="button">Correct</button>
+        <button class="btn bad" id="wrong" type="button">Wrong — pass it on</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <button class="btn" id="reveal" type="button" style="width:100%">Show the answer on screen</button>
+      <div style="height:9px"></div>
+      <div class="row" style="margin-bottom:9px">
+        <button class="btn" id="prev" type="button">‹ Previous</button>
+        <button class="btn primary" id="next" type="button">Next question ›</button>
+      </div>
+      <button class="btn" id="reset" type="button" style="width:100%">Reset this question</button>
+      <p class="hint" id="lockNote"></p>
+    </div>
+
+    <div class="card">
+      <details>
+        <summary>Scores &amp; who's signed in</summary>
+        <div style="height:8px"></div>
+        <div id="scores"></div>
+        <div style="height:12px"></div>
+        <button class="btn" id="zero" type="button" style="width:100%">Reset all scores to zero</button>
+      </details>
+    </div>
+
+    <div class="card">
+      <details>
+        <summary>Ask something off the list</summary>
+        <div style="height:10px"></div>
+        <textarea id="custom" rows="2" placeholder="Type a question to put on the projector"></textarea>
+        <div style="height:9px"></div>
+        <button class="btn" id="sendCustom" type="button" style="width:100%">Put it on the projector</button>
+        <p class="hint">Goes up with no options and no answer — you'll be judging that one yourself.
+          Use Previous or Next to get back to the sheet.</p>
+      </details>
+    </div>
+
+  </div>
+</div>
+
+<div class="offline">Reconnecting…</div>
+
+<script src="quiz-kit.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+const KEYS = ["A","B","C","D"];
+let PIN = localStorage.getItem("onam.quiz.pin") || "";
+let S = null, QS = [], CODES = {};
+
+/* ------------------------------------------------------------------ gate -- */
+
+async function loadPrivate(pin){
+  const res = await fetch("/api/teams", { headers: { "X-Pin": pin } });
+  if (!res.ok) return false;
+  const d = await res.json();
+  QS = d.questions || [];
+  CODES = d.codes || {};
+  $("sheetId").value = d.sheet_id || "";
+  $("sheetTab").value = d.sheet_tab || "Quiz";
+  $("sourceLbl").textContent = d.source || "";
+  PIN = pin;
+  localStorage.setItem("onam.quiz.pin", pin);
+  $("gate").classList.remove("on");
+  $("panel").classList.remove("hide");
+  renderTeamRows(d.teams || [], CODES);
+  if (!Object.values(CODES).some(c => c)) $("setupBox").open = true;
+  if (S) render(S);
+  return true;
+}
+
+$("pinGo").addEventListener("click", async () => {
+  if (!await loadPrivate($("pin").value.trim()))
+    $("pinMsg").textContent = "That PIN didn't work. Check the terminal the server is running in.";
+});
+$("pin").addEventListener("keydown", e => { if (e.key === "Enter") $("pinGo").click(); });
+
+(async () => {
+  if (!PIN || !await loadPrivate(PIN)) { $("gate").classList.add("on"); $("panel").classList.add("hide"); }
+})();
+
+/* --------------------------------------------------------------- actions -- */
+
+const send = (action, extra) => postJSON("/api/admin", Object.assign({ action, pin: PIN }, extra || {}));
+
+$("arm").addEventListener("click", () => send(S && S.phase === "armed" ? "reset" : "arm"));
+$("correct").addEventListener("click", () => send("correct"));
+$("wrong").addEventListener("click", () => send("wrong"));
+$("reset").addEventListener("click", () => send("reset"));
+$("reveal").addEventListener("click", () => send(S && S.answer ? "hide" : "reveal"));
+$("zero").addEventListener("click", () => {
+  if (confirm("Set every team back to zero?")) send("reset_scores");
+});
+$("prev").addEventListener("click", () => send("question", { index: Math.max(0, (S ? S.q_index : 0) - 1) }));
+$("next").addEventListener("click", () => send("question", { index: (S ? S.q_index : -1) + 1 }));
+$("sendCustom").addEventListener("click", () => {
+  const t = $("custom").value.trim();
+  if (t) { send("question", { text: t }); $("custom").value = ""; }
+});
+$("reload").addEventListener("click", async () => {
+  $("sourceLbl").textContent = "Loading…";
+  const r = await send("reload");
+  $("sourceLbl").textContent = r.source || "";
+  await loadPrivate(PIN);
+});
+$("saveSheet").addEventListener("click", async () => {
+  $("sourceLbl").textContent = "Loading…";
+  const r = await send("sheet", { sheet_id: $("sheetId").value.trim(), sheet_tab: $("sheetTab").value.trim() });
+  $("sourceLbl").textContent = r.source || "";
+  await loadPrivate(PIN);
+});
+
+/* ------------------------------------------------------------ team setup -- */
+
+function teamRow(name, code, i){
+  const st = teamStyle(name, i);
+  const d = document.createElement("div");
+  d.className = "teamRow";
+  d.innerHTML = '<span class="dot" style="background:' + st.c + '"></span>'
+    + '<input class="nm" type="text" value="' + esc(name) + '" placeholder="Team name">'
+    + '<input class="cd" type="text" value="' + esc(code || "") + '" placeholder="code" maxlength="8">'
+    + '<button class="x" type="button" title="Remove">×</button>';
+  d.querySelector(".x").addEventListener("click", () => d.remove());
+  return d;
+}
+
+function renderTeamRows(teams, codes){
+  const box = $("teamRows");
+  box.innerHTML = "";
+  teams.forEach((t, i) => box.appendChild(teamRow(t, codes[t], i)));
+}
+
+$("addTeam").addEventListener("click", () => {
+  $("teamRows").appendChild(teamRow("", "", $("teamRows").children.length));
+});
+
+$("genCodes").addEventListener("click", () => {
+  const used = new Set();
+  $("teamRows").querySelectorAll(".teamRow").forEach(r => {
+    let c;
+    do { c = String(Math.floor(1000 + Math.random() * 9000)); } while (used.has(c));
+    used.add(c);
+    r.querySelector(".cd").value = c;
+  });
+});
+
+$("saveTeams").addEventListener("click", async () => {
+  const names = [], codes = {};
+  $("teamRows").querySelectorAll(".teamRow").forEach(r => {
+    const n = r.querySelector(".nm").value.trim();
+    if (!n) return;
+    names.push(n);
+    codes[n] = r.querySelector(".cd").value.trim();
+  });
+  if (!names.length) return alert("Add at least one team.");
+  await send("teams", { names, codes });
+  await loadPrivate(PIN);
+  alert("Saved. Read each code out to one person per team.");
+});
+
+/* ---------------------------------------------------------------- render -- */
+
+function render(s){
+  S = s;
+  if (!PIN) return;
+
+  $("qno").textContent = s.q_index >= 0 ? "Q " + (s.q_index + 1) + " / " + s.q_total : "off-list";
+  $("q").textContent = s.question || "Nothing on the projector yet";
+
+  const rec = s.q_index >= 0 ? QS[s.q_index] : null;
+  const opts = (rec && rec.options) || [];
+  $("opts").innerHTML = opts.map((o, i) => o
+    ? '<div class="optline' + (rec && rec.answer_index === i ? ' right' : '') + '">'
+      + '<span class="k">' + KEYS[i] + '</span><span>' + esc(o) + '</span></div>'
+    : "").join("");
+  $("a").textContent = rec && rec.answer_text ? rec.answer_text : "— you're judging this one";
+
+  const armed = s.phase === "armed";
+  $("arm").textContent = armed ? "Close buzzers" : "Arm buzzers";
+  $("arm").classList.toggle("live", armed);
+  $("arm").disabled = !s.question;
+
+  $("reveal").textContent = s.answer ? "Hide the answer again" : "Show the answer on screen";
+  $("reveal").disabled = s.q_index < 0;
+
+  const w = s.phase === "buzzed" && s.winner ? s.winner : null;
+  $("resultCard").style.display = w ? "" : "none";
+  if (w){
+    const st = teamStyle(w.team, s.teams.indexOf(w.team));
+    $("wDot").style.background = st.c; $("wDot").style.color = st.c;
+    $("wName").textContent = w.team;
+    $("wTime").textContent = (w.ms / 1000).toFixed(2) + "s"
+      + (s.order.length > 1 ? " · beat " + (s.order.length - 1) + " other"
+        + (s.order.length > 2 ? "s" : "") : " · only buzzer");
+  }
+
+  $("prev").disabled = s.q_index <= 0;
+  $("next").disabled = s.q_index >= s.q_total - 1 && s.q_index >= 0;
+
+  $("lockNote").textContent = s.locked.length
+    ? "Already had a go: " + s.locked.join(", ") + ". Reset clears that."
+    : "";
+
+  $("scores").innerHTML = s.teams.map((t, i) => {
+    const st = teamStyle(t, i), out = s.locked.indexOf(t) !== -1, on = !!s.active[t];
+    return '<div class="scoreRow">'
+      + '<span class="live-dot' + (on ? '' : ' off') + '" title="'
+      + (on ? 'signed in' : 'not signed in') + '"></span>'
+      + '<span class="dot" style="background:' + st.c + '"></span>'
+      + '<span class="n' + (out ? ' out' : '') + '">' + esc(t) + '</span>'
+      + '<button class="btn" data-adj="-5" data-team="' + esc(t) + '" type="button">−</button>'
+      + '<span class="v">' + (s.scores[t] || 0) + '</span>'
+      + '<button class="btn" data-adj="5" data-team="' + esc(t) + '" type="button">+</button>'
+      + (on ? '<button class="btn" data-out="' + esc(t) + '" type="button">Sign out</button>' : '')
+      + '</div>';
+  }).join("");
+  $("scores").querySelectorAll("[data-adj]").forEach(b => {
+    b.addEventListener("click", () =>
+      send("adjust", { team: b.dataset.team, delta: parseInt(b.dataset.adj, 10) }));
+  });
+  $("scores").querySelectorAll("[data-out]").forEach(b => {
+    b.addEventListener("click", () => send("sign_out", { team: b.dataset.out }));
+  });
+}
+
+connect(render);
+</script>
+</body>
+</html>

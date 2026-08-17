@@ -1,0 +1,128 @@
+/* Onotsavam Quiz — shared shell, team palette and the pookkalam.
+   Loaded by quiz-buzzer.html, quiz-display.html and quiz-admin.html. */
+
+@import url("https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Work+Sans:wght@400;500;600;700&display=swap");
+
+:root{
+  /* The site palette from index.html, re-pitched for a lit hall: a projector
+     renders black as "no light", so luminous marks on a dark ground survive
+     ambient light far better than dark marks on cream. */
+  --night:#1a0d02; --ember:#2b1505; --bark:#3d2109;
+  --cream:#fff7e6; --marigold:#ff8c00; --gold:#f4b400;
+  --red:#d7263d; --green:#0b7a3b;
+
+  --font-display:'Baloo 2','Segoe UI',system-ui,sans-serif;
+  --font-body:'Work Sans','Segoe UI',system-ui,sans-serif;
+  --font-num:ui-monospace,'Cascadia Mono',Consolas,monospace;
+}
+
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  font-family:var(--font-body);
+  background:var(--night);
+  color:var(--cream);
+  -webkit-text-size-adjust:100%;
+  overscroll-behavior:none;
+}
+
+/* Warm haze so the dark ground reads as lamplight, not a void. */
+body::before{
+  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse 80% 55% at 50% 0%,rgba(255,140,0,.16),transparent 65%),
+    radial-gradient(ellipse 70% 50% at 50% 100%,rgba(215,38,61,.10),transparent 65%);
+}
+.layer{position:relative;z-index:1}
+
+.eyebrow{
+  font-family:var(--font-body);font-weight:700;
+  text-transform:uppercase;letter-spacing:.18em;
+  font-size:12px;color:rgba(255,247,230,.55);
+}
+.num{font-family:var(--font-num);font-variant-numeric:tabular-nums}
+
+/* ------------------------------------------------------------- pookkalam --
+   Concentric petal rings, the way one is actually laid: outward, ring by
+   ring. Each ring is an annulus of conic wedges. Drives every state in the
+   quiz — breathing when buzzers are live, blooming for a winner, drained
+   when a team is locked out. Set --pk to the owning team's colour. */
+
+.pk{position:relative;width:var(--pk-size,240px);height:var(--pk-size,240px);flex:none}
+.pk-ring{
+  position:absolute;top:50%;left:50%;border-radius:50%;
+  transform:translate(-50%,-50%);
+  -webkit-mask:radial-gradient(circle,transparent 0 var(--in),#000 var(--in) 100%);
+          mask:radial-gradient(circle,transparent 0 var(--in),#000 var(--in) 100%);
+}
+.pk-ring.r1{width:100%;height:100%;--in:76%;
+  background:repeating-conic-gradient(var(--pk,var(--marigold)) 0 9deg,transparent 9deg 18deg)}
+.pk-ring.r2{width:76%;height:76%;--in:70%;
+  background:repeating-conic-gradient(from 6deg,var(--gold) 0 7deg,transparent 7deg 14deg)}
+.pk-ring.r3{width:54%;height:54%;--in:62%;
+  background:repeating-conic-gradient(from 3deg,var(--cream) 0 10deg,transparent 10deg 20deg)}
+.pk-ring.r4{width:36%;height:36%;--in:55%;
+  background:repeating-conic-gradient(var(--pk,var(--marigold)) 0 12deg,transparent 12deg 24deg)}
+.pk-core{
+  position:absolute;top:50%;left:50%;width:19%;height:19%;
+  transform:translate(-50%,-50%);border-radius:50%;
+  background:radial-gradient(circle at 35% 32%,var(--gold),var(--red));
+}
+
+/* Live: rings turn against each other and breathe. Motion here is a signal —
+   it means the buzzers are open — so it earns its place. */
+@keyframes pk-spin{to{transform:translate(-50%,-50%) rotate(360deg)}}
+@keyframes pk-spin-rev{to{transform:translate(-50%,-50%) rotate(-360deg)}}
+@keyframes pk-breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.045)}}
+
+.pk.is-live{animation:pk-breathe 1.05s ease-in-out infinite}
+.pk.is-live .pk-ring.r1{animation:pk-spin 22s linear infinite}
+.pk.is-live .pk-ring.r2{animation:pk-spin-rev 16s linear infinite}
+.pk.is-live .pk-ring.r3{animation:pk-spin 11s linear infinite}
+.pk.is-live .pk-ring.r4{animation:pk-spin-rev 7s linear infinite}
+
+/* Won: one hard bloom outward, then hold. Scale only — opacity belongs to
+   whatever is hosting the pookkalam, and animating it here would stamp over
+   the display's dimmed backdrop. */
+@keyframes pk-bloom{
+  0%{transform:scale(.55)}
+  55%{transform:scale(1.12)}
+  100%{transform:scale(1)}
+}
+.pk.is-win{animation:pk-bloom .5s cubic-bezier(.2,.9,.25,1) both}
+
+/* Locked out: the petals go dry. */
+.pk.is-dead{filter:grayscale(1) brightness(.42);opacity:.5;transition:filter .4s,opacity .4s}
+
+@media (prefers-reduced-motion:reduce){
+  .pk,.pk.is-live,.pk.is-win,.pk.is-live .pk-ring{animation:none!important}
+  .pk.is-live{outline:3px solid var(--pk,var(--marigold));outline-offset:10px;border-radius:50%}
+}
+
+/* ----------------------------------------------------------------- bits -- */
+
+.btn{
+  font-family:var(--font-body);font-weight:700;font-size:15px;
+  border:1px solid rgba(255,247,230,.22);border-radius:12px;
+  background:rgba(255,247,230,.07);color:var(--cream);
+  padding:13px 18px;cursor:pointer;
+  transition:background .15s,border-color .15s,transform .1s;
+}
+.btn:hover{background:rgba(255,247,230,.13)}
+.btn:active{transform:translateY(1px)}
+.btn:disabled{opacity:.35;cursor:not-allowed}
+.btn.primary{background:linear-gradient(135deg,var(--marigold),#e05a00);border-color:transparent;color:#fff}
+.btn.good{background:linear-gradient(135deg,#12a05a,var(--green));border-color:transparent;color:#fff}
+.btn.bad{background:linear-gradient(135deg,#e3253f,#a3132a);border-color:transparent;color:#fff}
+
+:where(button,a,input,select,[tabindex]):focus-visible{
+  outline:3px solid var(--gold);outline-offset:3px;
+}
+
+.offline{
+  position:fixed;left:50%;bottom:14px;transform:translateX(-50%);z-index:99;
+  background:var(--red);color:#fff;font-weight:700;font-size:13px;
+  padding:8px 16px;border-radius:20px;display:none;
+  box-shadow:0 6px 18px rgba(0,0,0,.45);
+}
+.offline.show{display:block}

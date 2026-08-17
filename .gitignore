@@ -1,0 +1,6 @@
+# Quiz buzzer runtime state — holds the team join codes and live scores.
+# Each host generates their own; committing it would publish the codes.
+quiz-state.json
+
+__pycache__/
+*.pyc

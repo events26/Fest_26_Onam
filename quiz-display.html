@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Onotsavam Quiz — Display</title>
+<link rel="stylesheet" href="quiz-kit.css">
+<style>
+  body{height:100vh;overflow:hidden;cursor:none}
+  body.showcursor{cursor:default}
+  .layer{height:100vh;display:grid;grid-template-rows:auto 1fr auto}
+
+  .bar{display:flex;align-items:center;gap:18px;padding:20px 40px 4px}
+  .bar .mark{font-family:var(--font-display);font-weight:800;font-size:22px;color:var(--gold)}
+  .bar .qno{margin-left:auto}
+
+  .stage{position:relative;display:flex;flex-direction:column;justify-content:center;
+         gap:clamp(14px,2.4vh,30px);padding:0 clamp(30px,4vw,72px);min-height:0}
+
+  /* The bloom sits behind everything, so the hall reads the colour first. */
+  #bloomWrap{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+             pointer-events:none;opacity:0;transition:opacity .3s}
+  #bloomWrap.on{opacity:.34}
+  #bloomWrap .pk{--pk-size:min(78vh,78vw)}
+  #bloomWrap::after{
+    content:"";position:absolute;inset:0;
+    /* Plain fallback first: if color-mix is unsupported the whole declaration
+       would be dropped, and the winner moment would lose its wash. */
+    background:radial-gradient(circle at 50% 50%,rgba(255,140,0,.5),transparent 62%);
+    background:radial-gradient(circle at 50% 50%,color-mix(in srgb,var(--pk) 70%,transparent),transparent 62%);
+  }
+
+  .q{position:relative;font-family:var(--font-display);font-weight:700;
+     font-size:clamp(24px,3.5vw,54px);line-height:1.16;max-width:26ch;text-wrap:balance}
+  .q.small{font-size:clamp(19px,1.9vw,29px);opacity:.6;font-weight:600;max-width:52ch}
+
+  /* ---- options ---- */
+  .opts{position:relative;display:grid;grid-template-columns:1fr 1fr;
+        gap:clamp(9px,1.4vh,16px)}
+  .opts.hide{display:none}
+  .opt{
+    display:flex;align-items:center;gap:clamp(11px,1.3vw,20px);
+    background:rgba(255,247,230,.06);border:2px solid rgba(255,247,230,.13);
+    border-radius:14px;padding:clamp(11px,1.5vh,20px) clamp(14px,1.6vw,24px);
+    font-size:clamp(16px,1.85vw,30px);font-weight:600;line-height:1.25;
+    transition:background .3s,border-color .3s,opacity .3s;
+  }
+  .opt .k{
+    flex:none;width:clamp(30px,2.6vw,44px);height:clamp(30px,2.6vw,44px);
+    border-radius:50%;display:flex;align-items:center;justify-content:center;
+    background:rgba(255,247,230,.11);color:var(--gold);
+    font-family:var(--font-display);font-weight:800;
+    font-size:clamp(15px,1.4vw,23px);transition:background .3s,color .3s;
+  }
+  .opt.right{background:rgba(18,160,90,.22);border-color:#12a05a}
+  .opt.right .k{background:#12a05a;color:#fff}
+  .opt.dim{opacity:.34}
+
+  /* ---- live / winner ---- */
+  .panel{position:relative;min-height:clamp(74px,13vh,150px);display:flex;align-items:center}
+
+  .live{display:flex;align-items:center;gap:24px}
+  .live .pk{--pk-size:clamp(58px,7.5vh,96px)}
+  .live b{font-family:var(--font-display);font-weight:800;
+          font-size:clamp(23px,3vw,46px);color:var(--marigold);letter-spacing:.02em}
+  .live i{display:block;font-style:normal;font-size:clamp(13px,1.1vw,18px);
+          color:rgba(255,247,230,.55);font-weight:500;margin-top:2px}
+
+  .winner{display:flex;align-items:center;gap:clamp(16px,2.2vw,32px);width:100%}
+  .winner .swatch{width:clamp(44px,5vw,78px);height:clamp(44px,5vw,78px);border-radius:50%;
+                  background:var(--pk);flex:none;box-shadow:0 0 44px var(--pk)}
+  .winner .who{min-width:0}
+  .winner .who b{display:block;font-family:var(--font-display);font-weight:800;
+                 font-size:clamp(30px,5.2vw,86px);line-height:1;color:var(--pk)}
+  .winner .who i{display:block;font-style:normal;margin-top:8px;
+                 font-size:clamp(14px,1.35vw,22px);color:rgba(255,247,230,.6);font-weight:600}
+  .rest{margin-left:auto;flex:none;text-align:right;display:flex;flex-direction:column;gap:6px;
+        font-size:clamp(12px,1.05vw,17px);color:rgba(255,247,230,.5);font-weight:600}
+  .rest span b{color:rgba(255,247,230,.8);font-weight:700}
+
+  /* ---- join screen ---- */
+  .join{display:flex;align-items:center;gap:clamp(28px,4vw,64px)}
+  .join .pk{--pk-size:min(34vh,300px)}
+  .join h1{font-family:var(--font-display);font-weight:800;
+           font-size:clamp(30px,4vw,60px);margin:0 0 12px;line-height:1.1}
+  .join .url{font-family:var(--font-num);font-size:clamp(20px,2.6vw,40px);
+             color:var(--gold);background:rgba(244,180,0,.1);
+             border:2px dashed rgba(244,180,0,.4);border-radius:14px;
+             padding:12px 22px;display:inline-block}
+  .join p{color:rgba(255,247,230,.55);font-size:clamp(14px,1.3vw,20px);margin:16px 0 0}
+
+  /* ---- scoreboard ---- */
+  .scores{display:flex;gap:2px;padding:0 clamp(20px,3vw,40px) clamp(12px,2vh,24px)}
+  .sc{flex:1;min-width:0;padding:9px 9px 10px;border-radius:11px;
+      background:rgba(255,247,230,.05);border-top:4px solid var(--c);
+      display:flex;flex-direction:column;gap:3px}
+  .sc.lead{background:rgba(244,180,0,.12)}
+  .sc.out{opacity:.32}
+  .sc .n{font-size:clamp(10px,.9vw,14px);font-weight:700;color:rgba(255,247,230,.7);
+         overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .sc .v{font-family:var(--font-num);font-size:clamp(17px,1.8vw,29px);font-weight:700;line-height:1}
+  .sc .off{font-size:9px;color:rgba(255,247,230,.4);font-weight:700;letter-spacing:.08em}
+
+  .ctl{position:fixed;top:14px;right:16px;z-index:80;display:flex;gap:8px;
+       opacity:0;transition:opacity .25s}
+  body.showcursor .ctl{opacity:1}
+  .ctl .btn{padding:8px 13px;font-size:13px}
+</style>
+</head>
+<body>
+<div class="layer">
+
+  <div class="bar">
+    <span class="mark">ONOTSAVAM QUIZ</span>
+    <span class="eyebrow">CAFS 2026</span>
+    <span class="eyebrow qno num" id="qno"></span>
+  </div>
+
+  <div class="stage">
+    <div id="bloomWrap">
+      <div class="pk" id="bloom">
+        <div class="pk-ring r1"></div><div class="pk-ring r2"></div>
+        <div class="pk-ring r3"></div><div class="pk-ring r4"></div>
+        <div class="pk-core"></div>
+      </div>
+    </div>
+
+    <div id="joinScreen" class="join">
+      <div class="pk">
+        <div class="pk-ring r1"></div><div class="pk-ring r2"></div>
+        <div class="pk-ring r3"></div><div class="pk-ring r4"></div>
+        <div class="pk-core"></div>
+      </div>
+      <div>
+        <h1>Grab a phone,<br>join the buzzer</h1>
+        <div class="url num" id="joinUrl">—</div>
+        <p>One phone per team. Pick your team, enter its code, then wait for the first question.</p>
+      </div>
+    </div>
+
+    <div class="q" id="q" style="display:none"></div>
+    <div class="opts hide" id="opts"></div>
+    <div class="panel" id="panel" style="display:none"></div>
+  </div>
+
+  <div class="scores" id="scores"></div>
+</div>
+
+<div class="ctl">
+  <button class="btn" id="sound" type="button">Turn on sound</button>
+  <button class="btn" id="full" type="button">Full screen</button>
+</div>
+<div class="offline">Reconnecting…</div>
+
+<script src="quiz-kit.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+const KEYS = ["A","B","C","D"];
+let lastPhase = "", lastRound = -1, audioOn = false;
+
+$("sound").addEventListener("click", () => {
+  Sound.unlock(); Sound.arm(); audioOn = true;
+  $("sound").textContent = "Sound is on"; $("sound").disabled = true;
+});
+$("full").addEventListener("click", () => {
+  if (document.fullscreenElement) document.exitFullscreen();
+  else document.documentElement.requestFullscreen().catch(() => {});
+});
+
+/* Hide the pointer and the controls once the operator stops moving — nothing
+   on this screen should belong to the operator rather than the audience. */
+let idle;
+document.addEventListener("mousemove", () => {
+  document.body.classList.add("showcursor");
+  clearTimeout(idle);
+  idle = setTimeout(() => document.body.classList.remove("showcursor"), 2500);
+});
+
+function render(s){
+  $("joinUrl").textContent = s.join_url || "—";
+  $("qno").textContent = s.q_index >= 0 ? "Q " + (s.q_index + 1) + " / " + s.q_total : "";
+
+  const hasQ = !!s.question;
+  $("joinScreen").style.display = hasQ ? "none" : "";
+  $("q").style.display = hasQ ? "" : "none";
+  $("panel").style.display = hasQ ? "" : "none";
+  $("q").textContent = s.question || "";
+
+  const win = s.phase === "buzzed" && s.winner;
+  $("q").classList.toggle("small", !!win);   // steps aside once a team has the floor
+
+  /* Options. The correct one is only known here after the quizmaster reveals
+     it — until then the server does not send it at all. */
+  const opts = s.options || [];
+  const shown = opts.filter(o => o);
+  $("opts").classList.toggle("hide", shown.length === 0);
+  if (shown.length){
+    const right = s.answer && s.answer.index != null ? s.answer.index : -1;
+    $("opts").innerHTML = opts.map((o, i) => {
+      if (!o) return "";
+      const cls = right < 0 ? "opt" : (i === right ? "opt right" : "opt dim");
+      return '<div class="' + cls + '"><span class="k">' + KEYS[i] + '</span><span>'
+           + esc(o) + '</span></div>';
+    }).join("");
+  }
+
+  const panel = $("panel"), bloom = $("bloomWrap");
+
+  if (win){
+    const st = teamStyle(s.winner.team, s.teams.indexOf(s.winner.team));
+    document.documentElement.style.setProperty("--pk", st.c);
+    bloom.classList.add("on");
+    if (lastRound !== s.round || lastPhase !== "buzzed"){
+      const pk = $("bloom");
+      pk.classList.remove("is-win"); void pk.offsetWidth; pk.classList.add("is-win");
+      if (audioOn) Sound.hit(0.9);
+    }
+    const others = s.order.slice(1, 4).map(o =>
+      '<span>' + esc(shortName(o.team)) + ' <b class="num">+'
+      + ((o.ms - s.winner.ms) / 1000).toFixed(2) + 's</b></span>').join("");
+
+    panel.innerHTML =
+      '<div class="winner">'
+      +  '<div class="swatch"></div>'
+      +  '<div class="who"><b>' + esc(s.winner.team) + '</b>'
+      +    '<i class="num">' + (s.winner.ms / 1000).toFixed(2) + 's after the buzzers opened</i></div>'
+      +  (others ? '<div class="rest">' + others + '</div>' : '')
+      + '</div>';
+  }
+  else if (s.phase === "armed"){
+    bloom.classList.remove("on");
+    document.documentElement.style.setProperty("--pk", "var(--marigold)");
+    const out = s.locked.length
+      ? s.locked.length + " team" + (s.locked.length > 1 ? "s" : "") + " already had a go"
+      : "First buzzer takes it";
+    panel.innerHTML =
+      '<div class="live">'
+      +  '<div class="pk is-live"><div class="pk-ring r1"></div><div class="pk-ring r2"></div>'
+      +    '<div class="pk-ring r3"></div><div class="pk-ring r4"></div><div class="pk-core"></div></div>'
+      +  '<div><b>BUZZERS LIVE</b><i>' + esc(out) + '</i></div>'
+      + '</div>';
+    if (lastPhase !== "armed" && audioOn) Sound.arm();
+  }
+  else {
+    bloom.classList.remove("on");
+    const msg = s.answer ? "Answer's up" : "Buzzers closed";
+    panel.innerHTML = '<div class="live"><div><b style="color:rgba(255,247,230,.35)">'
+      + msg + '</b><i>Waiting for the quizmaster</i></div></div>';
+  }
+
+  /* Scoreboard */
+  const top = Math.max.apply(null, s.teams.map(t => s.scores[t] || 0));
+  $("scores").innerHTML = s.teams.map((t, i) => {
+    const st = teamStyle(t, i), v = s.scores[t] || 0;
+    const cls = "sc" + (v === top && top > 0 ? " lead" : "")
+              + (s.locked.indexOf(t) !== -1 ? " out" : "");
+    return '<div class="' + cls + '" style="--c:' + st.c + '">'
+         +   '<span class="n">' + esc(shortName(t)) + '</span>'
+         +   '<span class="v" style="color:' + st.c + '">' + v + '</span>'
+         +   (s.active[t] ? '' : '<span class="off">NOT JOINED</span>')
+         + '</div>';
+  }).join("");
+
+  lastPhase = s.phase; lastRound = s.round;
+}
+
+connect(render);
+</script>
+</body>
+</html>

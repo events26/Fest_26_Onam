@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
+<meta name="theme-color" content="#1a0d02">
+<title>Buzzer — Onotsavam Quiz</title>
+<link rel="stylesheet" href="quiz-kit.css">
+<style>
+  body{
+    height:100vh;height:100dvh;overflow:hidden;
+    -webkit-user-select:none;user-select:none;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .layer{height:100%;display:flex;flex-direction:column}
+  .screen{display:none;height:100%;flex-direction:column}
+  .screen.on{display:flex}
+
+  /* ---- sign in ---- */
+  #pick,#code{padding:26px 20px calc(20px + env(safe-area-inset-bottom));overflow-y:auto}
+  h1{font-family:var(--font-display);font-weight:800;font-size:27px;margin:6px 0 4px}
+  .lede{margin:0 0 22px;color:rgba(255,247,230,.6);font-size:15px;line-height:1.5}
+  .teamgrid{display:grid;gap:10px}
+  .teamcard{
+    display:flex;align-items:center;gap:14px;width:100%;text-align:left;
+    background:rgba(255,247,230,.06);border:1px solid rgba(255,247,230,.14);
+    border-radius:14px;padding:15px 16px;cursor:pointer;
+    font-family:var(--font-body);font-weight:700;font-size:17px;color:var(--cream);
+  }
+  .teamcard:active{background:rgba(255,247,230,.13)}
+  .teamcard .lock{margin-left:auto;font-size:12px;color:rgba(255,247,230,.4);font-weight:600}
+  .dot{width:22px;height:22px;border-radius:50%;flex:none;box-shadow:0 0 14px currentColor}
+
+  #codeInput{
+    width:100%;background:rgba(0,0,0,.34);border:2px solid rgba(255,247,230,.22);
+    border-radius:14px;color:var(--cream);font-family:var(--font-num);
+    font-size:32px;font-weight:700;letter-spacing:.28em;text-align:center;
+    padding:18px 12px;margin:4px 0 14px;
+  }
+  #codeInput:focus{border-color:var(--pk,var(--marigold));outline:none}
+  .err{color:#ff8b8b;font-size:14px;font-weight:600;margin:12px 0 0;min-height:20px}
+  .back{background:none;border:0;color:rgba(255,247,230,.45);font-family:var(--font-body);
+        font-size:14px;font-weight:600;cursor:pointer;padding:10px 0;text-decoration:underline;
+        text-underline-offset:3px}
+
+  /* ---- buzzer ---- */
+  #game{padding:0 18px}
+  .topbar{display:flex;align-items:center;gap:10px;padding:calc(14px + env(safe-area-inset-top)) 2px 6px}
+  .chip{display:flex;align-items:center;gap:9px;font-weight:700;font-size:15px;min-width:0}
+  .chip .dot{width:13px;height:13px}
+  .chip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .swap{margin-left:auto;flex:none;background:none;border:0;cursor:pointer;
+        color:rgba(255,247,230,.42);font-family:var(--font-body);font-size:13px;
+        font-weight:600;padding:6px;text-decoration:underline;text-underline-offset:3px}
+
+  .stage{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;min-height:0}
+
+  #buzz{
+    background:none;border:0;padding:0;cursor:pointer;border-radius:50%;
+    touch-action:manipulation;
+    transition:transform .09s cubic-bezier(.3,.8,.4,1),filter .2s;
+    filter:drop-shadow(0 0 34px var(--glow,transparent));
+  }
+  #buzz:disabled{cursor:default}
+  #buzz.armed{--glow:color-mix(in srgb,var(--pk) 55%,transparent)}
+  #buzz.press{transform:scale(.9)}
+  #game .pk{--pk-size:min(70vw,42vh)}
+
+  .say{text-align:center;padding:0 6px}
+  .say b{display:block;font-family:var(--font-display);font-weight:800;
+         font-size:clamp(26px,8vw,40px);line-height:1.1}
+  .say i{display:block;font-style:normal;margin-top:8px;font-size:15px;font-weight:500;
+         color:rgba(255,247,230,.62);line-height:1.45}
+
+  .foot{display:flex;align-items:center;justify-content:space-between;gap:12px;
+        padding:14px 2px calc(16px + env(safe-area-inset-bottom));
+        font-size:12.5px;color:rgba(255,247,230,.42);font-weight:600}
+  .foot .score{color:var(--cream);font-weight:700}
+
+  /* ---- kicked ---- */
+  #kicked{padding:26px 20px;align-items:center;justify-content:center;text-align:center}
+
+  #flood{position:fixed;inset:0;z-index:50;pointer-events:none;opacity:0;
+         background:var(--pk);mix-blend-mode:screen}
+  @keyframes flood{0%{opacity:0}18%{opacity:.62}100%{opacity:0}}
+  #flood.go{animation:flood .85s ease-out}
+  @media (prefers-reduced-motion:reduce){#flood.go{animation:none}}
+</style>
+</head>
+<body>
+<div class="layer">
+
+  <!-- 1. choose a team -->
+  <div id="pick" class="screen on">
+    <div class="eyebrow">Onotsavam 2026</div>
+    <h1>Which team are you?</h1>
+    <p class="lede">One phone signs in per team. Whoever holds it does the buzzing.</p>
+    <div class="teamgrid" id="teamgrid"></div>
+  </div>
+
+  <!-- 2. enter the team's code -->
+  <div id="code" class="screen">
+    <div class="eyebrow">Signing in as</div>
+    <h1 id="codeTeam">—</h1>
+    <p class="lede">Ask the quizmaster for your team's code.</p>
+    <input id="codeInput" inputmode="numeric" autocomplete="off"
+           autocapitalize="off" spellcheck="false" placeholder="••••">
+    <button class="btn primary" id="codeGo" style="width:100%">Sign in</button>
+    <p class="err" id="codeErr"></p>
+    <button class="back" id="codeBack" type="button">← Pick a different team</button>
+  </div>
+
+  <!-- 3. the buzzer -->
+  <div id="game" class="screen">
+    <div class="topbar">
+      <div class="chip"><span class="dot" id="chipDot"></span><span id="chipName"></span></div>
+      <button class="swap" id="swap" type="button">Sign out</button>
+    </div>
+    <div class="stage">
+      <button id="buzz" type="button" aria-label="Buzz in">
+        <div class="pk" id="pk">
+          <div class="pk-ring r1"></div><div class="pk-ring r2"></div>
+          <div class="pk-ring r3"></div><div class="pk-ring r4"></div>
+          <div class="pk-core"></div>
+        </div>
+      </button>
+      <div class="say" aria-live="assertive">
+        <b id="headline">Hold tight</b>
+        <i id="subline">The quizmaster hasn't opened the buzzers yet.</i>
+      </div>
+    </div>
+    <div class="foot">
+      <span id="roundLbl">Question —</span>
+      <span class="score" id="scoreLbl">0 pts</span>
+    </div>
+  </div>
+
+  <!-- 4. another phone took over -->
+  <div id="kicked" class="screen">
+    <h1>Signed out</h1>
+    <p class="lede">Another phone signed in as <b id="kickedTeam"></b>.<br>
+      Only one phone per team can hold the buzzer.</p>
+    <button class="btn primary" id="rejoin" type="button">Sign in again</button>
+  </div>
+
+</div>
+
+<div id="flood"></div>
+<div class="offline">Reconnecting…</div>
+
+<script src="quiz-kit.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+const LS = {
+  team:  () => localStorage.getItem("onam.quiz.team")  || "",
+  token: () => localStorage.getItem("onam.quiz.token") || "",
+  sid:   () => localStorage.getItem("onam.quiz.sid")   || "",
+  set(t, tok, sid){
+    localStorage.setItem("onam.quiz.team", t);
+    localStorage.setItem("onam.quiz.token", tok);
+    localStorage.setItem("onam.quiz.sid", sid);
+  },
+  clear(){ ["team","token","sid"].forEach(k => localStorage.removeItem("onam.quiz." + k)); }
+};
+
+let TEAM = LS.team(), STATE = null, style = null;
+let sentRound = -1, lastPhase = "", pendingTeam = "";
+
+function show(id){
+  ["pick","code","game","kicked"].forEach(s => $(s).classList.toggle("on", s === id));
+}
+
+/* ------------------------------------------------------------- signing in -- */
+
+function renderPicker(teams, needs){
+  $("teamgrid").innerHTML = teams.map((t,i) => {
+    const s = teamStyle(t,i);
+    return '<button class="teamcard" data-team="'+esc(t)+'">'
+         +   '<span class="dot" style="background:'+s.c+';color:'+s.c+'"></span>'
+         +   esc(t)
+         +   ((needs && needs[t]) ? '<span class="lock">code needed</span>' : '')
+         + '</button>';
+  }).join("");
+  $("teamgrid").querySelectorAll(".teamcard").forEach(b => {
+    b.addEventListener("click", () => {
+      Sound.unlock();                       // first real gesture — buys us audio later
+      startJoin(b.dataset.team);
+    });
+  });
+}
+
+function startJoin(team){
+  pendingTeam = team;
+  if (STATE && STATE.needs_code && STATE.needs_code[team]){
+    $("codeTeam").textContent = team;
+    $("codeErr").textContent = "";
+    $("codeInput").value = "";
+    show("code");
+    setTimeout(() => $("codeInput").focus(), 80);
+  } else {
+    join(team, "");
+  }
+}
+
+async function join(team, code){
+  const r = await postJSON("/api/join", { team, code });
+  if (!r.ok){
+    $("codeErr").textContent = r.reason === "bad_code"
+      ? "That code isn't right. Check with the quizmaster."
+      : "Couldn't sign in. Try again.";
+    return;
+  }
+  LS.set(team, r.token, r.sid);
+  TEAM = team;
+  applyTeam(team);
+  keepAwake();
+  show("game");
+  if (STATE) render(STATE);
+}
+
+$("codeGo").addEventListener("click", () => join(pendingTeam, $("codeInput").value.trim()));
+$("codeInput").addEventListener("keydown", e => { if (e.key === "Enter") $("codeGo").click(); });
+$("codeBack").addEventListener("click", () => { show("pick"); });
+$("rejoin").addEventListener("click", () => { LS.clear(); TEAM = ""; show("pick"); });
+$("swap").addEventListener("click", () => { LS.clear(); TEAM = ""; style = null; show("pick"); });
+
+/* Paint the team's identity. Deliberately does not render — render() calls
+   this to catch up after a reload, and the two must not bounce off each other. */
+function applyTeam(name){
+  const i = STATE && STATE.teams ? STATE.teams.indexOf(name) : 0;
+  style = teamStyle(name, i < 0 ? 0 : i);
+  document.documentElement.style.setProperty("--pk", style.c);
+  $("chipDot").style.background = style.c;
+  $("chipDot").style.color = style.c;
+  $("chipName").textContent = name;
+}
+
+/* --------------------------------------------------------------- buzzing -- */
+
+function canBuzz(){
+  return STATE && STATE.phase === "armed"
+      && STATE.locked.indexOf(TEAM) === -1
+      && sentRound !== STATE.round;
+}
+
+async function fire(){
+  if (!canBuzz()) return;
+  sentRound = STATE.round;                  // optimistic: never send twice
+  Sound.hit(0.35);
+  $("buzz").classList.add("press");
+  setTimeout(() => $("buzz").classList.remove("press"), 110);
+  say("Sent!", "Waiting on the other teams…");
+  const r = await postJSON("/api/buzz", { team: TEAM, token: LS.token() });
+  if (r && !r.ok && r.reason === "signed_out") signedOut();
+}
+
+/* pointerdown, not click — click waits for the release. */
+$("buzz").addEventListener("pointerdown", e => { e.preventDefault(); fire(); });
+$("buzz").addEventListener("keydown", e => {
+  if (e.key === " " || e.key === "Enter") { e.preventDefault(); fire(); }
+});
+
+function signedOut(){
+  $("kickedTeam").textContent = TEAM;
+  show("kicked");
+}
+
+/* ---------------------------------------------------------------- render -- */
+
+function say(head, sub){
+  $("headline").textContent = head;
+  $("subline").textContent = sub || "";
+}
+
+function render(s){
+  STATE = s;
+
+  if (!TEAM || !LS.token()){
+    renderPicker(s.teams, s.needs_code);
+    if (!$("code").classList.contains("on")) show("pick");
+    return;
+  }
+
+  /* The server hands each signed-in phone a public session id. If the one it
+     is broadcasting for our team is not ours, a different phone has taken over
+     (or the server restarted and forgot us). */
+  if (s.active[TEAM] !== LS.sid()){
+    renderPicker(s.teams, s.needs_code);
+    signedOut();
+    return;
+  }
+
+  if (!style) { applyTeam(TEAM); keepAwake(); }
+  if (!$("game").classList.contains("on")) show("game");
+
+  const pk = $("pk"), btn = $("buzz");
+  const lockedOut = s.locked.indexOf(TEAM) !== -1;
+  const mine = s.winner && s.winner.team === TEAM;
+
+  $("roundLbl").textContent = s.q_index >= 0
+    ? "Question " + (s.q_index + 1) + " of " + s.q_total : "Question —";
+  $("scoreLbl").textContent = (s.scores[TEAM] || 0) + " pts";
+
+  pk.classList.remove("is-live","is-win","is-dead");
+  btn.classList.remove("armed");
+  btn.disabled = true;
+
+  if (s.phase === "armed"){
+    if (lockedOut){
+      pk.classList.add("is-dead");
+      say("Locked out", "You've had your go at this one. Sit tight for the next question.");
+    } else if (sentRound === s.round){
+      pk.classList.add("is-live");
+      say("Sent!", "Waiting on the other teams…");
+    } else {
+      pk.classList.add("is-live");
+      btn.classList.add("armed");
+      btn.disabled = false;
+      say("BUZZ!", "Tap anywhere on the pookkalam.");
+      if (lastPhase !== "armed") { Sound.arm(); navigator.vibrate && navigator.vibrate(60); }
+      fetch("/api/ping", { method:"POST" }).catch(() => {});   // warm the socket
+    }
+  }
+  else if (s.phase === "buzzed" && s.winner){
+    if (mine){
+      pk.classList.add("is-win");
+      say("You got there first", "In " + (s.winner.ms / 1000).toFixed(2) + "s. Answer up!");
+      if (lastPhase !== "buzzed"){
+        Sound.hit(0.8);
+        navigator.vibrate && navigator.vibrate([40,50,120]);
+        const f = $("flood"); f.classList.remove("go"); void f.offsetWidth; f.classList.add("go");
+      }
+    } else {
+      pk.classList.add("is-dead");
+      const me = s.order.find(o => o.team === TEAM);
+      const gap = me ? " You were " + ordinal(s.order.indexOf(me) + 1)
+                     + ", " + ((me.ms - s.winner.ms) / 1000).toFixed(2) + "s behind." : "";
+      say(s.winner.team, "got there first." + gap);
+    }
+  }
+  else {
+    say("Hold tight", lockedOut
+      ? "Buzzers are closed. You're back in on the next question."
+      : "The quizmaster hasn't opened the buzzers yet.");
+  }
+
+  lastPhase = s.phase;
+}
+
+function ordinal(n){
+  const s = ["th","st","nd","rd"], v = n % 100;
+  return n + (s[(v - 20) % 10] || s[v] || s[0]);
+}
+
+/* A phone that locks mid-round can't buzz. Ask to stay awake; ignore refusal. */
+async function keepAwake(){
+  try {
+    if (!("wakeLock" in navigator)) return;
+    let lock = await navigator.wakeLock.request("screen");
+    document.addEventListener("visibilitychange", async () => {
+      if (!document.hidden) { try { lock = await navigator.wakeLock.request("screen"); } catch(_){} }
+    });
+  } catch(_){}
+}
+
+connect(render);
+</script>
+</body>
+</html>

@@ -1,0 +1,55 @@
+[
+  { "q": "Onam celebrates the yearly homecoming of which legendary king?",
+    "options": ["Ravana", "Bhageeratha", "Mahabali", "Parashurama"], "a": "C" },
+
+  { "q": "What is the floral carpet laid at the doorstep during Onam called?",
+    "options": ["Rangoli", "Pookkalam", "Kolam", "Alpana"], "a": "B" },
+
+  { "q": "Onam falls in which month of the Malayalam calendar?",
+    "options": ["Karkidakam", "Medam", "Thulam", "Chingam"], "a": "D" },
+
+  { "q": "Which flower traditionally makes up the Atham-day pookkalam?",
+    "options": ["Thumba", "Chembarathi", "Thulasi", "Mullah"], "a": "A" },
+
+  { "q": "How many days does the Onam festival traditionally run?",
+    "options": ["Five", "Seven", "Ten", "Twelve"], "a": "C" },
+
+  { "q": "What is the first day of Onam called?",
+    "options": ["Thiruvonam", "Atham", "Chithira", "Uthradam"], "a": "B" },
+
+  { "q": "What is the final and most important day of Onam called?",
+    "options": ["Uthradam", "Atham", "Avittam", "Thiruvonam"], "a": "D" },
+
+  { "q": "Which avatar of Vishnu sent Mahabali to the netherworld?",
+    "options": ["Vamana", "Narasimha", "Parashurama", "Krishna"], "a": "A" },
+
+  { "q": "The grand feast served on a banana leaf during Onam is called?",
+    "options": ["Payasam", "Avial", "Onasadya", "Thoran"], "a": "C" },
+
+  { "q": "What is the Onam snake boat race known as in Malayalam?",
+    "options": ["Kalaripayattu", "Vallam Kali", "Theyyam", "Pulikali"], "a": "B" },
+
+  { "q": "The Alappuzha snake boat race is named after which Indian Prime Minister?",
+    "options": ["Jawaharlal Nehru", "Indira Gandhi", "Rajiv Gandhi", "Lal Bahadur Shastri"], "a": "A" },
+
+  { "q": "The tiger dance performed during Onam, best known in Thrissur, is called?",
+    "options": ["Kathakali", "Theyyam", "Mohiniyattam", "Pulikali"], "a": "D" },
+
+  { "q": "What is the women's circular dance performed around the pookkalam called?",
+    "options": ["Oppana", "Margam Kali", "Thiruvathira Kali", "Chakyar Koothu"], "a": "C" },
+
+  { "q": "Name the traditional Kerala drum ensemble heard at Onam festivities.",
+    "options": ["Sopana Sangeetham", "Chenda melam", "Ottamthullal", "Kathakali"], "a": "B" },
+
+  { "q": "The off-white Kerala saree with a golden border worn at Onam is called?",
+    "options": ["Kasavu", "Kanjeevaram", "Banarasi", "Pochampally"], "a": "A" },
+
+  { "q": "Which crisp banana snack is a fixture of every Onasadya?",
+    "options": ["Murukku", "Pappadam", "Boondi", "Upperi"], "a": "D" },
+
+  { "q": "Onam is the official state festival of which Indian state?",
+    "options": ["Kerala", "Tamil Nadu", "Karnataka", "Andhra Pradesh"], "a": "A" },
+
+  { "q": "Which sweet dish traditionally closes the Onasadya?",
+    "options": ["Halwa", "Payasam", "Laddu", "Jalebi"], "a": "B" }
+]
