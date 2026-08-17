@@ -101,8 +101,9 @@ STATE = {
     "answer": None,         # only populated once the quizmaster reveals it
     "q_index": -1,
     "q_total": 0,
-    "winner": None,         # {"team": str, "ms": int}
-    "order": [],            # full buzz order, for settling arguments
+    "winner": None,         # whoever currently has the floor, or None
+    "order": [],            # every team that has buzzed, in the order they did
+    "current": 0,           # position in that queue whose turn it is
     "locked": [],           # teams that already answered wrong this round
     "scores": {},
     "teams": [],
@@ -113,7 +114,7 @@ STATE = {
 }
 
 _armed_at = 0.0
-_pending = []               # buzzes collected inside the grace window
+_buzzes = []                # every buzz this round: {"team", "t"}
 
 
 # ------------------------------------------------------------ persistence ---
@@ -140,16 +141,25 @@ def save():
 def load_saved():
     global SHEET_ID, SHEET_TAB
     try:
-        with open(SAVE_FILE, encoding="utf-8") as fh:
+        # utf-8-sig, not utf-8: Windows editors and PowerShell write a byte
+        # order mark that plain utf-8 chokes on, which would silently discard
+        # every saved team, code and score.
+        with open(SAVE_FILE, encoding="utf-8-sig") as fh:
             d = json.load(fh)
-    except (OSError, json.JSONDecodeError):
+    except (OSError, json.JSONDecodeError) as exc:
+        if not isinstance(exc, FileNotFoundError):
+            print("  ! %s could not be read (%s) - starting fresh"
+                  % (os.path.basename(SAVE_FILE), exc))
         set_teams(DEFAULT_TEAMS, {})
         return
     teams = d.get("teams") or DEFAULT_TEAMS
     set_teams(teams, d.get("codes") or {}, d.get("scores") or {})
     SHEET_ID = d.get("sheet_id", SHEET_ID)
     SHEET_TAB = d.get("sheet_tab", SHEET_TAB)
-    ADMIN_TOKENS.update(d.get("admin_tokens") or [])
+    saved_tokens = d.get("admin_tokens") or []
+    if isinstance(saved_tokens, str):        # hand-edited to a bare string
+        saved_tokens = [saved_tokens]
+    ADMIN_TOKENS.update(t for t in saved_tokens if isinstance(t, str) and t)
 
 
 def set_teams(names, codes, scores=None):
@@ -367,19 +377,27 @@ def do_join(team, code):
 
 # ----------------------------------------------------------------- buzzer ---
 
+def _rebuild_order():
+    """Rank everyone who has buzzed and point `winner` at whoever's turn it is.
+    Arrival times only ever increase, so nobody's position changes once set."""
+    ordered = sorted(_buzzes, key=lambda b: b["t"])
+    STATE["order"] = [
+        {"team": b["team"], "ms": int((b["t"] - _armed_at) * 1000)}
+        for b in ordered
+    ]
+    i = STATE["current"]
+    STATE["winner"] = STATE["order"][i] if 0 <= i < len(STATE["order"]) else None
+
+
 def resolve_buzz(round_id):
-    """Pick the winner once the grace window closes."""
+    """Close the grace window on the first buzz and hand the floor to whoever
+    got there first. Buzzing stays open afterwards so the queue keeps filling."""
     with LOCK:
-        if STATE["round"] != round_id or STATE["phase"] != "armed" or not _pending:
+        if STATE["round"] != round_id or STATE["phase"] != "armed" or not _buzzes:
             return
-        ordered = sorted(_pending, key=lambda b: b["t"])
-        STATE["order"] = [
-            {"team": b["team"], "ms": int((b["t"] - _armed_at) * 1000)}
-            for b in ordered
-        ]
-        STATE["winner"] = STATE["order"][0]
+        STATE["current"] = 0
+        _rebuild_order()
         STATE["phase"] = "buzzed"
-        _pending.clear()
     broadcast()
 
 
@@ -390,15 +408,25 @@ def do_buzz(team, token):
             return {"ok": False, "reason": "unknown_team"}
         if TOKENS.get(team) != token:
             return {"ok": False, "reason": "signed_out"}
-        if STATE["phase"] != "armed":
+        # "buzzed" still accepts buzzes: a team that was slower can still take a
+        # place in the queue, which is what the quizmaster walks down.
+        if STATE["phase"] not in ("armed", "buzzed"):
             return {"ok": False, "reason": "not_armed"}
         if team in STATE["locked"]:
             return {"ok": False, "reason": "locked_out"}
-        if any(b["team"] == team for b in _pending):
+        if any(b["team"] == team for b in _buzzes):
             return {"ok": True, "reason": "already_in"}
-        _pending.append({"team": team, "t": t})
-        if len(_pending) == 1:
+
+        _buzzes.append({"team": team, "t": t})
+        if len(_buzzes) == 1:
+            # First in: settle the near-simultaneous ones before revealing.
             threading.Timer(BUZZ_GRACE, resolve_buzz, args=(STATE["round"],)).start()
+            return {"ok": True}
+        joined_late = STATE["phase"] == "buzzed"
+        if joined_late:
+            _rebuild_order()
+    if joined_late:
+        broadcast()                 # let the quizmaster watch the queue grow
     return {"ok": True}
 
 
@@ -418,8 +446,9 @@ def set_question(index):
         STATE["phase"] = "idle"
         STATE["winner"] = None
         STATE["order"] = []
+        STATE["current"] = 0
         STATE["locked"] = []
-        _pending.clear()
+        _buzzes.clear()
         _armed_at = 0.0
 
 
@@ -431,33 +460,38 @@ def do_admin(action, body):
             STATE["round"] += 1
             STATE["winner"] = None
             STATE["order"] = []
-            _pending.clear()
+            STATE["current"] = 0
+            _buzzes.clear()
             _armed_at = time.monotonic()
 
         elif action == "reset":
             STATE["phase"] = "idle"
             STATE["winner"] = None
             STATE["order"] = []
+            STATE["current"] = 0
             STATE["locked"] = []
-            _pending.clear()
+            _buzzes.clear()
 
         elif action == "wrong":
+            # Step down the queue to whoever buzzed next. Teams that never
+            # buzzed are untouched and can still join the back of it.
             w = STATE["winner"]
             if w:
                 if w["team"] not in STATE["locked"]:
                     STATE["locked"].append(w["team"])
                 if POINTS_WRONG:
                     STATE["scores"][w["team"]] = STATE["scores"].get(w["team"], 0) + POINTS_WRONG
-            STATE["winner"] = None
-            STATE["order"] = []
-            _pending.clear()
-            if len(STATE["locked"]) >= len(STATE["teams"]):
-                STATE["phase"] = "idle"
-            else:
-                STATE["phase"] = "armed"
-                STATE["round"] += 1
-                _armed_at = time.monotonic()
+            STATE["current"] += 1
+            _rebuild_order()
             save()
+
+        elif action == "pick":
+            # Jump straight to a team in the queue - for when the quizmaster
+            # saw who was first and would rather not step through one by one.
+            i = int(body.get("index", 0))
+            if 0 <= i < len(STATE["order"]):
+                STATE["current"] = i
+                _rebuild_order()
 
         elif action == "correct":
             w = STATE["winner"]

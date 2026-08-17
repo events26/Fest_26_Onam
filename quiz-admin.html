@@ -39,6 +39,29 @@
   .row{display:flex;gap:9px}
   .row .btn{flex:1}
 
+  /* buzz order queue */
+  .qRow{
+    display:flex;align-items:center;gap:10px;width:100%;text-align:left;
+    background:rgba(255,247,230,.05);border:1px solid rgba(255,247,230,.12);
+    border-radius:11px;padding:9px 11px;margin-bottom:6px;cursor:pointer;
+    font-family:var(--font-body);color:var(--cream);font-size:15px;
+  }
+  .qRow:active{background:rgba(255,247,230,.12)}
+  .qRow .pos{
+    flex:none;width:22px;height:22px;border-radius:50%;
+    background:rgba(255,247,230,.12);color:rgba(255,247,230,.6);
+    font-family:var(--font-display);font-weight:800;font-size:12px;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .qRow .dot{width:12px;height:12px;border-radius:50%;flex:none}
+  .qRow .nm{flex:1;min-width:0;font-weight:600;
+            overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .qRow .t{font-family:var(--font-num);font-size:13px;color:rgba(255,247,230,.5)}
+  .qRow.now{border-color:var(--marigold);background:rgba(255,140,0,.15)}
+  .qRow.now .pos{background:var(--marigold);color:#fff}
+  .qRow.done{opacity:.4}
+  .qRow.done .nm{text-decoration:line-through}
+
   .teamRow{display:flex;align-items:center;gap:8px;margin-bottom:8px}
   .teamRow .dot{width:13px;height:13px;border-radius:50%;flex:none}
   .teamRow input.nm{flex:1;min-width:0}
@@ -162,7 +185,13 @@
       </div>
       <div class="row">
         <button class="btn good" id="correct" type="button">Correct</button>
-        <button class="btn bad" id="wrong" type="button">Wrong — pass it on</button>
+        <button class="btn bad" id="wrong" type="button">Wrong — next team</button>
+      </div>
+      <div id="queueWrap" style="display:none">
+        <div style="height:14px"></div>
+        <span class="eyebrow">Buzz order — tap to jump to a team</span>
+        <div style="height:7px"></div>
+        <div id="queue"></div>
       </div>
     </div>
 
@@ -338,6 +367,11 @@ $("saveTeams").addEventListener("click", async () => {
 
 /* ---------------------------------------------------------------- render -- */
 
+function ordinal(n){
+  const s = ["th","st","nd","rd"], v = n % 100;
+  return n + (s[(v - 20) % 10] || s[v] || s[0]);
+}
+
 function render(s){
   S = s;
   if (!TOKEN) return;
@@ -361,16 +395,42 @@ function render(s){
   $("reveal").textContent = s.answer ? "Hide the answer again" : "Show the answer on screen";
   $("reveal").disabled = s.q_index < 0;
 
-  const w = s.phase === "buzzed" && s.winner ? s.winner : null;
-  $("resultCard").style.display = w ? "" : "none";
+  const buzzing = s.phase === "buzzed";
+  const w = buzzing ? s.winner : null;
+  $("resultCard").style.display = buzzing ? "" : "none";
+  $("correct").disabled = !w;
+
   if (w){
     const st = teamStyle(w.team, s.teams.indexOf(w.team));
     $("wDot").style.background = st.c; $("wDot").style.color = st.c;
     $("wName").textContent = w.team;
-    $("wTime").textContent = (w.ms / 1000).toFixed(2) + "s"
-      + (s.order.length > 1 ? " · beat " + (s.order.length - 1) + " other"
-        + (s.order.length > 2 ? "s" : "") : " · only buzzer");
+    $("wTime").textContent = ordinal(s.current + 1) + " to buzz · "
+      + (w.ms / 1000).toFixed(2) + "s";
+    $("wrong").textContent = (s.current + 1 < s.order.length)
+      ? "Wrong — next team" : "Wrong — nobody else yet";
+  } else if (buzzing){
+    $("wDot").style.background = "rgba(255,247,230,.2)";
+    $("wName").textContent = "Everyone who buzzed is out";
+    $("wTime").textContent = "Buzzers are still open — anyone left can still come in";
+    $("wrong").textContent = "Wrong — next team";
   }
+
+  /* The full queue, so a wrong answer can be passed straight down it. */
+  $("queueWrap").style.display = s.order.length ? "" : "none";
+  $("queue").innerHTML = s.order.map((o, i) => {
+    const st = teamStyle(o.team, s.teams.indexOf(o.team));
+    const cls = "qRow" + (i === s.current ? " now" : "")
+              + (s.locked.indexOf(o.team) !== -1 ? " done" : "");
+    return '<button class="' + cls + '" data-pick="' + i + '" type="button">'
+      + '<span class="pos">' + (i + 1) + '</span>'
+      + '<span class="dot" style="background:' + st.c + '"></span>'
+      + '<span class="nm">' + esc(o.team) + '</span>'
+      + '<span class="t">' + (o.ms / 1000).toFixed(2) + 's</span>'
+      + '</button>';
+  }).join("");
+  $("queue").querySelectorAll("[data-pick]").forEach(b => {
+    b.addEventListener("click", () => send("pick", { index: parseInt(b.dataset.pick, 10) }));
+  });
 
   $("prev").disabled = s.q_index <= 0;
   $("next").disabled = s.q_index >= s.q_total - 1 && s.q_index >= 0;

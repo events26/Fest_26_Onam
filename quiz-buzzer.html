@@ -164,7 +164,7 @@ const LS = {
 };
 
 let TEAM = LS.team(), STATE = null, style = null;
-let sentRound = -1, lastPhase = "", pendingTeam = "";
+let sentRound = -1, lastPhase = "", lastTurn = -1, pendingTeam = "";
 
 function show(id){
   ["pick","code","game","kicked"].forEach(s => $(s).classList.toggle("on", s === id));
@@ -238,7 +238,9 @@ function applyTeam(name){
 /* --------------------------------------------------------------- buzzing -- */
 
 function canBuzz(){
-  return STATE && STATE.phase === "armed"
+  // "buzzed" still accepts buzzes — a slower team can still take a place in
+  // the queue the quizmaster works down.
+  return STATE && (STATE.phase === "armed" || STATE.phase === "buzzed")
       && STATE.locked.indexOf(TEAM) === -1
       && sentRound !== STATE.round;
 }
@@ -321,21 +323,34 @@ function render(s){
       fetch("/api/ping", { method:"POST" }).catch(() => {});   // warm the socket
     }
   }
-  else if (s.phase === "buzzed" && s.winner){
+  else if (s.phase === "buzzed"){
+    const myPlace = s.order.findIndex(o => o.team === TEAM);   // -1 if never buzzed
+
     if (mine){
       pk.classList.add("is-win");
-      say("You got there first", "In " + (s.winner.ms / 1000).toFixed(2) + "s. Answer up!");
-      if (lastPhase !== "buzzed"){
+      say("Your turn", "You buzzed " + ordinal(s.current + 1) + ", in "
+        + (s.winner.ms / 1000).toFixed(2) + "s. Answer up!");
+      if (lastTurn !== s.current || lastPhase !== "buzzed"){
         Sound.hit(0.8);
         navigator.vibrate && navigator.vibrate([40,50,120]);
         const f = $("flood"); f.classList.remove("go"); void f.offsetWidth; f.classList.add("go");
       }
-    } else {
+    } else if (lockedOut){
       pk.classList.add("is-dead");
-      const me = s.order.find(o => o.team === TEAM);
-      const gap = me ? " You were " + ordinal(s.order.indexOf(me) + 1)
-                     + ", " + ((me.ms - s.winner.ms) / 1000).toFixed(2) + "s behind." : "";
-      say(s.winner.team, "got there first." + gap);
+      say("Not this one", "You had your turn. Wait for the next question.");
+    } else if (myPlace >= 0){
+      // Queued behind the current team — still in with a chance.
+      pk.classList.add("is-live");
+      say("You're " + ordinal(myPlace + 1) + " in line",
+        (s.winner ? s.winner.team + " is answering now. " : "")
+        + "You're up if they miss it.");
+    } else {
+      // Never buzzed, and the buzzers are still open.
+      pk.classList.add("is-live");
+      btn.classList.add("armed");
+      btn.disabled = false;
+      say("Still open!", (s.winner ? s.winner.team + " buzzed first. " : "")
+        + "Tap to join the queue.");
     }
   }
   else {
@@ -345,6 +360,7 @@ function render(s){
   }
 
   lastPhase = s.phase;
+  lastTurn = s.current;
 }
 
 function ordinal(n){

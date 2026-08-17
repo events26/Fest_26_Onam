@@ -156,7 +156,12 @@
 <script>
 const $ = id => document.getElementById(id);
 const KEYS = ["A","B","C","D"];
-let lastPhase = "", lastRound = -1, audioOn = false;
+let lastPhase = "", lastRound = -1, lastCurrent = -1, audioOn = false;
+
+function ordinal(n){
+  const s = ["th","st","nd","rd"], v = n % 100;
+  return n + (s[(v - 20) % 10] || s[v] || s[0]);
+}
 
 $("sound").addEventListener("click", () => {
   Sound.unlock(); Sound.arm(); audioOn = true;
@@ -210,20 +215,24 @@ function render(s){
     const st = teamStyle(s.winner.team, s.teams.indexOf(s.winner.team));
     document.documentElement.style.setProperty("--pk", st.c);
     bloom.classList.add("on");
-    if (lastRound !== s.round || lastPhase !== "buzzed"){
+    // Re-bloom when the floor passes to the next team, not just on the first buzz.
+    if (lastRound !== s.round || lastPhase !== "buzzed" || lastCurrent !== s.current){
       const pk = $("bloom");
       pk.classList.remove("is-win"); void pk.offsetWidth; pk.classList.add("is-win");
       if (audioOn) Sound.hit(0.9);
     }
-    const others = s.order.slice(1, 4).map(o =>
-      '<span>' + esc(shortName(o.team)) + ' <b class="num">+'
-      + ((o.ms - s.winner.ms) / 1000).toFixed(2) + 's</b></span>').join("");
+    /* Everyone still queued behind the current team, so the hall can see the
+       running order rather than taking the quizmaster's word for it. */
+    const others = s.order.slice(s.current + 1, s.current + 5).map((o, i) =>
+      '<span>' + (s.current + i + 2) + '. ' + esc(shortName(o.team))
+      + ' <b class="num">' + (o.ms / 1000).toFixed(2) + 's</b></span>').join("");
 
     panel.innerHTML =
       '<div class="winner">'
       +  '<div class="swatch"></div>'
       +  '<div class="who"><b>' + esc(s.winner.team) + '</b>'
-      +    '<i class="num">' + (s.winner.ms / 1000).toFixed(2) + 's after the buzzers opened</i></div>'
+      +    '<i class="num">' + ordinal(s.current + 1) + ' to buzz · '
+      +      (s.winner.ms / 1000).toFixed(2) + 's</i></div>'
       +  (others ? '<div class="rest">' + others + '</div>' : '')
       + '</div>';
   }
@@ -240,6 +249,20 @@ function render(s){
       +  '<div><b>BUZZERS LIVE</b><i>' + esc(out) + '</i></div>'
       + '</div>';
     if (lastPhase !== "armed" && audioOn) Sound.arm();
+  }
+  else if (s.phase === "buzzed"){
+    /* Everyone who buzzed has been ruled out, but the buzzers never closed —
+       anyone who held back can still come in. */
+    bloom.classList.remove("on");
+    document.documentElement.style.setProperty("--pk", "var(--marigold)");
+    panel.innerHTML =
+      '<div class="live">'
+      +  '<div class="pk is-live"><div class="pk-ring r1"></div><div class="pk-ring r2"></div>'
+      +    '<div class="pk-ring r3"></div><div class="pk-ring r4"></div><div class="pk-core"></div></div>'
+      +  '<div><b>STILL OPEN</b><i>'
+      +    esc(s.order.length + " team" + (s.order.length === 1 ? "" : "s")
+           + " buzzed and missed it — anyone else can still take it") + '</i></div>'
+      + '</div>';
   }
   else {
     bloom.classList.remove("on");
@@ -261,7 +284,7 @@ function render(s){
          + '</div>';
   }).join("");
 
-  lastPhase = s.phase; lastRound = s.round;
+  lastPhase = s.phase; lastRound = s.round; lastCurrent = s.current;
 }
 
 connect(render);

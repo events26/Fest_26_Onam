@@ -153,12 +153,21 @@ drops *during* the quiz, nothing happens — the questions are already in memory
 Read the question aloud from your phone, then:
 
 - **Arm buzzers** — phones go live and start pulsing.
-- Someone buzzes. Everyone else locks out instantly; the projector blooms in
-  the winning team's colour and shows their reaction time.
-- **Correct** (+10 and closes the question) or **Wrong — pass it on** (locks
-  that team out and reopens the buzzers for everyone else).
+- Teams buzz. The first one takes the floor, and **everyone else queues up
+  behind them in the order they tapped**, so you get a full 1st-to-8th running
+  order rather than just a winner.
+- **Correct** (+10 and closes the question) or **Wrong — next team**, which
+  strikes that team off and hands the floor to whoever buzzed next.
 - **Show the answer on screen** highlights the right option on the projector.
 - **Next question ›**.
+
+The buzz order is listed under the controls with each team's reaction time. Tap
+any team in that list to jump straight to them, rather than stepping down one
+at a time — useful when you saw the order yourself and just want to get on.
+
+The buzzers never close while a question is live, so a team that hung back can
+still join the end of the queue. If everyone who buzzed is struck off, the
+projector says so and keeps taking buzzes.
 
 **Reset this question** reopens everything including lockouts, for when a
 question has to be thrown out.
