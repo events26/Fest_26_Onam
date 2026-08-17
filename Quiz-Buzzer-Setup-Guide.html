@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Onotsavam Quiz Buzzer — Setup Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  @page{ size:A4; margin:14mm 13mm 12mm; }
+
+  :root{
+    --marigold:#e07a00; --saffron:#c25400; --red:#c0182f; --green:#0b7a3b;
+    --gold:#b8860b; --ink:#2c1c05; --mute:#6b5636; --rule:#e6dcc8;
+    --paper:#fffdf7;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; font-family:'Work Sans',"Segoe UI",sans-serif;
+    color:var(--ink); background:#fff; font-size:10.4pt; line-height:1.5;
+  }
+  h1,h2,h3{font-family:'Baloo 2',"Segoe UI",sans-serif;margin:0}
+
+  /* ---- masthead ---- */
+  .head{
+    border-bottom:3px solid var(--marigold); padding-bottom:9px; margin-bottom:16px;
+    display:flex; align-items:flex-end; gap:14px;
+  }
+  .head h1{font-size:24pt;font-weight:800;line-height:1.05;color:var(--saffron)}
+  .head .sub{margin-left:auto;text-align:right;font-size:8.6pt;color:var(--mute);line-height:1.45}
+  .head .sub b{color:var(--ink)}
+
+  .intro{
+    background:var(--paper); border:1px solid var(--rule); border-left:4px solid var(--green);
+    border-radius:5px; padding:10px 13px; margin-bottom:16px; font-size:9.8pt;
+  }
+  .intro b{color:var(--green)}
+
+  /* ---- section headers ---- */
+  h2{
+    font-size:13.5pt; font-weight:800; color:var(--ink);
+    margin:20px 0 11px; padding-bottom:5px; border-bottom:2px solid var(--rule);
+    display:flex; align-items:baseline; gap:9px;
+  }
+  h2 .when{
+    font-family:'Work Sans',sans-serif; font-size:8pt; font-weight:700;
+    letter-spacing:.1em; text-transform:uppercase; color:#fff;
+    background:var(--marigold); padding:3px 9px; border-radius:20px;
+  }
+  h2 .when.day{background:var(--red)}
+
+  /* ---- steps ---- */
+  .step{display:flex; gap:11px; margin-bottom:12px; break-inside:avoid; page-break-inside:avoid}
+  .n{
+    flex:none; width:23px; height:23px; border-radius:50%;
+    background:var(--marigold); color:#fff;
+    font-family:'Baloo 2',sans-serif; font-weight:800; font-size:11.5pt;
+    display:flex; align-items:center; justify-content:center; line-height:1;
+    margin-top:1px;
+  }
+  .body{flex:1;min-width:0}
+  .body h3{font-size:11pt;font-weight:700;margin-bottom:2px}
+  .body p{margin:2px 0}
+  .body ul{margin:4px 0 0;padding-left:17px}
+  .body li{margin:1.5px 0}
+
+  code, .url{
+    font-family:Consolas,"Cascadia Mono",monospace; font-size:9.3pt;
+    background:#f4efe2; border:1px solid var(--rule); border-radius:3px;
+    padding:1px 5px; color:var(--saffron); font-weight:600;
+    word-break:break-all;
+  }
+  .urlbig{
+    display:block; font-family:Consolas,monospace; font-size:10.5pt; font-weight:700;
+    background:#f4efe2; border:1px solid var(--rule); border-radius:4px;
+    padding:6px 10px; margin:5px 0; color:var(--saffron); word-break:break-all;
+  }
+
+  .warn{
+    background:#fff4f4; border:1px solid #f0c9cd; border-left:4px solid var(--red);
+    border-radius:4px; padding:8px 11px; margin:6px 0 0; font-size:9.6pt;
+  }
+  .warn b{color:var(--red)}
+  .tip{
+    background:#f2faf5; border:1px solid #c8e6d3; border-left:4px solid var(--green);
+    border-radius:4px; padding:8px 11px; margin:6px 0 0; font-size:9.6pt;
+  }
+  .tip b{color:var(--green)}
+
+  /* ---- troubleshooting ---- */
+  table{width:100%; border-collapse:collapse; font-size:9.5pt; margin-top:4px}
+  th{
+    text-align:left; background:#f4efe2; color:var(--ink);
+    font-weight:700; padding:6px 9px; border:1px solid var(--rule);
+    font-size:8.4pt; text-transform:uppercase; letter-spacing:.05em;
+  }
+  td{padding:6px 9px; border:1px solid var(--rule); vertical-align:top}
+  td:first-child{width:34%; font-weight:600}
+
+  .foot{
+    margin-top:18px; padding-top:8px; border-top:2px solid var(--rule);
+    font-size:8.6pt; color:var(--mute); display:flex; gap:12px;
+  }
+  .foot .r{margin-left:auto; text-align:right}
+</style>
+</head>
+<body>
+
+<div class="head">
+  <h1>Onotsavam<br>Quiz Buzzer</h1>
+  <div class="sub">
+    <b>Setup guide for the host</b><br>
+    Teams buzz in from their own phones.<br>
+    You need one laptop and about 15 minutes.
+  </div>
+</div>
+
+<div class="intro">
+  <b>Only your laptop needs anything installed.</b> Everyone playing just opens a
+  web page on their phone — nothing to download, no app, no accounts. Work through
+  “Before the day” once, in advance, so nothing is a surprise on the day itself.
+</div>
+
+<h2><span class="when">Before the day</span> Get it working once, in advance</h2>
+
+<div class="step">
+  <div class="n">1</div>
+  <div class="body">
+    <h3>Download the code</h3>
+    <p>Open this page in your browser:</p>
+    <span class="urlbig">https://github.com/events26/Fest_26_Onam</span>
+    <p>Click the green <b>Code</b> button near the top right, then
+       <b>Download ZIP</b>. You do <b>not</b> need a GitHub account or any other program.</p>
+  </div>
+</div>
+
+<div class="step">
+  <div class="n">2</div>
+  <div class="body">
+    <h3>Unzip it</h3>
+    <p>Find the downloaded file (usually in <b>Downloads</b>), right-click it and choose
+       <b>Extract All…</b>, then <b>Extract</b>. You now have a folder called
+       <code>Fest_26_Onam-main</code>. Keep it somewhere easy, like your Desktop.</p>
+  </div>
+</div>
+
+<div class="step">
+  <div class="n">3</div>
+  <div class="body">
+    <h3>Install Python</h3>
+    <p>Go to <span class="url">python.org/downloads</span> and click the big yellow
+       <b>Download Python</b> button. Run the file it downloads.</p>
+    <div class="warn">
+      <b>This is the one step people get wrong.</b> On the first screen of the installer,
+      tick the box at the bottom that says <b>“Add python.exe to PATH”</b> <i>before</i>
+      clicking Install Now. If you miss it, nothing later will work, and the error message
+      will not tell you why. If you are unsure, run the installer again and check.
+    </div>
+  </div>
+</div>
+
+<div class="step">
+  <div class="n">4</div>
+  <div class="body">
+    <h3>Test it</h3>
+    <p>Open the folder from step 2 and double-click <code>start-quiz.bat</code>.
+       A black window should open showing three web addresses.</p>
+    <div class="tip">
+      <b>If it says Python is not installed</b>, go back to step 3 — the PATH box was
+      almost certainly missed. Close the window and try again after reinstalling.
+    </div>
+    <p style="margin-top:6px">Leave that black window open and go to step 5 to confirm
+       it really works. Closing the window stops the quiz.</p>
+  </div>
+</div>
+
+<div class="step">
+  <div class="n">5</div>
+  <div class="body">
+    <h3>Allow it through the firewall</h3>
+    <p>Windows will pop up a box asking whether to allow Python to communicate on the
+       network. Click <b>Allow access</b>, and make sure <b>Private networks</b> is ticked.</p>
+    <div class="warn">
+      <b>If you click Cancel, phones will not be able to connect</b> and there will be no
+      other clue what went wrong. If you have already dismissed it, see the troubleshooting
+      table on the next page.
+    </div>
+  </div>
+</div>
+
+<div class="step">
+  <div class="n">6</div>
+  <div class="body">
+    <h3>Check it from a phone</h3>
+    <p>In the black window, find the line starting <b>Teams join</b>. It shows an address
+       like <code>http://192.168.1.42:8000/</code> — the numbers will be different on your
+       laptop, so use whatever <i>your</i> window shows.</p>
+    <p>Put one phone on the <b>same Wi-Fi as the laptop</b> and type that address into its
+       browser. If the team page loads, you are ready. If not, see troubleshooting.</p>
+  </div>
+</div>
+
+<h2><span class="when day">On the day</span> Running the quiz</h2>
+
+<div class="step">
+  <div class="n">7</div>
+  <div class="body">
+    <h3>Get everyone on one network</h3>
+    <p>The laptop and every phone must be on the <b>same Wi-Fi</b>. A hotspot from your own
+       phone is the most reliable choice.</p>
+    <div class="warn">
+      <b>Avoid office, hotel and guest Wi-Fi.</b> These usually stop devices from talking to
+      each other, so phones will never reach the laptop no matter what you do. A personal
+      hotspot avoids the problem completely.
+    </div>
+  </div>
+</div>
+
+<div class="step">
+  <div class="n">8</div>
+  <div class="body">
+    <h3>Start the quiz</h3>
+    <p>Double-click <code>start-quiz.bat</code> again. Note the <b>Teams join</b> address —
+       you will read this out to everyone.</p>
+  </div>
+</div>
+
+<div class="step">
+  <div class="n">9</div>
+  <div class="body">
+    <h3>Put the big screen up</h3>
+    <p>On the laptop, open <span class="url">http://localhost:8000/display</span> in your
+       browser and connect the projector. Then:</p>
+    <ul>
+      <li>Click <b>Full screen</b></li>
+      <li>Click <b>Turn on sound</b> — browsers block sound until you click once, so this
+          must be done before the first question</li>
+    </ul>
+  </div>
+</div>
+
+<div class="step">
+  <div class="n">10</div>
+  <div class="body">
+    <h3>Open your own controls</h3>
+    <p>On <b>your</b> phone, open the same address as the teams but with
+       <code>/admin</code> on the end — for example
+       <code>http://192.168.1.42:8000/admin</code> — then sign in.</p>
+    <div class="warn">
+      <b>Ask Sanjay for the username and password before the day.</b> There is no separate
+      quiz password: it is the same login as the main Onam admin page, so you cannot get in
+      without it.
+    </div>
+    <div class="tip">
+      <b>Signing in needs internet, so do it early.</b> Once you are in you stay in, even if
+      the connection drops or the laptop restarts. Keep this page on your own phone — it
+      shows the answers, so do not put it on the projector.
+    </div>
+  </div>
+</div>
+
+<div class="step">
+  <div class="n">11</div>
+  <div class="body">
+    <h3>Set up the teams</h3>
+    <p>On the admin page, open <b>Teams &amp; codes</b>. Change the team names if you need
+       to, then tap <b>Generate codes</b> and <b>Save teams &amp; codes</b>.</p>
+    <p>Read each code out to <b>one person per team</b>. That phone holds the buzzer for
+       the whole quiz.</p>
+  </div>
+</div>
+
+<div class="step">
+  <div class="n">12</div>
+  <div class="body">
+    <h3>Let the teams in</h3>
+    <p>Read out the <b>Teams join</b> address. Each team opens it, picks their team name and
+       types their code.</p>
+    <p>Watch the projector: each team's <b>NOT JOINED</b> label disappears as they sign in,
+       so you can see who is still missing without asking.</p>
+  </div>
+</div>
+
+<div class="step">
+  <div class="n">13</div>
+  <div class="body">
+    <h3>Run each question</h3>
+    <p>Read the question aloud from your phone, then:</p>
+    <ul>
+      <li><b>Arm buzzers</b> — every phone lights up and starts pulsing</li>
+      <li>The first team to tap wins; everyone else locks out instantly and the big screen
+          fills with the winning team's colour</li>
+      <li><b>Correct</b> gives them 10 points, or <b>Wrong — pass it on</b> locks them out
+          and reopens the buzzers for everyone else</li>
+      <li><b>Show the answer on screen</b> highlights the right option on the projector</li>
+      <li><b>Next question</b></li>
+    </ul>
+    <p style="margin-top:5px"><b>Reset this question</b> starts a question over completely,
+       for when one has to be thrown out.</p>
+  </div>
+</div>
+
+<h2 style="page-break-before:always">If something goes wrong</h2>
+
+<table>
+  <tr><th>What you see</th><th>What to do</th></tr>
+  <tr>
+    <td>The black window says Python is not installed</td>
+    <td>The <b>Add python.exe to PATH</b> box was missed during installation. Reinstall
+        Python from <span class="url">python.org/downloads</span> and tick it this time.</td>
+  </tr>
+  <tr>
+    <td>Phones cannot open the page, but the laptop can</td>
+    <td>Almost always the firewall. Right-click the Start button, choose
+        <b>Terminal (Admin)</b>, and paste this in, then press Enter:
+        <span class="urlbig" style="font-size:8.6pt">New-NetFirewallRule -DisplayName "Onam Quiz" -Direction Inbound -Protocol TCP -LocalPort 8000 -Action Allow -Profile Private,Public</span>
+        If that does not fix it, the Wi-Fi is separating devices — switch to a phone hotspot.</td>
+  </tr>
+  <tr>
+    <td>Nothing opens, even on the laptop</td>
+    <td>The black window is not running, or was closed. Double-click
+        <code>start-quiz.bat</code> again and leave the window open.</td>
+  </tr>
+  <tr>
+    <td>The address does not work on phones</td>
+    <td>Check you typed the numbers from <i>your</i> window, including
+        <code>:8000</code> at the end. Also check the phone is on Wi-Fi and has not
+        quietly switched to mobile data.</td>
+  </tr>
+  <tr>
+    <td>Cannot sign in to the admin page</td>
+    <td>Signing in needs a working internet connection. Check you can load any website on
+        that phone, then try again.</td>
+  </tr>
+  <tr>
+    <td>A team's phone died or was locked out</td>
+    <td>They sign in again with the same code — the newest phone takes over the buzzer.
+        You can also tap <b>Sign out</b> next to their name on the admin page.</td>
+  </tr>
+  <tr>
+    <td>The laptop restarted mid-quiz</td>
+    <td>Nothing is lost. Team names, codes, scores and your sign-in are all saved. Start
+        <code>start-quiz.bat</code> again; teams re-open the join page.</td>
+  </tr>
+  <tr>
+    <td>No sound from the projector</td>
+    <td><b>Turn on sound</b> was not clicked on the display page. Move the mouse to make
+        the buttons appear, then click it.</td>
+  </tr>
+</table>
+
+<div class="tip" style="margin-top:14px">
+  <b>Worth a five-minute rehearsal.</b> Run steps 8 to 13 with two phones the day before.
+  Everything that goes wrong on the day goes wrong in the first two minutes, and it is much
+  easier to fix when there is not a room full of people waiting.
+</div>
+
+<div class="foot">
+  <div>Onotsavam 2026 — Quiz Buzzer<br>Full notes: <b>QUIZ-README.md</b> in the same folder</div>
+  <div class="r">Questions come from a Google Sheet<br>or the 18 built in as standard</div>
+</div>
+
+</body>
+</html>
