@@ -9,129 +9,111 @@
 
   :root{
     --marigold:#e07a00; --saffron:#c25400; --red:#c0182f; --green:#0b7a3b;
-    --gold:#b8860b; --ink:#2c1c05; --mute:#6b5636; --rule:#e6dcc8;
-    --paper:#fffdf7;
+    --blue:#3a6ea5; --gold:#b8860b; --ink:#2c1c05; --mute:#6b5636;
+    --rule:#e6dcc8; --paper:#fffdf7;
   }
   *{box-sizing:border-box}
-  body{
-    margin:0; font-family:'Work Sans',"Segoe UI",sans-serif;
-    color:var(--ink); background:#fff; font-size:10.4pt; line-height:1.5;
-  }
+  body{margin:0;font-family:'Work Sans',"Segoe UI",sans-serif;
+       color:var(--ink);background:#fff;font-size:10.4pt;line-height:1.5}
   h1,h2,h3{font-family:'Baloo 2',"Segoe UI",sans-serif;margin:0}
 
-  /* ---- masthead ---- */
-  .head{
-    border-bottom:3px solid var(--marigold); padding-bottom:9px; margin-bottom:16px;
-    display:flex; align-items:flex-end; gap:14px;
-  }
+  .head{border-bottom:3px solid var(--marigold);padding-bottom:9px;margin-bottom:14px;
+        display:flex;align-items:flex-end;gap:14px}
   .head h1{font-size:24pt;font-weight:800;line-height:1.05;color:var(--saffron)}
   .head .sub{margin-left:auto;text-align:right;font-size:8.6pt;color:var(--mute);line-height:1.45}
   .head .sub b{color:var(--ink)}
 
-  .intro{
-    background:var(--paper); border:1px solid var(--rule); border-left:4px solid var(--green);
-    border-radius:5px; padding:10px 13px; margin-bottom:16px; font-size:9.8pt;
-  }
+  .intro{background:var(--paper);border:1px solid var(--rule);border-left:4px solid var(--green);
+         border-radius:5px;padding:10px 13px;margin-bottom:14px;font-size:9.8pt}
   .intro b{color:var(--green)}
 
-  /* ---- section headers ---- */
-  h2{
-    font-size:13.5pt; font-weight:800; color:var(--ink);
-    margin:20px 0 11px; padding-bottom:5px; border-bottom:2px solid var(--rule);
-    display:flex; align-items:baseline; gap:9px;
-  }
-  h2 .when{
-    font-family:'Work Sans',sans-serif; font-size:8pt; font-weight:700;
-    letter-spacing:.1em; text-transform:uppercase; color:#fff;
-    background:var(--marigold); padding:3px 9px; border-radius:20px;
-  }
-  h2 .when.day{background:var(--red)}
+  /* ---- the fork ---- */
+  .fork{display:flex;gap:11px;margin-bottom:6px}
+  .opt{flex:1;border:2px solid var(--rule);border-radius:6px;padding:11px 13px;background:#fff}
+  .opt.pick{border-color:var(--blue);background:#f3f6fa}
+  .opt h3{font-size:11.5pt;font-weight:800;margin-bottom:3px}
+  .opt .tag{display:inline-block;font-size:7.4pt;font-weight:700;letter-spacing:.08em;
+            text-transform:uppercase;color:#fff;background:var(--blue);
+            padding:2px 7px;border-radius:20px;margin-bottom:5px}
+  .opt .tag.grey{background:var(--mute)}
+  .opt p{margin:3px 0 0;font-size:9.4pt;line-height:1.45}
+  .opt .go{margin-top:7px;font-weight:700;font-size:9.4pt;color:var(--saffron)}
 
-  /* ---- steps ---- */
-  .step{display:flex; gap:11px; margin-bottom:12px; break-inside:avoid; page-break-inside:avoid}
-  .n{
-    flex:none; width:23px; height:23px; border-radius:50%;
-    background:var(--marigold); color:#fff;
-    font-family:'Baloo 2',sans-serif; font-weight:800; font-size:11.5pt;
-    display:flex; align-items:center; justify-content:center; line-height:1;
-    margin-top:1px;
-  }
+  h2{font-size:13.5pt;font-weight:800;margin:20px 0 11px;padding-bottom:5px;
+     border-bottom:2px solid var(--rule);display:flex;align-items:baseline;gap:9px}
+  h2 .when{font-family:'Work Sans',sans-serif;font-size:8pt;font-weight:700;
+           letter-spacing:.1em;text-transform:uppercase;color:#fff;
+           background:var(--marigold);padding:3px 9px;border-radius:20px}
+  h2 .when.a{background:var(--blue)}
+  h2 .when.b{background:var(--mute)}
+  h2 .when.run{background:var(--red)}
+
+  .step{display:flex;gap:11px;margin-bottom:12px;break-inside:avoid;page-break-inside:avoid}
+  .n{flex:none;width:23px;height:23px;border-radius:50%;background:var(--marigold);color:#fff;
+     font-family:'Baloo 2',sans-serif;font-weight:800;font-size:11.5pt;
+     display:flex;align-items:center;justify-content:center;line-height:1;margin-top:1px}
+  .n.a{background:var(--blue)}
+  .n.b{background:var(--mute)}
   .body{flex:1;min-width:0}
   .body h3{font-size:11pt;font-weight:700;margin-bottom:2px}
   .body p{margin:2px 0}
   .body ul{margin:4px 0 0;padding-left:17px}
   .body li{margin:1.5px 0}
 
-  code, .url{
-    font-family:Consolas,"Cascadia Mono",monospace; font-size:9.3pt;
-    background:#f4efe2; border:1px solid var(--rule); border-radius:3px;
-    padding:1px 5px; color:var(--saffron); font-weight:600;
-    /* break-word, not break-all: an address short enough to fit moves to the
-       next line whole instead of splitting mid-number as 192.1 / 68.1.42 */
-    overflow-wrap:break-word; word-break:normal;
-  }
-  .urlbig{
-    display:block; font-family:Consolas,monospace; font-size:10.5pt; font-weight:700;
-    background:#f4efe2; border:1px solid var(--rule); border-radius:4px;
-    padding:6px 10px; margin:5px 0; color:var(--saffron); word-break:break-all;
-  }
+  code,.url{font-family:Consolas,"Cascadia Mono",monospace;font-size:9.3pt;
+    background:#f4efe2;border:1px solid var(--rule);border-radius:3px;
+    padding:1px 5px;color:var(--saffron);font-weight:600;
+    overflow-wrap:break-word;word-break:normal}
+  .cmd{display:block;font-family:Consolas,monospace;font-size:9.6pt;font-weight:700;
+    background:#2c1c05;color:#ffd899;border-radius:4px;padding:7px 11px;margin:5px 0;
+    white-space:nowrap;overflow:hidden}
+  .urlbig{display:block;font-family:Consolas,monospace;font-size:10.5pt;font-weight:700;
+    background:#f4efe2;border:1px solid var(--rule);border-radius:4px;
+    padding:6px 10px;margin:5px 0;color:var(--saffron);word-break:break-all}
 
-  .warn{
-    background:#fff4f4; border:1px solid #f0c9cd; border-left:4px solid var(--red);
-    border-radius:4px; padding:8px 11px; margin:6px 0 0; font-size:9.6pt;
-  }
+  .warn{background:#fff4f4;border:1px solid #f0c9cd;border-left:4px solid var(--red);
+        border-radius:4px;padding:8px 11px;margin:6px 0 0;font-size:9.6pt}
   .warn b{color:var(--red)}
-  .tip{
-    background:#f2faf5; border:1px solid #c8e6d3; border-left:4px solid var(--green);
-    border-radius:4px; padding:8px 11px; margin:6px 0 0; font-size:9.6pt;
-  }
+  .tip{background:#f2faf5;border:1px solid #c8e6d3;border-left:4px solid var(--green);
+       border-radius:4px;padding:8px 11px;margin:6px 0 0;font-size:9.6pt}
   .tip b{color:var(--green)}
-  .mac{
-    background:#f3f6fa; border:1px solid #ccd8e6; border-left:4px solid #3a6ea5;
-    border-radius:4px; padding:8px 11px; margin:6px 0 0; font-size:9.6pt;
-  }
-  /* a small mock of the buzz order as it appears on the quizmaster's phone */
-  .queue{margin:7px 0 0; border:1px solid var(--rule); border-radius:5px; overflow:hidden}
-  .qrow{
-    display:flex; align-items:center; gap:8px; padding:5px 9px;
-    border-bottom:1px solid var(--rule); font-size:9.4pt; background:#fff;
-  }
+  .note{background:#f3f6fa;border:1px solid #ccd8e6;border-left:4px solid var(--blue);
+        border-radius:4px;padding:8px 11px;margin:6px 0 0;font-size:9.6pt}
+  .note b{color:#2d5a86}
+
+  /* who-does-what diagram */
+  .map{border:1px solid var(--rule);border-radius:5px;overflow:hidden;margin:8px 0 0}
+  .map .r{display:flex;gap:10px;padding:7px 11px;border-bottom:1px solid var(--rule);font-size:9.5pt}
+  .map .r:last-child{border-bottom:0}
+  .map .who{flex:none;width:118px;font-weight:700}
+  .map .r.hi{background:#f3f6fa}
+
+  /* buzz order mock */
+  .queue{margin:7px 0 0;border:1px solid var(--rule);border-radius:5px;overflow:hidden}
+  .qrow{display:flex;align-items:center;gap:8px;padding:5px 9px;
+        border-bottom:1px solid var(--rule);font-size:9.4pt;background:#fff}
   .qrow:last-child{border-bottom:0}
-  .qrow .p{
-    flex:none; width:15px; height:15px; border-radius:50%;
-    background:#e8ded0; color:var(--mute); font-weight:700; font-size:7.6pt;
-    display:flex; align-items:center; justify-content:center;
-  }
-  .qrow .t{flex:1; font-weight:600}
-  .qrow .ms{font-family:Consolas,monospace; font-size:8.6pt; color:var(--mute)}
+  .qrow .p{flex:none;width:15px;height:15px;border-radius:50%;background:#e8ded0;
+           color:var(--mute);font-weight:700;font-size:7.6pt;
+           display:flex;align-items:center;justify-content:center}
+  .qrow .t{flex:1;font-weight:600}
+  .qrow .ms{font-family:Consolas,monospace;font-size:8.6pt;color:var(--mute)}
   .qrow.now{background:#fff6e8}
-  .qrow.now .p{background:var(--marigold); color:#fff}
-  .qrow .tag{
-    font-size:7.4pt; font-weight:700; text-transform:uppercase; letter-spacing:.07em;
-    color:#fff; background:var(--marigold); padding:2px 6px; border-radius:20px;
-  }
+  .qrow.now .p{background:var(--marigold);color:#fff}
+  .qrow .tagx{font-size:7.4pt;font-weight:700;text-transform:uppercase;letter-spacing:.07em;
+              color:#fff;background:var(--marigold);padding:2px 6px;border-radius:20px}
 
-  .mac .lbl{
-    display:inline-block; background:#3a6ea5; color:#fff; font-size:7.6pt;
-    font-weight:700; letter-spacing:.09em; text-transform:uppercase;
-    padding:2px 7px; border-radius:20px; margin-right:6px; vertical-align:1px;
-  }
+  table{width:100%;border-collapse:collapse;font-size:9.5pt;margin-top:4px}
+  th{text-align:left;background:#f4efe2;color:var(--ink);font-weight:700;
+     padding:6px 9px;border:1px solid var(--rule);font-size:8.4pt;
+     text-transform:uppercase;letter-spacing:.05em}
+  td{padding:6px 9px;border:1px solid var(--rule);vertical-align:top}
+  td:first-child{width:34%;font-weight:600}
+  tr{break-inside:avoid;page-break-inside:avoid}
 
-  /* ---- troubleshooting ---- */
-  table{width:100%; border-collapse:collapse; font-size:9.5pt; margin-top:4px}
-  th{
-    text-align:left; background:#f4efe2; color:var(--ink);
-    font-weight:700; padding:6px 9px; border:1px solid var(--rule);
-    font-size:8.4pt; text-transform:uppercase; letter-spacing:.05em;
-  }
-  td{padding:6px 9px; border:1px solid var(--rule); vertical-align:top}
-  td:first-child{width:34%; font-weight:600}
-
-  .foot{
-    margin-top:18px; padding-top:8px; border-top:2px solid var(--rule);
-    font-size:8.6pt; color:var(--mute); display:flex; gap:12px;
-  }
-  .foot .r{margin-left:auto; text-align:right}
+  .foot{margin-top:16px;padding-top:8px;border-top:2px solid var(--rule);
+        font-size:8.6pt;color:var(--mute);display:flex;gap:12px}
+  .foot .r{margin-left:auto;text-align:right}
 </style>
 </head>
 <body>
@@ -146,64 +128,281 @@
 </div>
 
 <div class="intro">
-  <b>Only your laptop needs anything installed.</b> Everyone playing just opens a
-  web page on their phone — nothing to download, no app, no accounts. Work through
-  “Before the day” once, in advance, so nothing is a surprise on the day itself.
-  <br><br>
-  Written for Windows. <b>On a Mac</b>, follow the same steps and read the blue boxes
-  where they appear — everything else is identical.
+  <b>Everyone playing just opens a web page on their phone</b> — nothing to download,
+  no app, no accounts. One device has to run the quiz itself, and that is all this
+  guide sets up. Do it once in advance, not on the day.
 </div>
 
-<h2><span class="when">Before the day</span> Get it working once, in advance</h2>
+<h2>Start here: which device runs the quiz?</h2>
+
+<div class="fork">
+  <div class="opt pick">
+    <span class="tag">Setup A</span>
+    <h3>An Android phone</h3>
+    <p>Use this if the laptop is a work machine that blocks installing software, or
+       will not let other phones connect to it.</p>
+    <p>The phone shares the hotspot and runs the quiz. The laptop only opens a web
+       page, which no work policy blocks.</p>
+    <div class="go">→ Go to Setup A, then Running the quiz</div>
+  </div>
+  <div class="opt">
+    <span class="tag grey">Setup B</span>
+    <h3>A laptop</h3>
+    <p>Use this if you can install software on the laptop and click Allow when
+       Windows asks about the firewall.</p>
+    <p>Simplest option on a personal laptop. On a locked-down work laptop it usually
+       fails, and you cannot fix it without an administrator.</p>
+    <div class="go">→ Skip to Setup B, then Running the quiz</div>
+  </div>
+</div>
+
+<div class="warn">
+  <b>Not sure?</b> If it is your own laptop, use Setup B. If it belongs to your employer,
+  use Setup A — a work laptop normally refuses both the install and the incoming
+  connections from phones, and neither can be worked around without admin rights.
+</div>
+
+<h2 style="page-break-before:always"><span class="when a">Setup A</span> Running it from an Android phone</h2>
+
+<p style="margin-top:0">One Android phone does everything: it shares the hotspot, runs the
+   quiz, and shows your quizmaster controls. Here is who does what:</p>
+
+<div class="map">
+  <div class="r hi"><span class="who">Android phone</span><span>Hotspot + the quiz itself + your private controls. Sits on a charger.</span></div>
+  <div class="r"><span class="who">Laptop</span><span>Joins the hotspot and opens the big screen page. Nothing installed.</span></div>
+  <div class="r"><span class="who">Team phones</span><span>Join the hotspot and open the buzzer page.</span></div>
+</div>
+
+<div class="tip">
+  <b>Do this the day before.</b> Downloading Python onto the phone takes a few minutes
+  and needs internet. Plug the phone into a charger — a hotspot and a server together
+  drain a battery fast.
+</div>
+
+<div class="step" style="margin-top:14px">
+  <div class="n a">1</div>
+  <div class="body">
+    <h3>Install Termux on the phone</h3>
+    <p>Termux is a free terminal app. Open this page in the phone's browser:</p>
+    <span class="urlbig">github.com/termux/termux-app/releases</span>
+    <p>Open <b>Assets</b> under the newest release and download the file ending
+       <code>universal.apk</code>. Android will warn about installing from an unknown
+       source — allow it for your browser. That is a normal phone setting and needs no
+       special permission.</p>
+    <div class="warn">
+      <b>Do not install Termux from the Play Store.</b> That version is out of date and
+      step 3 will fail on it, with an error that does not explain why.
+    </div>
+  </div>
+</div>
+
+<div class="step">
+  <div class="n a">2</div>
+  <div class="body">
+    <h3>Open Termux and update it</h3>
+    <p>You get a black screen with a prompt. Type this and press Enter:</p>
+    <span class="cmd">pkg update -y &amp;&amp; pkg upgrade -y</span>
+    <p>If it asks anything, press Enter to accept. Takes a couple of minutes.</p>
+  </div>
+</div>
+
+<div class="step">
+  <div class="n a">3</div>
+  <div class="body">
+    <h3>Install Python</h3>
+    <span class="cmd">pkg install -y python git</span>
+    <p>Check it worked with <code>python --version</code> — it should print a version
+       number.</p>
+  </div>
+</div>
+
+<div class="step">
+  <div class="n a">4</div>
+  <div class="body">
+    <h3>Download the quiz</h3>
+    <span class="cmd">git clone https://github.com/events26/Fest_26_Onam.git</span>
+    <span class="cmd">cd Fest_26_Onam</span>
+    <p>That is everything downloaded. You will not need internet again except to sign in
+       as quizmaster.</p>
+  </div>
+</div>
+
+<div class="step">
+  <div class="n a">5</div>
+  <div class="body">
+    <h3>Turn the hotspot on — before starting the quiz</h3>
+    <p>Leave Termux open, go to Settings, turn on the phone's hotspot, then switch back
+       to Termux.</p>
+    <div class="warn">
+      <b>Order matters here.</b> The quiz works out its address the moment it starts, so
+      if the hotspot is off it will print an address nobody can reach.
+    </div>
+  </div>
+</div>
+
+<div class="step">
+  <div class="n a">6</div>
+  <div class="body">
+    <h3>Stop Android from shutting it down</h3>
+    <span class="cmd">termux-wake-lock</span>
+    <div class="warn">
+      <b>Do not skip this.</b> Without it Android suspends Termux when the screen sleeps,
+      and every phone in the room simply stops responding mid-question with nothing on
+      screen to explain it. Also worth setting Termux to <b>Unrestricted</b> battery usage
+      in Android Settings.
+    </div>
+  </div>
+</div>
+
+<div class="step">
+  <div class="n a">7</div>
+  <div class="body">
+    <h3>Start the quiz</h3>
+    <span class="cmd">python quiz-server.py</span>
+    <p>It prints the addresses. On an Android hotspot the join address is almost always:</p>
+    <span class="urlbig">http://192.168.43.1:8000/</span>
+    <p>If it printed something different, use what it printed. If it listed more than one,
+       try them in order.</p>
+    <div class="tip">
+      <b>Leave Termux open and the screen on.</b> You can dim it, but do not close the app.
+      Now skip to <b>Running the quiz</b>.
+    </div>
+  </div>
+</div>
+
+<h2 style="page-break-before:always"><span class="when b">Setup B</span> Running it from a laptop</h2>
+
+<div class="step">
+  <div class="n b">1</div>
+  <div class="body">
+    <h3>Download the code</h3>
+    <span class="urlbig">https://github.com/events26/Fest_26_Onam</span>
+    <p>Click the green <b>Code</b> button, then <b>Download ZIP</b>. You do not need a
+       GitHub account or any other program.</p>
+  </div>
+</div>
+
+<div class="step">
+  <div class="n b">2</div>
+  <div class="body">
+    <h3>Unzip it</h3>
+    <p>Right-click the downloaded file and choose <b>Extract All…</b>, then <b>Extract</b>.
+       You get a folder called <code>Fest_26_Onam-main</code>. Keep it somewhere easy,
+       like the Desktop.</p>
+    <div class="note"><b>On a Mac</b> — just double-click the ZIP, it unpacks itself.</div>
+  </div>
+</div>
+
+<div class="step">
+  <div class="n b">3</div>
+  <div class="body">
+    <h3>Install Python</h3>
+    <p>Go to <span class="url">python.org/downloads</span> and click the big yellow
+       <b>Download Python</b> button, then run the file.</p>
+    <div class="warn">
+      <b>This is the one step people get wrong.</b> On the installer's first screen, tick
+      <b>“Add python.exe to PATH”</b> at the bottom <i>before</i> clicking Install Now. Miss
+      it and nothing later works, and the error will not tell you why.
+    </div>
+    <div class="note">
+      <b>Cannot install anything on this laptop?</b> Open <b>NO-ADMIN-SETUP.txt</b> in the
+      quiz folder — there is a portable Python that is just a ZIP, no installer and no
+      admin needed. If phones then still cannot reach the laptop, use <b>Setup A</b>
+      instead; that is a firewall restriction you cannot remove without an administrator.
+    </div>
+    <div class="note"><b>On a Mac</b> — no PATH box to worry about. Open Terminal
+      (<b>⌘ Space</b>, type Terminal) and run <code>python3 --version</code>. If it offers
+      to install developer tools, click Install.</div>
+  </div>
+</div>
+
+<div class="step">
+  <div class="n b">4</div>
+  <div class="body">
+    <h3>Test it</h3>
+    <p>Open the folder and double-click <code>start-quiz.bat</code>. A black window should
+       open showing three web addresses. Leave it open — closing it stops the quiz.</p>
+    <div class="note"><b>On a Mac</b> — use <code>start-quiz.command</code>, and the
+      <b>first</b> time right-click it and choose <b>Open</b> rather than double-clicking.
+      macOS blocks downloaded scripts, and a double-click just refuses with no way
+      forward. After that once, double-clicking works.</div>
+  </div>
+</div>
+
+<div class="step">
+  <div class="n b">5</div>
+  <div class="body">
+    <h3>Allow it through the firewall</h3>
+    <p>Windows asks whether to let Python communicate on the network. Click
+       <b>Allow access</b> with <b>Private networks</b> ticked.</p>
+    <div class="warn">
+      <b>Click Cancel and phones will never connect</b>, with no other clue what went wrong.
+      If the box never appeared, or clicking it asked for an administrator password, this
+      laptop cannot host the quiz — use <b>Setup A</b> instead.
+    </div>
+  </div>
+</div>
+
+<div class="step">
+  <div class="n b">6</div>
+  <div class="body">
+    <h3>Check it from a phone</h3>
+    <p>In the black window find the line starting <b>Teams join</b>. It shows an address
+       like <code>http://192.168.1.42:8000/</code> — the numbers differ on every laptop, so
+       use whatever <i>your</i> window shows.</p>
+    <p>Put one phone on the <b>same Wi-Fi as the laptop</b> and open that address. If the
+       team page loads, you are ready.</p>
+  </div>
+</div>
+
+<h2 style="page-break-before:always"><span class="when run">Both setups</span> Running the quiz</h2>
 
 <div class="step">
   <div class="n">1</div>
   <div class="body">
-    <h3>Download the code</h3>
-    <p>Open this page in your browser:</p>
-    <span class="urlbig">https://github.com/events26/Fest_26_Onam</span>
-    <p>Click the green <b>Code</b> button near the top right, then
-       <b>Download ZIP</b>. You do <b>not</b> need a GitHub account or any other program.</p>
+    <h3>Get everyone on one network</h3>
+    <p>Every phone and the laptop must be on the <b>same hotspot</b> — the phone's own
+       hotspot in Setup A, or whatever the laptop is on in Setup B.</p>
+    <div class="warn">
+      <b>Avoid office, hotel and guest Wi-Fi.</b> These stop devices talking to each other,
+      so phones will never reach the quiz no matter what else you do. A personal hotspot
+      avoids it completely.
+    </div>
   </div>
 </div>
 
 <div class="step">
   <div class="n">2</div>
   <div class="body">
-    <h3>Unzip it</h3>
-    <p>Find the downloaded file (usually in <b>Downloads</b>), right-click it and choose
-       <b>Extract All…</b>, then <b>Extract</b>. You now have a folder called
-       <code>Fest_26_Onam-main</code>. Keep it somewhere easy, like your Desktop.</p>
-    <div class="mac"><span class="lbl">On a Mac</span>
-      Just double-click the ZIP — it unpacks itself into the same folder.
-    </div>
+    <h3>Put the big screen up</h3>
+    <p>On the laptop, join the hotspot and open the join address with <code>/display</code>
+       on the end — for example <code>http://192.168.43.1:8000/display</code> — then
+       connect the projector and:</p>
+    <ul>
+      <li>Click <b>Full screen</b></li>
+      <li>Click <b>Turn on sound</b> — browsers block sound until you click once, so this
+          has to happen before the first question</li>
+    </ul>
   </div>
 </div>
 
 <div class="step">
   <div class="n">3</div>
   <div class="body">
-    <h3>Install Python</h3>
-    <p>Go to <span class="url">python.org/downloads</span> and click the big yellow
-       <b>Download Python</b> button. Run the file it downloads.</p>
+    <h3>Open your own controls</h3>
+    <p>Open the join address with <code>/admin</code> on the end, then sign in.</p>
     <div class="warn">
-      <b>This is the one step people get wrong.</b> On the first screen of the installer,
-      tick the box at the bottom that says <b>“Add python.exe to PATH”</b> <i>before</i>
-      clicking Install Now. If you miss it, nothing later will work, and the error message
-      will not tell you why. If you are unsure, run the installer again and check.
+      <b>Keep this on a phone, not the projected screen.</b> It shows the answers. In Setup
+      A you can use the server phone itself at <code>http://127.0.0.1:8000/admin</code>.
     </div>
-    <div class="warn" style="border-left-color:#3a6ea5;background:#f3f6fa;border-color:#ccd8e6">
-      <b style="color:#2d5a86">Work laptop that will not let you install anything?</b>
-      You do not need to. There is a portable version of Python that is just a ZIP file —
-      no installer, no admin password, nothing added to Windows. Open
-      <b>NO-ADMIN-SETUP.txt</b> in the quiz folder and follow it instead of this step, then
-      carry on at step 4. It takes about three minutes.
+    <div class="warn">
+      <b>Ask Sanjay for the username and password before the day.</b> There is no separate
+      quiz password — it is the same login as the main Onam admin page, so you cannot get
+      in without it.
     </div>
-    <div class="mac"><span class="lbl">On a Mac</span>
-      There is no PATH box to worry about. Open <b>Terminal</b> (press <b>⌘ Space</b>, type
-      Terminal, press Enter) and run <code>python3 --version</code>. If it prints a version
-      number you are done. If it offers to install developer tools, click <b>Install</b> and
-      wait. Otherwise download Python from the same site above.
+    <div class="tip">
+      <b>Signing in needs internet, so do it early.</b> Once you are in you stay in, even
+      if the connection drops or the quiz restarts.
     </div>
   </div>
 </div>
@@ -211,144 +410,27 @@
 <div class="step">
   <div class="n">4</div>
   <div class="body">
-    <h3>Test it</h3>
-    <p>Open the folder from step 2 and double-click <code>start-quiz.bat</code>.
-       A black window should open showing three web addresses.</p>
-    <div class="tip">
-      <b>If it says Python is not installed</b>, go back to step 3 — the PATH box was
-      almost certainly missed. Close the window and try again after reinstalling.
-    </div>
-    <div class="mac"><span class="lbl">On a Mac</span>
-      Use <code>start-quiz.command</code> instead. The <b>first</b> time, do not double-click
-      it: <b>right-click it and choose Open</b>, then click <b>Open</b> again on the warning
-      about an unidentified developer. macOS blocks downloaded scripts otherwise, and a plain
-      double-click just refuses with no way forward. After that first time, double-clicking
-      works normally.
-      <br><br>
-      If it still will not open, use Terminal instead: type <code>cd </code> (with a space),
-      drag the folder from step 2 into the Terminal window, press Enter, then run
-      <code>python3 quiz-server.py</code>.
-    </div>
-    <p style="margin-top:6px">Leave that window open and go to step 5 to confirm
-       it really works. Closing the window stops the quiz.</p>
-  </div>
-</div>
-
-<div class="step">
-  <div class="n">5</div>
-  <div class="body">
-    <h3>Allow it through the firewall</h3>
-    <p>Windows will pop up a box asking whether to allow Python to communicate on the
-       network. Click <b>Allow access</b>, and make sure <b>Private networks</b> is ticked.</p>
-    <div class="warn">
-      <b>If you click Cancel, phones will not be able to connect</b> and there will be no
-      other clue what went wrong. If you have already dismissed it, see the troubleshooting
-      table on the next page.
-    </div>
-    <div class="mac"><span class="lbl">On a Mac</span>
-      You may get a box asking whether <b>Python</b> should accept incoming network
-      connections. Click <b>Allow</b>. Many Macs have the firewall switched off and will not
-      ask at all — that is fine, carry on.
-    </div>
-  </div>
-</div>
-
-<div class="step">
-  <div class="n">6</div>
-  <div class="body">
-    <h3>Check it from a phone</h3>
-    <p>In the black window, find the line starting <b>Teams join</b>. It shows an address
-       like <code>http://192.168.1.42:8000/</code> — the numbers will be different on your
-       laptop, so use whatever <i>your</i> window shows.</p>
-    <p>Put one phone on the <b>same Wi-Fi as the laptop</b> and type that address into its
-       browser. If the team page loads, you are ready. If not, see troubleshooting.</p>
-  </div>
-</div>
-
-<h2><span class="when day">On the day</span> Running the quiz</h2>
-
-<div class="step">
-  <div class="n">7</div>
-  <div class="body">
-    <h3>Get everyone on one network</h3>
-    <p>The laptop and every phone must be on the <b>same Wi-Fi</b>. A hotspot from your own
-       phone is the most reliable choice.</p>
-    <div class="warn">
-      <b>Avoid office, hotel and guest Wi-Fi.</b> These usually stop devices from talking to
-      each other, so phones will never reach the laptop no matter what you do. A personal
-      hotspot avoids the problem completely.
-    </div>
-  </div>
-</div>
-
-<div class="step">
-  <div class="n">8</div>
-  <div class="body">
-    <h3>Start the quiz</h3>
-    <p>Double-click <code>start-quiz.bat</code> again — or
-       <code>start-quiz.command</code> on a Mac. Note the <b>Teams join</b> address —
-       you will read this out to everyone.</p>
-  </div>
-</div>
-
-<div class="step">
-  <div class="n">9</div>
-  <div class="body">
-    <h3>Put the big screen up</h3>
-    <p>On the laptop, open <span class="url">http://localhost:8000/display</span> in your
-       browser and connect the projector. Then:</p>
-    <ul>
-      <li>Click <b>Full screen</b></li>
-      <li>Click <b>Turn on sound</b> — browsers block sound until you click once, so this
-          must be done before the first question</li>
-    </ul>
-  </div>
-</div>
-
-<div class="step">
-  <div class="n">10</div>
-  <div class="body">
-    <h3>Open your own controls</h3>
-    <p>On <b>your</b> phone, open the same address as the teams but with
-       <code>/admin</code> on the end — for example
-       <code>http://192.168.1.42:8000/admin</code> — then sign in.</p>
-    <div class="warn">
-      <b>Ask Sanjay for the username and password before the day.</b> There is no separate
-      quiz password: it is the same login as the main Onam admin page, so you cannot get in
-      without it.
-    </div>
-    <div class="tip">
-      <b>Signing in needs internet, so do it early.</b> Once you are in you stay in, even if
-      the connection drops or the laptop restarts. Keep this page on your own phone — it
-      shows the answers, so do not put it on the projector.
-    </div>
-  </div>
-</div>
-
-<div class="step">
-  <div class="n">11</div>
-  <div class="body">
     <h3>Set up the teams</h3>
-    <p>On the admin page, open <b>Teams &amp; codes</b>. Change the team names if you need
-       to, then tap <b>Generate codes</b> and <b>Save teams &amp; codes</b>.</p>
+    <p>Open <b>Teams &amp; codes</b>. Change the team names if you need to, then tap
+       <b>Generate codes</b> and <b>Save teams &amp; codes</b>.</p>
     <p>Read each code out to <b>one person per team</b>. That phone holds the buzzer for
        the whole quiz.</p>
   </div>
 </div>
 
 <div class="step">
-  <div class="n">12</div>
+  <div class="n">5</div>
   <div class="body">
     <h3>Let the teams in</h3>
-    <p>Read out the <b>Teams join</b> address. Each team opens it, picks their team name and
-       types their code.</p>
+    <p>Read out the join address. Each team opens it, picks their team name and types
+       their code.</p>
     <p>Watch the projector: each team's <b>NOT JOINED</b> label disappears as they sign in,
        so you can see who is still missing without asking.</p>
   </div>
 </div>
 
 <div class="step">
-  <div class="n">13</div>
+  <div class="n">6</div>
   <div class="body">
     <h3>Run each question</h3>
     <p>Read the question aloud from your phone, then tap <b>Arm buzzers</b>. Every phone
@@ -358,7 +440,7 @@
        they tapped. Your phone shows the whole running order:</p>
 
     <div class="queue">
-      <div class="qrow now"><span class="p">1</span><span class="t">Maveli Squad</span><span class="ms">0.41s</span><span class="tag">answering</span></div>
+      <div class="qrow now"><span class="p">1</span><span class="t">Maveli Squad</span><span class="ms">0.41s</span><span class="tagx">answering</span></div>
       <div class="qrow"><span class="p">2</span><span class="t">Gajaveerans</span><span class="ms">0.63s</span></div>
       <div class="qrow"><span class="p">3</span><span class="t">Vallam Vikings</span><span class="ms">0.88s</span></div>
       <div class="qrow"><span class="p">4</span><span class="t">Onam Kombans</span><span class="ms">1.12s</span></div>
@@ -367,20 +449,19 @@
     <p style="margin-top:7px">Then:</p>
     <ul>
       <li><b>Correct</b> gives them 10 points and closes the question</li>
-      <li><b>Wrong — next team</b> crosses them off and passes the floor straight to
-          number 2, then 3, and so on down the list</li>
-      <li>Or <b>tap any team in the list</b> to jump straight to them, if you would rather
-          not step through one at a time</li>
+      <li><b>Wrong — next team</b> crosses them off and passes the floor to number 2,
+          then 3, and so on down the list</li>
+      <li>Or <b>tap any team in the list</b> to jump straight to them</li>
       <li><b>Show the answer on screen</b> highlights the right option on the projector</li>
       <li><b>Next question</b></li>
     </ul>
     <div class="tip">
       <b>The buzzers stay open all the way through.</b> A team that hesitated can still tap
       and join the end of the queue. If everyone who buzzed gets it wrong, the big screen
-      says so and keeps waiting for someone else.
+      says so and keeps waiting.
     </div>
-    <p style="margin-top:6px"><b>Reset this question</b> starts a question over completely,
-       for when one has to be thrown out.</p>
+    <p style="margin-top:6px"><b>Reset this question</b> starts one over completely, for
+       when a question has to be thrown out.</p>
   </div>
 </div>
 
@@ -388,87 +469,80 @@
 
 <table>
   <tr><th>What you see</th><th>What to do</th></tr>
+
   <tr>
-    <td>The black window says Python was not found</td>
-    <td>If you installed Python, the <b>Add python.exe to PATH</b> box was missed. Reinstall
-        from <span class="url">python.org/downloads</span> and tick it this time.<br>
-        If you cannot install anything on this laptop, open <b>NO-ADMIN-SETUP.txt</b> in the
-        quiz folder — the portable version needs no installer and no admin rights.</td>
+    <td><b>Setup A:</b> “pkg: command not found”</td>
+    <td>Termux came from the Play Store. Uninstall it and install the APK from the
+        releases page in step&nbsp;1.</td>
   </tr>
   <tr>
-    <td>Phones cannot open the page, but the laptop can</td>
-    <td>Almost always the firewall. Right-click the Start button, choose
-        <b>Terminal (Admin)</b>, and paste this in, then press Enter:
+    <td><b>Setup A:</b> everything freezes when the phone screen goes off</td>
+    <td><code>termux-wake-lock</code> was not run, or Android is still restricting the app.
+        Run it, and set Termux to Unrestricted battery usage in Android Settings.</td>
+  </tr>
+  <tr>
+    <td><b>Setup A:</b> Termux closed by accident</td>
+    <td>Reopen it and run <code>cd Fest_26_Onam</code>, then
+        <code>termux-wake-lock</code>, then <code>python quiz-server.py</code>. Team names,
+        codes and scores are all saved — teams just open the join page again.</td>
+  </tr>
+  <tr>
+    <td><b>Setup A:</b> the address does not load on other phones</td>
+    <td>Check the hotspot is on and everyone is connected to it, not the office wifi. Then
+        press Ctrl-C, check the hotspot again, and start the quiz once more so it re-reads
+        its address.</td>
+  </tr>
+
+  <tr>
+    <td><b>Setup B:</b> the black window says Python was not found</td>
+    <td>If you installed Python, the <b>Add python.exe to PATH</b> box was missed —
+        reinstall and tick it. If you cannot install anything, see
+        <b>NO-ADMIN-SETUP.txt</b>.</td>
+  </tr>
+  <tr>
+    <td><b>Setup B:</b> phones cannot open the page, but the laptop can</td>
+    <td>The firewall is blocking it. Right-click Start, choose <b>Terminal (Admin)</b> and
+        paste this in:
         <span class="urlbig" style="font-size:8.2pt;white-space:nowrap;word-break:normal">New-NetFirewallRule -DisplayName "Onam Quiz" -LocalPort 8000 -Protocol TCP -Action Allow</span>
-        If that does not fix it, the Wi-Fi is separating devices — switch to a phone hotspot.</td>
+        If that needs a password you do not have, switch to <b>Setup A</b>.</td>
   </tr>
   <tr>
-    <td>Nothing opens, even on the laptop</td>
-    <td>The black window is not running, or was closed. Double-click
-        <code>start-quiz.bat</code> again and leave the window open.</td>
+    <td><b>Setup B:</b> “start-quiz.command cannot be opened”</td>
+    <td>On a Mac, right-click the file and choose <b>Open</b>, then <b>Open</b> again on the
+        warning. Only needed once.</td>
   </tr>
-  <tr>
-    <td><b>Mac:</b> “start-quiz.command cannot be opened because it is from an
-        unidentified developer”</td>
-    <td>Right-click the file and choose <b>Open</b>, then click <b>Open</b> on the warning.
-        Only needed once. If it still refuses, open Terminal, type <code>cd </code>, drag the
-        folder in, press Enter, then run <code>python3 quiz-server.py</code>.</td>
-  </tr>
-  <tr>
-    <td><b>Mac:</b> the file opens in a text editor instead of running</td>
-    <td>Its permissions were lost while unzipping. In Terminal, type
-        <code>chmod +x </code> then drag <code>start-quiz.command</code> in and press Enter.
-        Or just run <code>python3 quiz-server.py</code> from the folder.</td>
-  </tr>
-  <tr>
-    <td><b>Mac:</b> phones cannot connect</td>
-    <td>Open <b>System Settings → Network → Firewall</b>. Either switch it off for the
-        event, or open <b>Options…</b> and set Python to <b>Allow incoming connections</b>.</td>
-  </tr>
-  <tr>
-    <td>The address does not work on phones</td>
-    <td>Check you typed the numbers from <i>your</i> window, including
-        <code>:8000</code> at the end. Also check the phone is on Wi-Fi and has not
-        quietly switched to mobile data.</td>
-  </tr>
+
   <tr>
     <td>Cannot sign in to the admin page</td>
-    <td>Signing in needs a working internet connection. Check you can load any website on
-        that phone, then try again.</td>
+    <td>Signing in needs internet. Check that phone can load any website, then try again.</td>
   </tr>
   <tr>
     <td>A team's phone died or was locked out</td>
-    <td>They sign in again with the same code — the newest phone takes over the buzzer.
-        You can also tap <b>Sign out</b> next to their name on the admin page.</td>
+    <td>They sign in again with the same code — the newest phone takes over the buzzer. You
+        can also tap <b>Sign out</b> next to their name on the admin page.</td>
   </tr>
   <tr>
-    <td>The laptop restarted mid-quiz</td>
-    <td>Nothing is lost. Team names, codes, scores and your sign-in are all saved. Start
-        the launcher again; teams re-open the join page.</td>
-  </tr>
-  <tr>
-    <td>Everyone buzzes instantly, just to grab a good place in the order</td>
-    <td>Give a wrong buzz a penalty. Open <code>quiz-server.py</code> in Notepad, find the
-        line <code>POINTS_WRONG = 0</code> near the top, change it to
-        <code>POINTS_WRONG = -5</code> and save. Restart the launcher. Guessing usually
-        stops within one round of the first penalty.</td>
+    <td>Everyone buzzes instantly, just to grab a place in the order</td>
+    <td>Make a wrong buzz cost something. Open <code>quiz-server.py</code>, find
+        <code>POINTS_WRONG = 0</code> near the top, change it to
+        <code>POINTS_WRONG = -5</code> and restart. Guessing usually stops within a round.</td>
   </tr>
   <tr>
     <td>No sound from the projector</td>
-    <td><b>Turn on sound</b> was not clicked on the display page. Move the mouse to make
-        the buttons appear, then click it.</td>
+    <td><b>Turn on sound</b> was not clicked on the display page. Move the mouse to make the
+        buttons appear, then click it.</td>
   </tr>
 </table>
 
 <div class="tip" style="margin-top:14px">
-  <b>Worth a five-minute rehearsal.</b> Run steps 8 to 13 with two phones the day before.
-  Everything that goes wrong on the day goes wrong in the first two minutes, and it is much
-  easier to fix when there is not a room full of people waiting.
+  <b>Worth a five-minute rehearsal.</b> Run through the last section with two phones the day
+  before. Everything that goes wrong on the day goes wrong in the first two minutes, and it
+  is far easier to fix when there is not a room full of people waiting.
 </div>
 
 <div class="foot">
   <div>Onotsavam 2026 — Quiz Buzzer<br>Full notes: <b>QUIZ-README.md</b> in the same folder</div>
-  <div class="r">Questions come from a Google Sheet<br>or the 18 built in as standard</div>
+  <div class="r">Setup A detail: <b>PHONE-SERVER-SETUP.txt</b><br>No admin rights: <b>NO-ADMIN-SETUP.txt</b></div>
 </div>
 
 </body>
