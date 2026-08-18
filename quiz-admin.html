@@ -169,7 +169,7 @@
       <span class="eyebrow">On the projector now</span>
       <div class="qtext" id="q">—</div>
       <div id="opts"></div>
-      <div class="ans">
+      <div class="ans" id="ansBox" style="display:none">
         <span class="eyebrow">Answer — only on this screen</span>
         <div class="v" id="a">—</div>
       </div>
@@ -376,19 +376,24 @@ function render(s){
 
   const rec = s.q_index >= 0 ? QS[s.q_index] : null;
   const opts = (rec && rec.options) || [];
+  // No answer key is stored — the quizmaster calls it aloud — so nothing is
+  // marked here, and Reveal has nothing to put on the projector.
+  const hasKey = !!(rec && rec.answer_index != null);
   $("opts").innerHTML = opts.map((o, i) => o
-    ? '<div class="optline' + (rec && rec.answer_index === i ? ' right' : '') + '">'
+    ? '<div class="optline' + (hasKey && rec.answer_index === i ? ' right' : '') + '">'
       + '<span class="k">' + KEYS[i] + '</span><span>' + esc(o) + '</span></div>'
     : "").join("");
-  $("a").textContent = rec && rec.answer_text ? rec.answer_text : "— you're judging this one";
+  $("ansBox").style.display = hasKey ? "" : "none";
+  if (hasKey) $("a").textContent = rec.answer_text;
 
   const armed = s.phase === "armed";
   $("arm").textContent = armed ? "Close buzzers" : "Arm buzzers";
   $("arm").classList.toggle("live", armed);
   $("arm").disabled = !s.question;
 
-  $("reveal").textContent = s.answer ? "Hide the answer again" : "Show the answer on screen";
-  $("reveal").disabled = s.q_index < 0;
+  $("reveal").textContent = !hasKey ? "No answer stored — call it yourself"
+    : (s.answer ? "Hide the answer again" : "Show the answer on screen");
+  $("reveal").disabled = s.q_index < 0 || !hasKey;
 
   const tiers = s.tiers || [];
   const tier = tiers[s.current] || { correct: 0, wrong: 0 };

@@ -1,114 +1,106 @@
 [
   { "q": "Which ancient Tamil literary work contains one of the earliest known references to an Onam celebration?",
-    "options": ["Silappadikaram", "Manimekalai", "Maduraikkanci", "Thirukkural"], "a": "C" },
+    "options": ["Silappadikaram", "Manimekalai", "Maduraikkanci", "Thirukkural"] },
 
   { "q": "Which famous Kerala boat race is held on the Pamba River?",
-    "options": ["Nehru Trophy Boat Race", "Aranmula Uthrattadi Vallamkali", "President's Cup", "Champakulam Moolam"],
-    "a": "B", "note": "CHECK - Champakulam Moolam is also on the Pamba, so D is arguable" },
+    "options": ["Nehru Trophy Boat Race", "Aranmula Uthrattadi Vallamkali", "President's Cup", "Champakulam Moolam"] },
 
   { "q": "Which traditional Kerala performing art uses elaborate masks and costumes and is associated with the harvest season?",
-    "options": ["Kummattikali", "Bharatanatyam", "Pulikali", "Thiruvathirakali"], "a": "A" },
+    "options": ["Kummattikali", "Bharatanatyam", "Pulikali", "Thiruvathirakali"] },
 
   { "q": "Which festival marks the Malayalam New Year traditionally in many parts of Kerala?",
-    "options": ["Onam", "Vishu", "Thiruvathira", "Navaratri"], "a": "B" },
+    "options": ["Onam", "Vishu", "Thiruvathira", "Navaratri"] },
 
   { "q": "Which legendary Malayalam writer was awarded the Padma Vibhushan in 2025, posthumously?",
-    "options": ["O. V. Vijayan", "M. T. Vasudevan Nair", "T. Padmanabhan", "M. Mukundan"], "a": "B" },
+    "options": ["O. V. Vijayan", "M. T. Vasudevan Nair", "T. Padmanabhan", "M. Mukundan"] },
 
   { "q": "P. R. Sreejesh received which Padma award in 2025?",
-    "options": ["Padma Shri", "Padma Bhushan", "Padma Vibhushan", "Bharat Ratna"], "a": "B" },
+    "options": ["Padma Shri", "Padma Bhushan", "Padma Vibhushan", "Bharat Ratna"] },
 
   { "q": "Which Malayalam novel won the Kendra Sahitya Akademi Award for 2025?",
-    "options": ["Aadujeevitham", "Maayamanushyar", "Manjummel Boys", "Randidangazhi"],
-    "a": "B", "note": "CHECK - reached by elimination, the other three do not fit" },
+    "options": ["Aadujeevitham", "Maayamanushyar", "Manjummel Boys", "Randidangazhi"] },
 
   { "q": "Who won Best Actress at the 2025 Kerala State Film Awards?",
-    "options": ["Parvathy Thiruvothu", "Shamla Hamza", "Urvashi", "Anna Ben"],
-    "a": "B", "note": "CHECK against the official 2025 announcement" },
+    "options": ["Parvathy Thiruvothu", "Shamla Hamza", "Urvashi", "Anna Ben"] },
 
   { "q": "Pulikali is traditionally performed on which day of the Onam celebrations?",
-    "options": ["First day", "Second day", "Fourth day", "Tenth day"], "a": "C" },
+    "options": ["First day", "Second day", "Fourth day", "Tenth day"] },
 
   { "q": "Which ancient temple site in Kerala is traditionally revered as the capital of King Mahabali and epicentre of Onam?",
-    "options": ["Muziris", "Balipuram", "Thrikkakkara", "Aranmula"], "a": "C" },
+    "options": ["Muziris", "Balipuram", "Thrikkakkara", "Aranmula"] },
 
   { "q": "Aranmula Kannadi is one of Kerala's most famous traditional handicrafts. What is its most distinctive feature?",
     "options": ["It is a hand-polished metal mirror with the reflective surface on the front",
                 "It is made from specially curved hand made glass",
                 "It uses natural crystal instead of glass",
-                "All the above"], "a": "A" },
+                "All the above"] },
 
   { "q": "In which year was Onam officially declared the National Festival of Kerala by the State Government?",
-    "options": ["1947", "1956", "1961", "1972"], "a": "C" },
+    "options": ["1947", "1956", "1961", "1972"] },
 
   { "q": "Which renowned 20th-century Malayalam poet composed the celebrated poem \"Onappattukal\"?",
-    "options": ["Vallathol Narayana Menon", "Ulloor S. Parameswara Iyer", "Kumaran Asan", "Changampuzha Krishna Pillai"],
-    "a": "A", "note": "CHECK - attribution uncertain, confirm before the quiz" },
+    "options": ["Vallathol Narayana Menon", "Ulloor S. Parameswara Iyer", "Kumaran Asan", "Changampuzha Krishna Pillai"] },
 
   { "q": "What is the literal or folk meaning of the phrase \"Onam kera moola\"?",
-    "options": ["Under developed place", "Pooja room", "Highly civilised society", "Pathalam"],
-    "a": "A", "note": "GUESS - please set the correct answer yourself" },
+    "options": ["Under developed place", "Pooja room", "Highly civilised society", "Pathalam"] },
 
   { "q": "Which day is celebrated as Kerala Karshaka Dinam (Farmer's Day)?",
-    "options": ["Medam 1", "Chingam 1", "Chingam 10", "Medam 14"], "a": "B" },
+    "options": ["Medam 1", "Chingam 1", "Chingam 10", "Medam 14"] },
 
   { "q": "Which German missionary and scholar compiled the first comprehensive Malayalam-English dictionary?",
-    "options": ["Benjamin Bailey", "Hermann Gundert", "Arnos Pathiri", "Robert Caldwell"], "a": "B" },
+    "options": ["Benjamin Bailey", "Hermann Gundert", "Arnos Pathiri", "Robert Caldwell"] },
 
   { "q": "In which temple is the traditional Onavillu offered during the Onam season?",
     "options": ["Sree Padmanabhaswamy Temple, Thiruvananthapuram",
                 "Thrikkakara Vamana Moorthy Temple, Kochi",
                 "Sree Krishna Temple, Guruvayur",
-                "Sree Krishna Temple, Ambalappuzha"], "a": "A" },
+                "Sree Krishna Temple, Ambalappuzha"] },
 
   { "q": "In a traditional grand Valla Sadya, how many dishes are traditionally served?",
-    "options": ["16", "32", "52", "64"],
-    "a": "D", "note": "CHECK - published counts for Valla Sadya vary by source" },
+    "options": ["16", "32", "52", "64"] },
 
   { "q": "Which country hosted the opening match of the 2026 FIFA World Cup?",
-    "options": ["USA", "Canada", "Mexico", "Brazil"], "a": "C" },
+    "options": ["USA", "Canada", "Mexico", "Brazil"] },
 
   { "q": "India's indigenously developed 500 MWe Prototype Fast Breeder Reactor, which achieved first criticality in 2026, is located at:",
-    "options": ["Kalpakkam, Tamil Nadu", "Kakrapar, Gujarat", "Kudankulam, Tamil Nadu", "Rawatbhata, Rajasthan"], "a": "A" },
+    "options": ["Kalpakkam, Tamil Nadu", "Kakrapar, Gujarat", "Kudankulam, Tamil Nadu", "Rawatbhata, Rajasthan"] },
 
   { "q": "Who was named Player of the Tournament after India's historic 2025 Women's Cricket World Cup triumph?",
-    "options": ["Smriti Mandhana", "Harmanpreet Kaur", "Deepti Sharma", "Shafali Verma"], "a": "C" },
+    "options": ["Smriti Mandhana", "Harmanpreet Kaur", "Deepti Sharma", "Shafali Verma"] },
 
   { "q": "Why do meals served on aircraft often taste different from the same food eaten on the ground?",
     "options": ["Food is prepared with less salt and less spice",
                 "Cabin pressure, humidity and altitude affect taste perception",
                 "Aircraft food is always frozen and reheated",
-                "Food loses its nutritional value during loading"], "a": "B" },
+                "Food loses its nutritional value during loading"] },
 
   { "q": "What is the installed solar plant capacity in the CAFS COK unit?",
-    "options": ["200 kWp", "250 kWp", "500 kWp", "750 kWp"],
-    "a": "", "note": "NOT KNOWN - internal CAFS figure, set the right letter before the quiz" },
+    "options": ["200 kWp", "250 kWp", "500 kWp", "750 kWp"] },
 
   { "q": "The Athachamayam procession at Tripunithura historically marked which tradition of the Cochin royal family?",
     "options": ["The coronation of the Maharaja of Cochin",
                 "The Maharaja's ceremonial procession to celebrate Onam",
                 "The annual naval victory of the Cochin kingdom",
-                "The beginning of the Malayalam calendar year"], "a": "B" },
+                "The beginning of the Malayalam calendar year"] },
 
   { "q": "Which Sadya dish is distinctive for its mild flavour and is traditionally made with ash gourd and cowpeas in a coconut-milk base?",
-    "options": ["Kalan", "Olan", "Pachadi", "Theeyal"], "a": "B" },
+    "options": ["Kalan", "Olan", "Pachadi", "Theeyal"] },
 
   { "q": "Who is the current Minister for Cultural Affairs in the Government of Kerala?",
-    "options": ["Saji Cheriyan", "P. C. Vishnunadh", "O. J. Janeesh", "K. A. Thulasi"],
-    "a": "A", "note": "CHECK - may have changed after the 2026 Kerala assembly election" },
+    "options": ["Saji Cheriyan", "P. C. Vishnunadh", "O. J. Janeesh", "K. A. Thulasi"] },
 
   { "q": "\"Don't come up, I will handle them.\" — These were the last words of whom?",
-    "options": ["Major Sandeep Unnikrishnan", "Captain Vikram Batra", "Major Somnath Sharma", "Major Shaitan Singh"], "a": "A" },
+    "options": ["Major Sandeep Unnikrishnan", "Captain Vikram Batra", "Major Somnath Sharma", "Major Shaitan Singh"] },
 
   { "q": "Operation Sindoor was launched by the Indian Armed Forces in response to which major incident?",
-    "options": ["The Pulwama terrorist attack", "The Pahalgam terrorist attack", "The Uri terrorist attack", "The Pathankot terrorist attack"], "a": "B" },
+    "options": ["The Pulwama terrorist attack", "The Pahalgam terrorist attack", "The Uri terrorist attack", "The Pathankot terrorist attack"] },
 
   { "q": "Which Indian-made missile is known for its supersonic speed and has also become a major defence export product?",
-    "options": ["Akash", "BrahMos", "Astra", "Prithvi"], "a": "B" },
+    "options": ["Akash", "BrahMos", "Astra", "Prithvi"] },
 
   { "q": "What is a key feature of Israel's Iron Dome that makes it different from many conventional air-defence systems?",
     "options": ["It can engage every incoming projectile",
                 "It can choose not to intercept projectiles predicted to fall in unpopulated areas",
                 "It operates entirely without radar",
-                "It uses nuclear warheads to destroy incoming rockets"], "a": "B" }
+                "It uses nuclear warheads to destroy incoming rockets"] }
 ]
