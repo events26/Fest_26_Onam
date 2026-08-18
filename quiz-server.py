@@ -841,6 +841,25 @@ def lan_ips():
     return out or ["127.0.0.1"]
 
 
+def watch_address():
+    """Keep the join address on the projector honest.
+
+    It is worked out once at startup, which is wrong the moment the network
+    changes underneath - most often a hotspot switched on after the quiz was
+    started, leaving an address on the big screen that nobody can reach. Re-check
+    quietly and correct it if it moves.
+    """
+    while True:
+        time.sleep(15)
+        url = "http://%s:%d/" % (lan_ips()[0], PORT)
+        with LOCK:
+            if url == STATE["join_url"]:
+                continue
+            STATE["join_url"] = url
+        print("  address changed - teams now join at %s" % url)
+        broadcast()
+
+
 def main():
     try:
         sys.stdout.reconfigure(line_buffering=True)   # the join URL must never sit in a buffer
@@ -888,6 +907,7 @@ def main():
     print("  same hotspot. Ctrl-C to stop.")
     print("")
 
+    threading.Thread(target=watch_address, daemon=True).start()
     srv = QuizServer(("0.0.0.0", PORT), Handler)
     try:
         srv.serve_forever()
