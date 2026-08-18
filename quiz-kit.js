@@ -30,6 +30,22 @@ function shortName(name) {
   return first.length > 11 ? first.slice(0, 10) + "…" : first;
 }
 
+/* Scores carry halves and can go negative. Show 10 not 10.0, 7.5 not 7.50,
+   and keep the sign on penalties so a rule reads as a rule. */
+function pts(n) {
+  const v = Math.round(Number(n) * 100) / 100;
+  return Number.isInteger(v) ? String(v) : String(v);
+}
+function signed(n) {
+  const v = Number(n);
+  return (v > 0 ? "+" : "") + pts(v);
+}
+
+function ordinal(n) {
+  const s = ["th", "st", "nd", "rd"], v = n % 100;
+  return n + (s[(v - 20) % 10] || s[v] || s[0]);
+}
+
 function esc(s) {
   return String(s == null ? "" : s).replace(/[&<>"']/g, c => (
     { "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]

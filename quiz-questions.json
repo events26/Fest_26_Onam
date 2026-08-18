@@ -1,55 +1,114 @@
 [
-  { "q": "Onam celebrates the yearly homecoming of which legendary king?",
-    "options": ["Ravana", "Bhageeratha", "Mahabali", "Parashurama"], "a": "C" },
+  { "q": "Which ancient Tamil literary work contains one of the earliest known references to an Onam celebration?",
+    "options": ["Silappadikaram", "Manimekalai", "Maduraikkanci", "Thirukkural"], "a": "C" },
 
-  { "q": "What is the floral carpet laid at the doorstep during Onam called?",
-    "options": ["Rangoli", "Pookkalam", "Kolam", "Alpana"], "a": "B" },
+  { "q": "Which famous Kerala boat race is held on the Pamba River?",
+    "options": ["Nehru Trophy Boat Race", "Aranmula Uthrattadi Vallamkali", "President's Cup", "Champakulam Moolam"],
+    "a": "B", "note": "CHECK - Champakulam Moolam is also on the Pamba, so D is arguable" },
 
-  { "q": "Onam falls in which month of the Malayalam calendar?",
-    "options": ["Karkidakam", "Medam", "Thulam", "Chingam"], "a": "D" },
+  { "q": "Which traditional Kerala performing art uses elaborate masks and costumes and is associated with the harvest season?",
+    "options": ["Kummattikali", "Bharatanatyam", "Pulikali", "Thiruvathirakali"], "a": "A" },
 
-  { "q": "Which flower traditionally makes up the Atham-day pookkalam?",
-    "options": ["Thumba", "Chembarathi", "Thulasi", "Mullah"], "a": "A" },
+  { "q": "Which festival marks the Malayalam New Year traditionally in many parts of Kerala?",
+    "options": ["Onam", "Vishu", "Thiruvathira", "Navaratri"], "a": "B" },
 
-  { "q": "How many days does the Onam festival traditionally run?",
-    "options": ["Five", "Seven", "Ten", "Twelve"], "a": "C" },
+  { "q": "Which legendary Malayalam writer was awarded the Padma Vibhushan in 2025, posthumously?",
+    "options": ["O. V. Vijayan", "M. T. Vasudevan Nair", "T. Padmanabhan", "M. Mukundan"], "a": "B" },
 
-  { "q": "What is the first day of Onam called?",
-    "options": ["Thiruvonam", "Atham", "Chithira", "Uthradam"], "a": "B" },
+  { "q": "P. R. Sreejesh received which Padma award in 2025?",
+    "options": ["Padma Shri", "Padma Bhushan", "Padma Vibhushan", "Bharat Ratna"], "a": "B" },
 
-  { "q": "What is the final and most important day of Onam called?",
-    "options": ["Uthradam", "Atham", "Avittam", "Thiruvonam"], "a": "D" },
+  { "q": "Which Malayalam novel won the Kendra Sahitya Akademi Award for 2025?",
+    "options": ["Aadujeevitham", "Maayamanushyar", "Manjummel Boys", "Randidangazhi"],
+    "a": "B", "note": "CHECK - reached by elimination, the other three do not fit" },
 
-  { "q": "Which avatar of Vishnu sent Mahabali to the netherworld?",
-    "options": ["Vamana", "Narasimha", "Parashurama", "Krishna"], "a": "A" },
+  { "q": "Who won Best Actress at the 2025 Kerala State Film Awards?",
+    "options": ["Parvathy Thiruvothu", "Shamla Hamza", "Urvashi", "Anna Ben"],
+    "a": "B", "note": "CHECK against the official 2025 announcement" },
 
-  { "q": "The grand feast served on a banana leaf during Onam is called?",
-    "options": ["Payasam", "Avial", "Onasadya", "Thoran"], "a": "C" },
+  { "q": "Pulikali is traditionally performed on which day of the Onam celebrations?",
+    "options": ["First day", "Second day", "Fourth day", "Tenth day"], "a": "C" },
 
-  { "q": "What is the Onam snake boat race known as in Malayalam?",
-    "options": ["Kalaripayattu", "Vallam Kali", "Theyyam", "Pulikali"], "a": "B" },
+  { "q": "Which ancient temple site in Kerala is traditionally revered as the capital of King Mahabali and epicentre of Onam?",
+    "options": ["Muziris", "Balipuram", "Thrikkakkara", "Aranmula"], "a": "C" },
 
-  { "q": "The Alappuzha snake boat race is named after which Indian Prime Minister?",
-    "options": ["Jawaharlal Nehru", "Indira Gandhi", "Rajiv Gandhi", "Lal Bahadur Shastri"], "a": "A" },
+  { "q": "Aranmula Kannadi is one of Kerala's most famous traditional handicrafts. What is its most distinctive feature?",
+    "options": ["It is a hand-polished metal mirror with the reflective surface on the front",
+                "It is made from specially curved hand made glass",
+                "It uses natural crystal instead of glass",
+                "All the above"], "a": "A" },
 
-  { "q": "The tiger dance performed during Onam, best known in Thrissur, is called?",
-    "options": ["Kathakali", "Theyyam", "Mohiniyattam", "Pulikali"], "a": "D" },
+  { "q": "In which year was Onam officially declared the National Festival of Kerala by the State Government?",
+    "options": ["1947", "1956", "1961", "1972"], "a": "C" },
 
-  { "q": "What is the women's circular dance performed around the pookkalam called?",
-    "options": ["Oppana", "Margam Kali", "Thiruvathira Kali", "Chakyar Koothu"], "a": "C" },
+  { "q": "Which renowned 20th-century Malayalam poet composed the celebrated poem \"Onappattukal\"?",
+    "options": ["Vallathol Narayana Menon", "Ulloor S. Parameswara Iyer", "Kumaran Asan", "Changampuzha Krishna Pillai"],
+    "a": "A", "note": "CHECK - attribution uncertain, confirm before the quiz" },
 
-  { "q": "Name the traditional Kerala drum ensemble heard at Onam festivities.",
-    "options": ["Sopana Sangeetham", "Chenda melam", "Ottamthullal", "Kathakali"], "a": "B" },
+  { "q": "What is the literal or folk meaning of the phrase \"Onam kera moola\"?",
+    "options": ["Under developed place", "Pooja room", "Highly civilised society", "Pathalam"],
+    "a": "A", "note": "GUESS - please set the correct answer yourself" },
 
-  { "q": "The off-white Kerala saree with a golden border worn at Onam is called?",
-    "options": ["Kasavu", "Kanjeevaram", "Banarasi", "Pochampally"], "a": "A" },
+  { "q": "Which day is celebrated as Kerala Karshaka Dinam (Farmer's Day)?",
+    "options": ["Medam 1", "Chingam 1", "Chingam 10", "Medam 14"], "a": "B" },
 
-  { "q": "Which crisp banana snack is a fixture of every Onasadya?",
-    "options": ["Murukku", "Pappadam", "Boondi", "Upperi"], "a": "D" },
+  { "q": "Which German missionary and scholar compiled the first comprehensive Malayalam-English dictionary?",
+    "options": ["Benjamin Bailey", "Hermann Gundert", "Arnos Pathiri", "Robert Caldwell"], "a": "B" },
 
-  { "q": "Onam is the official state festival of which Indian state?",
-    "options": ["Kerala", "Tamil Nadu", "Karnataka", "Andhra Pradesh"], "a": "A" },
+  { "q": "In which temple is the traditional Onavillu offered during the Onam season?",
+    "options": ["Sree Padmanabhaswamy Temple, Thiruvananthapuram",
+                "Thrikkakara Vamana Moorthy Temple, Kochi",
+                "Sree Krishna Temple, Guruvayur",
+                "Sree Krishna Temple, Ambalappuzha"], "a": "A" },
 
-  { "q": "Which sweet dish traditionally closes the Onasadya?",
-    "options": ["Halwa", "Payasam", "Laddu", "Jalebi"], "a": "B" }
+  { "q": "In a traditional grand Valla Sadya, how many dishes are traditionally served?",
+    "options": ["16", "32", "52", "64"],
+    "a": "D", "note": "CHECK - published counts for Valla Sadya vary by source" },
+
+  { "q": "Which country hosted the opening match of the 2026 FIFA World Cup?",
+    "options": ["USA", "Canada", "Mexico", "Brazil"], "a": "C" },
+
+  { "q": "India's indigenously developed 500 MWe Prototype Fast Breeder Reactor, which achieved first criticality in 2026, is located at:",
+    "options": ["Kalpakkam, Tamil Nadu", "Kakrapar, Gujarat", "Kudankulam, Tamil Nadu", "Rawatbhata, Rajasthan"], "a": "A" },
+
+  { "q": "Who was named Player of the Tournament after India's historic 2025 Women's Cricket World Cup triumph?",
+    "options": ["Smriti Mandhana", "Harmanpreet Kaur", "Deepti Sharma", "Shafali Verma"], "a": "C" },
+
+  { "q": "Why do meals served on aircraft often taste different from the same food eaten on the ground?",
+    "options": ["Food is prepared with less salt and less spice",
+                "Cabin pressure, humidity and altitude affect taste perception",
+                "Aircraft food is always frozen and reheated",
+                "Food loses its nutritional value during loading"], "a": "B" },
+
+  { "q": "What is the installed solar plant capacity in the CAFS COK unit?",
+    "options": ["200 kWp", "250 kWp", "500 kWp", "750 kWp"],
+    "a": "", "note": "NOT KNOWN - internal CAFS figure, set the right letter before the quiz" },
+
+  { "q": "The Athachamayam procession at Tripunithura historically marked which tradition of the Cochin royal family?",
+    "options": ["The coronation of the Maharaja of Cochin",
+                "The Maharaja's ceremonial procession to celebrate Onam",
+                "The annual naval victory of the Cochin kingdom",
+                "The beginning of the Malayalam calendar year"], "a": "B" },
+
+  { "q": "Which Sadya dish is distinctive for its mild flavour and is traditionally made with ash gourd and cowpeas in a coconut-milk base?",
+    "options": ["Kalan", "Olan", "Pachadi", "Theeyal"], "a": "B" },
+
+  { "q": "Who is the current Minister for Cultural Affairs in the Government of Kerala?",
+    "options": ["Saji Cheriyan", "P. C. Vishnunadh", "O. J. Janeesh", "K. A. Thulasi"],
+    "a": "A", "note": "CHECK - may have changed after the 2026 Kerala assembly election" },
+
+  { "q": "\"Don't come up, I will handle them.\" — These were the last words of whom?",
+    "options": ["Major Sandeep Unnikrishnan", "Captain Vikram Batra", "Major Somnath Sharma", "Major Shaitan Singh"], "a": "A" },
+
+  { "q": "Operation Sindoor was launched by the Indian Armed Forces in response to which major incident?",
+    "options": ["The Pulwama terrorist attack", "The Pahalgam terrorist attack", "The Uri terrorist attack", "The Pathankot terrorist attack"], "a": "B" },
+
+  { "q": "Which Indian-made missile is known for its supersonic speed and has also become a major defence export product?",
+    "options": ["Akash", "BrahMos", "Astra", "Prithvi"], "a": "B" },
+
+  { "q": "What is a key feature of Israel's Iron Dome that makes it different from many conventional air-defence systems?",
+    "options": ["It can engage every incoming projectile",
+                "It can choose not to intercept projectiles predicted to fall in unpopulated areas",
+                "It operates entirely without radar",
+                "It uses nuclear warheads to destroy incoming rockets"], "a": "B" }
 ]

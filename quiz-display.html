@@ -101,6 +101,28 @@
   .sc .v{font-family:var(--font-num);font-size:clamp(17px,1.8vw,29px);font-weight:700;line-height:1}
   .sc .off{font-size:9px;color:rgba(255,247,230,.4);font-weight:700;letter-spacing:.08em}
 
+  /* ---- scoring rules ---- */
+  .rules{display:flex;gap:8px;position:relative}
+  .rules .tier{
+    flex:1;background:rgba(255,247,230,.05);border:1px solid rgba(255,247,230,.12);
+    border-top:3px solid var(--gold);border-radius:11px;padding:10px 12px;
+  }
+  .rules .tier .lbl{font-size:clamp(11px,1vw,15px);font-weight:700;
+                    color:rgba(255,247,230,.55);text-transform:uppercase;letter-spacing:.08em}
+  .rules .tier .val{display:flex;align-items:baseline;gap:10px;margin-top:4px}
+  .rules .tier .ok{font-family:var(--font-num);font-weight:700;
+                   font-size:clamp(19px,2.1vw,32px);color:#3ddc84}
+  .rules .tier .no{font-family:var(--font-num);font-weight:700;
+                   font-size:clamp(13px,1.3vw,20px);color:#ff7b7b}
+  .rules .tier.on{border-top-color:var(--marigold);background:rgba(255,140,0,.16)}
+  .rules .tier.done{opacity:.34}
+
+  /* compact version while a question is live */
+  .rulestrip{display:flex;gap:14px;align-items:center;font-size:clamp(11px,1vw,15px);
+             color:rgba(255,247,230,.45);font-weight:600;padding:0 clamp(20px,3vw,40px) 8px}
+  .rulestrip b{color:rgba(255,247,230,.75)}
+  .rulestrip .on{color:var(--marigold)}
+
   .ctl{position:fixed;top:14px;right:16px;z-index:80;display:flex;gap:8px;
        opacity:0;transition:opacity .25s}
   body.showcursor .ctl{opacity:1}
@@ -138,12 +160,20 @@
       </div>
     </div>
 
+    <div id="rulesWrap" style="display:none">
+      <div class="eyebrow" style="margin-bottom:8px">How the points work</div>
+      <div class="rules" id="rules"></div>
+    </div>
+
     <div class="q" id="q" style="display:none"></div>
     <div class="opts hide" id="opts"></div>
     <div class="panel" id="panel" style="display:none"></div>
   </div>
 
-  <div class="scores" id="scores"></div>
+  <div>
+    <div class="rulestrip" id="ruleStrip"></div>
+    <div class="scores" id="scores"></div>
+  </div>
 </div>
 
 <div class="ctl">
@@ -157,11 +187,6 @@
 const $ = id => document.getElementById(id);
 const KEYS = ["A","B","C","D"];
 let lastPhase = "", lastRound = -1, lastCurrent = -1, audioOn = false;
-
-function ordinal(n){
-  const s = ["th","st","nd","rd"], v = n % 100;
-  return n + (s[(v - 20) % 10] || s[v] || s[0]);
-}
 
 $("sound").addEventListener("click", () => {
   Sound.unlock(); Sound.arm(); audioOn = true;
@@ -184,6 +209,29 @@ document.addEventListener("mousemove", () => {
 function render(s){
   $("joinUrl").textContent = s.join_url || "—";
   $("qno").textContent = s.q_index >= 0 ? "Q " + (s.q_index + 1) + " / " + s.q_total : "";
+
+  const tiers = s.tiers || [];
+  const live = s.phase === "buzzed" || s.phase === "armed";
+
+  /* Between questions the ladder gets the room's full attention; while a
+     question is live it shrinks to one line so it never competes with it. */
+  $("rulesWrap").style.display = (!s.question || !live) && tiers.length ? "" : "none";
+  $("rules").innerHTML = tiers.map((t, i) => {
+    const cls = "tier" + (live && i === s.current ? " on" : "")
+              + (live && i < s.current ? " done" : "");
+    return '<div class="' + cls + '">'
+      + '<div class="lbl">' + ordinal(i + 1) + ' to buzz</div>'
+      + '<div class="val"><span class="ok">' + signed(t.correct) + '</span>'
+      + '<span class="no">' + signed(t.wrong) + ' if wrong</span></div>'
+      + '</div>';
+  }).join("");
+
+  $("ruleStrip").innerHTML = (live && tiers.length)
+    ? tiers.map((t, i) =>
+        '<span' + (i === s.current ? ' class="on"' : '') + '>'
+        + ordinal(i + 1) + ' <b>' + signed(t.correct) + '</b> / ' + signed(t.wrong) + '</span>').join("")
+      + '<span style="margin-left:auto">Only ' + tiers.length + ' teams can answer each question</span>'
+    : "";
 
   const hasQ = !!s.question;
   $("joinScreen").style.display = hasQ ? "none" : "";
@@ -212,6 +260,7 @@ function render(s){
   const panel = $("panel"), bloom = $("bloomWrap");
 
   if (win){
+    const tier = tiers[s.current] || { correct: 0, wrong: 0 };
     const st = teamStyle(s.winner.team, s.teams.indexOf(s.winner.team));
     document.documentElement.style.setProperty("--pk", st.c);
     bloom.classList.add("on");
@@ -231,8 +280,9 @@ function render(s){
       '<div class="winner">'
       +  '<div class="swatch"></div>'
       +  '<div class="who"><b>' + esc(s.winner.team) + '</b>'
-      +    '<i class="num">' + ordinal(s.current + 1) + ' to buzz · '
-      +      (s.winner.ms / 1000).toFixed(2) + 's</i></div>'
+      +    '<i class="num">' + ordinal(s.current + 1) + ' attempt · playing for '
+      +      signed(tier.correct) + ' or ' + signed(tier.wrong)
+      +      ' · buzzed in ' + (s.winner.ms / 1000).toFixed(2) + 's</i></div>'
       +  (others ? '<div class="rest">' + others + '</div>' : '')
       + '</div>';
   }
@@ -255,31 +305,40 @@ function render(s){
        anyone who held back can still come in. */
     bloom.classList.remove("on");
     document.documentElement.style.setProperty("--pk", "var(--marigold)");
+    const left = tiers.length - s.current;
+    const tier = tiers[s.current] || { correct: 0, wrong: 0 };
     panel.innerHTML =
       '<div class="live">'
       +  '<div class="pk is-live"><div class="pk-ring r1"></div><div class="pk-ring r2"></div>'
       +    '<div class="pk-ring r3"></div><div class="pk-ring r4"></div><div class="pk-core"></div></div>'
       +  '<div><b>STILL OPEN</b><i>'
-      +    esc(s.order.length + " team" + (s.order.length === 1 ? "" : "s")
-           + " buzzed and missed it — anyone else can still take it") + '</i></div>'
+      +    esc(s.order.length + " missed it — " + left + " attempt"
+           + (left === 1 ? "" : "s") + " left, worth ") + signed(tier.correct)
+      +    '</i></div>'
       + '</div>';
   }
   else {
     bloom.classList.remove("on");
-    const msg = s.answer ? "Answer's up" : "Buzzers closed";
+    const msg = s.spent ? "Question closed" : (s.answer ? "Answer's up" : "Buzzers closed");
+    const sub = s.spent && !s.answer
+      ? "All " + tiers.length + " attempts used"
+      : "Waiting for the quizmaster";
     panel.innerHTML = '<div class="live"><div><b style="color:rgba(255,247,230,.35)">'
-      + msg + '</b><i>Waiting for the quizmaster</i></div></div>';
+      + msg + '</b><i>' + esc(sub) + '</i></div></div>';
   }
 
-  /* Scoreboard */
-  const top = Math.max.apply(null, s.teams.map(t => s.scores[t] || 0));
+  /* Scoreboard. Values carry halves and can go negative, so they are formatted
+     rather than printed raw, and the leader is only marked once anyone scores. */
+  const vals = s.teams.map(t => s.scores[t] || 0);
+  const top = vals.length ? Math.max.apply(null, vals) : 0;
+  const anyScore = vals.some(v => v !== 0);
   $("scores").innerHTML = s.teams.map((t, i) => {
     const st = teamStyle(t, i), v = s.scores[t] || 0;
-    const cls = "sc" + (v === top && top > 0 ? " lead" : "")
+    const cls = "sc" + (anyScore && v === top ? " lead" : "")
               + (s.locked.indexOf(t) !== -1 ? " out" : "");
     return '<div class="' + cls + '" style="--c:' + st.c + '">'
          +   '<span class="n">' + esc(shortName(t)) + '</span>'
-         +   '<span class="v" style="color:' + st.c + '">' + v + '</span>'
+         +   '<span class="v" style="color:' + (v < 0 ? "#ff7b7b" : st.c) + '">' + pts(v) + '</span>'
          +   (s.active[t] ? '' : '<span class="off">NOT JOINED</span>')
          + '</div>';
   }).join("");

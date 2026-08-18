@@ -71,8 +71,16 @@ DEFAULT_TEAMS = [
     "Kerala Vibes",
 ]
 
-POINTS_CORRECT = 10
-POINTS_WRONG = 0            # set negative (e.g. -5) to punish speculative buzzing
+# Scoring ladder, one entry per attempt. The team that buzzes first plays for
+# full value; each team after them is answering an easier question, because the
+# wrong options ahead of them have already been eliminated, so both the reward
+# and the risk shrink. Once this list runs out the question closes and nobody
+# else can answer it.
+TIERS = [
+    {"correct": 10.0, "wrong": -5.0},     # 1st to buzz - full value
+    {"correct": 7.5,  "wrong": -3.75},    # 2nd - 75%, one option gone
+    {"correct": 5.0,  "wrong": -2.5},     # 3rd - 50%, two options left
+]
 
 # Every buzz landing within this window of the first one is judged together,
 # and the earliest arrival wins. Absorbs thread-scheduling jitter; far too
@@ -105,6 +113,8 @@ STATE = {
     "order": [],            # every team that has buzzed, in the order they did
     "current": 0,           # position in that queue whose turn it is
     "locked": [],           # teams that already answered wrong this round
+    "tiers": [],            # the scoring ladder, so every screen can show it
+    "spent": False,         # all attempts used - nobody else can answer
     "scores": {},
     "teams": [],
     "active": {},           # team -> public session id of the signed-in phone
@@ -229,8 +239,14 @@ def parse_sheet(text):
     return out
 
 
-def _build(q, opts, ans):
-    """Answer may be a letter or the option text; accept either."""
+def _build(q, opts, ans, note=""):
+    """Answer may be a letter or the option text; accept either.
+
+    `note` is a private aside for the quizmaster - "check this one before the
+    quiz", say. It is appended to the answer text, which only ever reaches the
+    admin page; revealing an answer highlights an option by position, so a note
+    can never reach the projector.
+    """
     idx, text = None, ans
     if opts:
         letter = _norm(ans)
@@ -242,6 +258,8 @@ def _build(q, opts, ans):
                 if o and _norm(o) == _norm(ans):
                     idx, text = i, o
                     break
+    if note:
+        text = ("%s  [%s]" % (text, note)) if text else "[%s]" % note
     return {"q": q, "options": opts, "answer_index": idx, "answer_text": text}
 
 
@@ -277,7 +295,8 @@ def load_questions():
     try:
         with open(QUESTIONS_FILE, encoding="utf-8") as fh:
             data = json.load(fh)
-        QUESTIONS = [_build(d.get("q", ""), d.get("options") or [], d.get("a", ""))
+        QUESTIONS = [_build(d.get("q", ""), d.get("options") or [],
+                            d.get("a", ""), d.get("note", ""))
                      for d in data if d.get("q")]
         STATE["source"] = (STATE["source"] + " - using quiz-questions.json"
                            if SHEET_ID else "quiz-questions.json (%d questions)" % len(QUESTIONS))
@@ -377,6 +396,22 @@ def do_join(team, code):
 
 # ----------------------------------------------------------------- buzzer ---
 
+def _tier(position):
+    """What the team in this queue position is playing for. Past the end of the
+    ladder nothing is at stake, because the question has already closed."""
+    if 0 <= position < len(TIERS):
+        return TIERS[position]
+    return {"correct": 0.0, "wrong": 0.0}
+
+
+def _award(team, delta):
+    """Scores carry halves and can go negative. Rounding each time keeps
+    0.1-sized floating point dust out of the scoreboard."""
+    if not delta:
+        return
+    STATE["scores"][team] = round(STATE["scores"].get(team, 0) + delta, 2)
+
+
 def _rebuild_order():
     """Rank everyone who has buzzed and point `winner` at whoever's turn it is.
     Arrival times only ever increase, so nobody's position changes once set."""
@@ -416,6 +451,9 @@ def do_buzz(team, token):
             return {"ok": False, "reason": "locked_out"}
         if any(b["team"] == team for b in _buzzes):
             return {"ok": True, "reason": "already_in"}
+        # Only as many teams can queue as there are attempts to give away.
+        if len(_buzzes) >= len(TIERS):
+            return {"ok": False, "reason": "queue_full"}
 
         _buzzes.append({"team": team, "t": t})
         if len(_buzzes) == 1:
@@ -448,6 +486,7 @@ def set_question(index):
         STATE["order"] = []
         STATE["current"] = 0
         STATE["locked"] = []
+        STATE["spent"] = False
         _buzzes.clear()
         _armed_at = 0.0
 
@@ -461,6 +500,7 @@ def do_admin(action, body):
             STATE["winner"] = None
             STATE["order"] = []
             STATE["current"] = 0
+            STATE["spent"] = False
             _buzzes.clear()
             _armed_at = time.monotonic()
 
@@ -470,18 +510,22 @@ def do_admin(action, body):
             STATE["order"] = []
             STATE["current"] = 0
             STATE["locked"] = []
+            STATE["spent"] = False
             _buzzes.clear()
 
         elif action == "wrong":
-            # Step down the queue to whoever buzzed next. Teams that never
-            # buzzed are untouched and can still join the back of it.
+            # Dock them at their own tier, then step down the queue. Teams that
+            # never buzzed are untouched and can still join the back of it.
             w = STATE["winner"]
             if w:
                 if w["team"] not in STATE["locked"]:
                     STATE["locked"].append(w["team"])
-                if POINTS_WRONG:
-                    STATE["scores"][w["team"]] = STATE["scores"].get(w["team"], 0) + POINTS_WRONG
+                _award(w["team"], _tier(STATE["current"])["wrong"])
             STATE["current"] += 1
+            if STATE["current"] >= len(TIERS):
+                # Ladder exhausted - the question is over, nobody else answers.
+                STATE["spent"] = True
+                STATE["phase"] = "idle"
             _rebuild_order()
             save()
 
@@ -496,9 +540,9 @@ def do_admin(action, body):
         elif action == "correct":
             w = STATE["winner"]
             if w:
-                pts = int(body.get("points", POINTS_CORRECT))
-                STATE["scores"][w["team"]] = STATE["scores"].get(w["team"], 0) + pts
+                _award(w["team"], _tier(STATE["current"])["correct"])
             STATE["phase"] = "idle"
+            STATE["spent"] = True
             save()
 
         elif action == "reveal":
@@ -754,6 +798,7 @@ def main():
         sys.stdout.reconfigure(line_buffering=True)   # the join URL must never sit in a buffer
     except (AttributeError, OSError):
         pass
+    STATE["tiers"] = list(TIERS)          # every screen shows the same ladder
     load_saved()
     load_questions()
     if QUESTIONS:

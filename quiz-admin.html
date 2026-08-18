@@ -367,11 +367,6 @@ $("saveTeams").addEventListener("click", async () => {
 
 /* ---------------------------------------------------------------- render -- */
 
-function ordinal(n){
-  const s = ["th","st","nd","rd"], v = n % 100;
-  return n + (s[(v - 20) % 10] || s[v] || s[0]);
-}
-
 function render(s){
   S = s;
   if (!TOKEN) return;
@@ -395,6 +390,8 @@ function render(s){
   $("reveal").textContent = s.answer ? "Hide the answer again" : "Show the answer on screen";
   $("reveal").disabled = s.q_index < 0;
 
+  const tiers = s.tiers || [];
+  const tier = tiers[s.current] || { correct: 0, wrong: 0 };
   const buzzing = s.phase === "buzzed";
   const w = buzzing ? s.winner : null;
   $("resultCard").style.display = buzzing ? "" : "none";
@@ -404,15 +401,19 @@ function render(s){
     const st = teamStyle(w.team, s.teams.indexOf(w.team));
     $("wDot").style.background = st.c; $("wDot").style.color = st.c;
     $("wName").textContent = w.team;
-    $("wTime").textContent = ordinal(s.current + 1) + " to buzz · "
+    $("wTime").textContent = ordinal(s.current + 1) + " attempt · "
       + (w.ms / 1000).toFixed(2) + "s";
-    $("wrong").textContent = (s.current + 1 < s.order.length)
-      ? "Wrong — next team" : "Wrong — nobody else yet";
+    $("correct").textContent = "Correct " + signed(tier.correct);
+    // Say what the wrong button costs, and whether anyone is left after them.
+    const last = s.current + 1 >= tiers.length;
+    $("wrong").textContent = "Wrong " + signed(tier.wrong)
+      + (last ? " · closes it" : " · next team");
   } else if (buzzing){
+    const left = tiers.length - s.current;
     $("wDot").style.background = "rgba(255,247,230,.2)";
     $("wName").textContent = "Everyone who buzzed is out";
-    $("wTime").textContent = "Buzzers are still open — anyone left can still come in";
-    $("wrong").textContent = "Wrong — next team";
+    $("wTime").textContent = left + " attempt" + (left === 1 ? "" : "s")
+      + " left · buzzers still open";
   }
 
   /* The full queue, so a wrong answer can be passed straight down it. */
@@ -421,10 +422,12 @@ function render(s){
     const st = teamStyle(o.team, s.teams.indexOf(o.team));
     const cls = "qRow" + (i === s.current ? " now" : "")
               + (s.locked.indexOf(o.team) !== -1 ? " done" : "");
+    const tv = tiers[i];
     return '<button class="' + cls + '" data-pick="' + i + '" type="button">'
       + '<span class="pos">' + (i + 1) + '</span>'
       + '<span class="dot" style="background:' + st.c + '"></span>'
       + '<span class="nm">' + esc(o.team) + '</span>'
+      + (tv ? '<span class="t">' + signed(tv.correct) + '</span>' : '')
       + '<span class="t">' + (o.ms / 1000).toFixed(2) + 's</span>'
       + '</button>';
   }).join("");
@@ -447,7 +450,7 @@ function render(s){
       + '<span class="dot" style="background:' + st.c + '"></span>'
       + '<span class="n' + (out ? ' out' : '') + '">' + esc(t) + '</span>'
       + '<button class="btn" data-adj="-5" data-team="' + esc(t) + '" type="button">−</button>'
-      + '<span class="v">' + (s.scores[t] || 0) + '</span>'
+      + '<span class="v">' + pts(s.scores[t] || 0) + '</span>'
       + '<button class="btn" data-adj="5" data-team="' + esc(t) + '" type="button">+</button>'
       + (on ? '<button class="btn" data-out="' + esc(t) + '" type="button">Sign out</button>' : '')
       + '</div>';

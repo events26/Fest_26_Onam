@@ -301,7 +301,7 @@ function render(s){
 
   $("roundLbl").textContent = s.q_index >= 0
     ? "Question " + (s.q_index + 1) + " of " + s.q_total : "Question —";
-  $("scoreLbl").textContent = (s.scores[TEAM] || 0) + " pts";
+  $("scoreLbl").textContent = pts(s.scores[TEAM] || 0) + " pts";
 
   pk.classList.remove("is-live","is-win","is-dead");
   btn.classList.remove("armed");
@@ -318,7 +318,9 @@ function render(s){
       pk.classList.add("is-live");
       btn.classList.add("armed");
       btn.disabled = false;
-      say("BUZZ!", "Tap anywhere on the pookkalam.");
+      const t0 = (s.tiers || [])[0];
+      say("BUZZ!", t0 ? "First in plays for " + signed(t0.correct) + ", or " + signed(t0.wrong)
+                        + " if wrong." : "Tap anywhere on the pookkalam.");
       if (lastPhase !== "armed") { Sound.arm(); navigator.vibrate && navigator.vibrate(60); }
       fetch("/api/ping", { method:"POST" }).catch(() => {});   // warm the socket
     }
@@ -326,10 +328,14 @@ function render(s){
   else if (s.phase === "buzzed"){
     const myPlace = s.order.findIndex(o => o.team === TEAM);   // -1 if never buzzed
 
+    const tier = (s.tiers || [])[s.current];
+
     if (mine){
       pk.classList.add("is-win");
-      say("Your turn", "You buzzed " + ordinal(s.current + 1) + ", in "
-        + (s.winner.ms / 1000).toFixed(2) + "s. Answer up!");
+      say("Your turn", tier
+        ? ordinal(s.current + 1) + " attempt — " + signed(tier.correct) + " if you're right, "
+          + signed(tier.wrong) + " if not."
+        : "Answer up!");
       if (lastTurn !== s.current || lastPhase !== "buzzed"){
         Sound.hit(0.8);
         navigator.vibrate && navigator.vibrate([40,50,120]);
@@ -340,17 +346,23 @@ function render(s){
       say("Not this one", "You had your turn. Wait for the next question.");
     } else if (myPlace >= 0){
       // Queued behind the current team — still in with a chance.
+      const mine_t = (s.tiers || [])[myPlace];
       pk.classList.add("is-live");
       say("You're " + ordinal(myPlace + 1) + " in line",
         (s.winner ? s.winner.team + " is answering now. " : "")
-        + "You're up if they miss it.");
-    } else {
-      // Never buzzed, and the buzzers are still open.
+        + (mine_t ? "Your go is worth " + signed(mine_t.correct) + "." : "You're up if they miss it."));
+    } else if (s.order.length < (s.tiers || []).length){
+      // Never buzzed, and there is still an attempt left to claim.
+      const next_t = (s.tiers || [])[s.order.length];
       pk.classList.add("is-live");
       btn.classList.add("armed");
       btn.disabled = false;
-      say("Still open!", (s.winner ? s.winner.team + " buzzed first. " : "")
-        + "Tap to join the queue.");
+      say("Still open!", next_t
+        ? "Last free spot is " + ordinal(s.order.length + 1) + ", worth " + signed(next_t.correct) + "."
+        : "Tap to join the queue.");
+    } else {
+      pk.classList.add("is-dead");
+      say("All taken", "Every attempt on this question is spoken for.");
     }
   }
   else {
@@ -361,11 +373,6 @@ function render(s){
 
   lastPhase = s.phase;
   lastTurn = s.current;
-}
-
-function ordinal(n){
-  const s = ["th","st","nd","rd"], v = n % 100;
-  return n + (s[(v - 20) % 10] || s[v] || s[0]);
 }
 
 /* A phone that locks mid-round can't buzz. Ask to stay awake; ignore refusal. */
