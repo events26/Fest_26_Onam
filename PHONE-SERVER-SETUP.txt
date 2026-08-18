@@ -126,6 +126,78 @@ From here everything works exactly as the main setup guide describes: set the
 team codes, read them out, arm the buzzers.
 
 
+GETTING A LATER VERSION
+=======================
+
+When the quiz has been updated, you do NOT reinstall anything. Termux, Python
+and git all stay exactly as they are. It is four lines, typed into the same
+black Termux screen you used before.
+
+Open the Termux app. If the quiz is still running you will see it printing
+away; stop it first.
+
+STEP 1 - Stop the quiz that is running
+--------------------------------------
+Press CTRL and C together.
+
+On a phone there is no Ctrl key, so use either of these:
+
+  - Hold VOLUME DOWN and tap the C key.  This is Ctrl-C.
+  - Or swipe UP on the keyboard to show Termux's extra key row, which has a
+    CTRL button, then tap CTRL followed by C.
+
+You are done when the printing stops and you get a prompt back - a line ending
+in a $ sign, waiting for you to type.
+
+STEP 2 - Go to the quiz folder
+------------------------------
+  cd ~/Fest_26_Onam
+
+The ~ means "my home folder", so this works no matter where you were. Press
+Enter after every line.
+
+STEP 3 - Download the update
+----------------------------
+  git pull
+
+It prints a few lines about what changed. If it says "Already up to date."
+then you already have the newest version and nothing was needed.
+
+STEP 4 - Start it again
+-----------------------
+  termux-wake-lock
+  python quiz-server.py
+
+Check the hotspot is still on, and you are back where you were.
+
+Your team names, join codes and scores are NOT affected by an update. They live
+in a separate file that git never touches.
+
+
+IF STEP 3 GOES WRONG
+--------------------
+"git: command not found"
+    Git is missing. Install it and try again:
+      pkg install -y git
+
+"Your local changes would be overwritten"
+    Something in the folder was edited by hand. To throw those edits away and
+    take the published version:
+      git fetch origin
+      git reset --hard origin/main
+    Team names, codes and scores still survive this - they are in a file git
+    ignores.
+
+"could not resolve host" or a network error
+    The phone has no internet. An update needs a connection; the quiz itself
+    does not. Connect to wifi or mobile data, then try again.
+
+"not a git repository"
+    You are in the wrong folder. Run  cd ~/Fest_26_Onam  and try again. If that
+    says no such file, list what is there with  ls  and look for the folder
+    name you actually cloned.
+
+
 IF SOMETHING GOES WRONG
 -----------------------
 "pkg: command not found"
