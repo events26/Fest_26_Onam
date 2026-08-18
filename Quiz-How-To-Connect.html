@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Onotsavam Quiz — Addresses and Joining</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  @page{ size:A4; margin:14mm 13mm 12mm; }
+
+  :root{
+    --marigold:#e07a00; --saffron:#c25400; --red:#c0182f; --green:#0b7a3b;
+    --sky:#3a6ea5; --blue:#2d5a86; --ink:#2c1c05; --mute:#6b5636;
+    --rule:#e6dcc8; --paper:#fffdf7;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Work Sans',"Segoe UI",sans-serif;
+       color:var(--ink);background:#fff;font-size:10.5pt;line-height:1.5}
+  h1,h2,h3{font-family:'Baloo 2',"Segoe UI",sans-serif;margin:0}
+
+  .head{border-bottom:3px solid var(--marigold);padding-bottom:9px;margin-bottom:14px;
+        display:flex;align-items:flex-end;gap:14px}
+  .head h1{font-size:23pt;font-weight:800;line-height:1.05;color:var(--saffron)}
+  .head .sub{margin-left:auto;text-align:right;font-size:8.6pt;color:var(--mute);line-height:1.45}
+  .head .sub b{color:var(--ink)}
+
+  h2{font-size:13pt;font-weight:800;margin:19px 0 10px;padding-bottom:5px;
+     border-bottom:2px solid var(--rule)}
+
+  .lead{background:var(--paper);border:1px solid var(--rule);border-left:4px solid var(--green);
+        border-radius:5px;padding:10px 13px;margin-bottom:10px;font-size:10pt}
+  .lead b{color:var(--green)}
+
+  /* url anatomy */
+  .anat{background:#2c1c05;border-radius:6px;padding:14px 16px 11px;margin:8px 0 0;text-align:center}
+  .anat .u{font-family:Consolas,"Cascadia Mono",monospace;font-size:17pt;font-weight:700;
+           color:#ffd899;letter-spacing:.5px}
+  .anat .u .part{color:#7fd7a6}
+  .anat .u .port{color:#ffa9a9}
+  .anat .legend{display:flex;justify-content:center;gap:26px;margin-top:9px;
+                font-size:8.4pt;color:#c8b79a}
+  .anat .legend b{display:block;font-size:8.8pt}
+  .anat .legend .g{color:#7fd7a6}
+  .anat .legend .r{color:#ffa9a9}
+
+  table{width:100%;border-collapse:collapse;font-size:10pt;margin-top:4px}
+  th{text-align:left;background:#f4efe2;font-weight:700;padding:7px 10px;
+     border:1px solid var(--rule);font-size:8.4pt;text-transform:uppercase;letter-spacing:.05em}
+  td{padding:8px 10px;border:1px solid var(--rule);vertical-align:top}
+  tr{break-inside:avoid;page-break-inside:avoid}
+  .who{width:29%;font-weight:700}
+  .addr{font-family:Consolas,monospace;font-weight:700;color:var(--saffron);font-size:9.6pt}
+  .addr .tail{background:#fff2d9;border-radius:3px;padding:0 3px}
+
+  code{font-family:Consolas,monospace;font-size:9.4pt;background:#f4efe2;
+       border:1px solid var(--rule);border-radius:3px;padding:1px 5px;
+       color:var(--saffron);font-weight:600}
+
+  .step{display:flex;gap:11px;margin-bottom:11px;break-inside:avoid;page-break-inside:avoid}
+  .n{flex:none;width:23px;height:23px;border-radius:50%;background:var(--marigold);color:#fff;
+     font-family:'Baloo 2',sans-serif;font-weight:800;font-size:11.5pt;
+     display:flex;align-items:center;justify-content:center;line-height:1;margin-top:1px}
+  .body{flex:1;min-width:0}
+  .body h3{font-size:11pt;font-weight:700;margin-bottom:2px}
+  .body p{margin:2px 0}
+
+  .warn{background:#fff4f4;border:1px solid #f0c9cd;border-left:4px solid var(--red);
+        border-radius:4px;padding:8px 11px;margin:6px 0 0;font-size:9.6pt}
+  .warn b{color:var(--red)}
+  .tip{background:#f2faf5;border:1px solid #c8e6d3;border-left:4px solid var(--green);
+       border-radius:4px;padding:8px 11px;margin:6px 0 0;font-size:9.6pt}
+  .tip b{color:var(--green)}
+  .note{background:#f3f6fa;border:1px solid #ccd8e6;border-left:4px solid var(--sky);
+        border-radius:4px;padding:8px 11px;margin:6px 0 0;font-size:9.6pt}
+  .note b{color:var(--blue)}
+
+  .foot{margin-top:16px;padding-top:8px;border-top:2px solid var(--rule);
+        font-size:8.6pt;color:var(--mute);display:flex;gap:12px}
+  .foot .r{margin-left:auto;text-align:right}
+</style>
+</head>
+<body>
+
+<div class="head">
+  <h1>Addresses &amp;<br>how to connect</h1>
+  <div class="sub">
+    <b>Onotsavam Quiz Buzzer</b><br>
+    Which address each person opens,<br>
+    and where the numbers come from.
+  </div>
+</div>
+
+<div class="lead">
+  <b>There is no fixed web address for this.</b> The device running the quiz works out its
+  own address when it starts, and prints it. That address is different on every machine and
+  every network, so always read it off the screen rather than copying one from anywhere else
+  — including this page.
+</div>
+
+<h2>Where to find the address</h2>
+
+<p style="margin-top:0">Two places, and they always agree:</p>
+
+<div class="step">
+  <div class="n">1</div>
+  <div class="body">
+    <h3>On the device running the quiz</h3>
+    <p>The window that started it prints a line beginning <b>Teams join</b>. That is the one
+       to read out.</p>
+  </div>
+</div>
+
+<div class="step">
+  <div class="n">2</div>
+  <div class="body">
+    <h3>On the projector</h3>
+    <p>Before the quiz starts, the big screen shows the same address in large type under
+       “Grab a phone, join the buzzer”. Easiest option — teams can simply read it off the
+       wall instead of being told.</p>
+  </div>
+</div>
+
+<div class="anat">
+  <div class="u">http://<span class="part">192.168.43.1</span><span class="port">:8000</span>/</div>
+  <div class="legend">
+    <div><b class="g">192.168.43.1</b>changes on every host</div>
+    <div><b class="r">:8000</b>always this, do not miss it</div>
+  </div>
+</div>
+
+<div class="warn">
+  <b>The <code>:8000</code> is not optional.</b> Leaving it off is the single most common
+  typing mistake, and the page simply will not load. There is no error explaining why.
+</div>
+
+<div class="note">
+  <b>Examples of what it might look like.</b> On an Android phone hotspot it is usually
+  <code>192.168.43.1</code>. On a laptop on home wifi, something like
+  <code>192.168.1.6</code>. On an iPhone hotspot, <code>172.20.10.x</code>. All are normal —
+  use whichever your own screen shows.
+</div>
+
+<h2>Who opens what</h2>
+
+<p style="margin-top:0">Everyone uses the same numbers. Only the ending differs.</p>
+
+<table>
+  <tr><th>Who</th><th>What they open</th></tr>
+  <tr>
+    <td class="who">Every team<br><span style="font-weight:400;color:var(--mute)">one phone each</span></td>
+    <td><span class="addr">http://192.168.43.1:8000/</span><br>
+        The buzzer. Nothing after the last slash.</td>
+  </tr>
+  <tr>
+    <td class="who">The projector<br><span style="font-weight:400;color:var(--mute)">laptop or big screen</span></td>
+    <td><span class="addr">http://192.168.43.1:8000<span class="tail">/display</span></span><br>
+        The question, the buzz order and the scores. Press Full screen, then Turn on sound.</td>
+  </tr>
+  <tr>
+    <td class="who">The quizmaster<br><span style="font-weight:400;color:var(--mute)">your own phone</span></td>
+    <td><span class="addr">http://192.168.43.1:8000<span class="tail">/admin</span></span><br>
+        The controls. Keep this on your own phone — never on the projected screen.</td>
+  </tr>
+</table>
+
+<div class="tip">
+  <b>If the quiz runs on a phone</b>, the quizmaster can open the controls on that same phone
+  using <code>http://127.0.0.1:8000/admin</code>. <code>127.0.0.1</code> means “this device”,
+  so it works even with no signal at all.
+</div>
+
+<h2>Getting the teams connected</h2>
+
+<div class="step">
+  <div class="n">1</div>
+  <div class="body">
+    <h3>Everyone joins the same hotspot</h3>
+    <p>Every phone, and the laptop driving the projector, must be on the <b>same network</b>
+       as the device running the quiz.</p>
+    <div class="warn">
+      <b>Office, hotel and guest wifi will not work.</b> These stop devices talking to each
+      other, so phones can never reach the quiz no matter what is typed. A personal hotspot
+      avoids the problem completely.
+    </div>
+  </div>
+</div>
+
+<div class="step">
+  <div class="n">2</div>
+  <div class="body">
+    <h3>Open the address in a browser</h3>
+    <p>Type it into Chrome or Safari as it appears on the projector. It is a normal web page
+       — there is no app to install and no account to create.</p>
+  </div>
+</div>
+
+<div class="step">
+  <div class="n">3</div>
+  <div class="body">
+    <h3>Pick the team, enter the code</h3>
+    <p>Each team taps their own name and types the code the quizmaster read out. The screen
+       then shows a large pookkalam — that is the buzzer.</p>
+    <div class="tip">
+      <b>One phone per team.</b> If a second phone signs in with the same code it takes over,
+      and the first is told it has been signed out. That is deliberate: a flat battery cannot
+      lock a team out for the rest of the quiz.
+    </div>
+  </div>
+</div>
+
+<div class="step">
+  <div class="n">4</div>
+  <div class="body">
+    <h3>Check nobody is missing</h3>
+    <p>The projector's scoreboard marks every team that has not signed in yet with
+       <b>NOT JOINED</b>. When those labels have all gone, everyone is in and you can start.</p>
+  </div>
+</div>
+
+<h2>If someone cannot connect</h2>
+
+<table>
+  <tr><th>Check</th><th>What to do</th></tr>
+  <tr>
+    <td class="who">Did they include <code>:8000</code>?</td>
+    <td>By far the most common cause. The address will not work without it.</td>
+  </tr>
+  <tr>
+    <td class="who">Are they on the right network?</td>
+    <td>Phones often drop back to mobile data when a hotspot has no internet. Check the wifi
+        name on the phone matches the one the quiz is running on.</td>
+  </tr>
+  <tr>
+    <td class="who">Did the address change?</td>
+    <td>If the hotspot was switched on after the quiz started, the address may have moved.
+        The projector corrects itself within about fifteen seconds — read it again from the
+        big screen.</td>
+  </tr>
+  <tr>
+    <td class="who">Does it work on the host device?</td>
+    <td>On the device running the quiz, open <code>http://localhost:8000/</code>. If that
+        fails, the quiz is not running — restart it. If it works but phones cannot connect,
+        it is the network, not the address.</td>
+  </tr>
+  <tr>
+    <td class="who">Is a firewall in the way?</td>
+    <td>On a laptop host, Windows must have been allowed through the firewall when it asked.
+        If that was refused, phones cannot connect and it cannot be fixed without an
+        administrator — run the quiz from a phone instead.</td>
+  </tr>
+</table>
+
+<div class="tip" style="margin-top:14px">
+  <b>Have one phone connect before the room fills up.</b> If a single phone can load the page,
+  every phone can. Finding out otherwise in front of everyone is the one thing worth avoiding.
+</div>
+
+<div class="foot">
+  <div>Onotsavam 2026 — Quiz Buzzer<br>Setting it up: <b>Quiz-Buzzer-Setup-Guide.pdf</b></div>
+  <div class="r">Running it from a phone: <b>PHONE-SERVER-SETUP.txt</b><br>
+    Updating it: <b>Quiz-Update-On-Phone.pdf</b></div>
+</div>
+
+</body>
+</html>
