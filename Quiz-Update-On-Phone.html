@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Updating the Quiz on Your Phone</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  @page{ size:A4; margin:14mm 13mm 12mm; }
+
+  :root{
+    --blue:#2d5a86; --sky:#3a6ea5; --marigold:#e07a00; --saffron:#c25400;
+    --red:#c0182f; --green:#0b7a3b; --ink:#2c1c05; --mute:#6b5636;
+    --rule:#e6dcc8; --paper:#fffdf7;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Work Sans',"Segoe UI",sans-serif;
+       color:var(--ink);background:#fff;font-size:10.6pt;line-height:1.5}
+  h1,h2,h3{font-family:'Baloo 2',"Segoe UI",sans-serif;margin:0}
+
+  .head{border-bottom:3px solid var(--sky);padding-bottom:9px;margin-bottom:14px;
+        display:flex;align-items:flex-end;gap:14px}
+  .head h1{font-size:23pt;font-weight:800;line-height:1.05;color:var(--blue)}
+  .head .sub{margin-left:auto;text-align:right;font-size:8.6pt;color:var(--mute);line-height:1.45}
+  .head .sub b{color:var(--ink)}
+
+  .intro{background:#f3f6fa;border:1px solid #ccd8e6;border-left:4px solid var(--sky);
+         border-radius:5px;padding:11px 13px;margin-bottom:8px;font-size:10pt}
+  .intro b{color:var(--blue)}
+
+  h2{font-size:13pt;font-weight:800;margin:20px 0 10px;padding-bottom:5px;
+     border-bottom:2px solid var(--rule)}
+
+  .step{display:flex;gap:11px;margin-bottom:14px;break-inside:avoid;page-break-inside:avoid}
+  .n{flex:none;width:25px;height:25px;border-radius:50%;background:var(--sky);color:#fff;
+     font-family:'Baloo 2',sans-serif;font-weight:800;font-size:12pt;
+     display:flex;align-items:center;justify-content:center;line-height:1;margin-top:1px}
+  .body{flex:1;min-width:0}
+  .body h3{font-size:11.5pt;font-weight:700;margin-bottom:3px}
+  .body p{margin:3px 0}
+
+  .cmd{display:block;font-family:Consolas,"Cascadia Mono",monospace;
+       font-size:11pt;font-weight:700;background:#2c1c05;color:#ffd899;
+       border-radius:5px;padding:9px 13px;margin:6px 0;white-space:nowrap}
+
+  code{font-family:Consolas,monospace;font-size:9.5pt;background:#f4efe2;
+       border:1px solid var(--rule);border-radius:3px;padding:1px 5px;
+       color:var(--saffron);font-weight:600}
+
+  /* key caps for the ctrl-c explanation */
+  .keys{display:flex;gap:11px;margin:8px 0 0}
+  .kcard{flex:1;border:2px solid #ccd8e6;background:#f9fbfd;border-radius:6px;padding:10px 12px}
+  .kcard .t{font-size:8pt;font-weight:700;text-transform:uppercase;
+            letter-spacing:.09em;color:var(--sky);margin-bottom:6px}
+  .kcard .row{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:9.6pt}
+  .kc{display:inline-block;font-family:Consolas,monospace;font-weight:700;font-size:9.4pt;
+      background:#fff;border:1.5px solid #9db4cc;border-bottom-width:3px;
+      border-radius:5px;padding:3px 9px;color:var(--blue)}
+  .kcard .note{margin-top:6px;font-size:9pt;color:var(--mute);line-height:1.4}
+
+  .warn{background:#fff4f4;border:1px solid #f0c9cd;border-left:4px solid var(--red);
+        border-radius:4px;padding:9px 12px;margin:7px 0 0;font-size:9.8pt}
+  .warn b{color:var(--red)}
+  .tip{background:#f2faf5;border:1px solid #c8e6d3;border-left:4px solid var(--green);
+       border-radius:4px;padding:9px 12px;margin:7px 0 0;font-size:9.8pt}
+  .tip b{color:var(--green)}
+
+  table{width:100%;border-collapse:collapse;font-size:9.6pt;margin-top:4px}
+  th{text-align:left;background:#f4efe2;font-weight:700;padding:6px 9px;
+     border:1px solid var(--rule);font-size:8.4pt;text-transform:uppercase;letter-spacing:.05em}
+  td{padding:7px 9px;border:1px solid var(--rule);vertical-align:top}
+  td:first-child{width:38%;font-weight:600}
+  tr{break-inside:avoid;page-break-inside:avoid}
+
+  .foot{margin-top:18px;padding-top:8px;border-top:2px solid var(--rule);
+        font-size:8.6pt;color:var(--mute);display:flex;gap:12px}
+  .foot .r{margin-left:auto;text-align:right}
+</style>
+</head>
+<body>
+
+<div class="head">
+  <h1>Updating the quiz<br>on your phone</h1>
+  <div class="sub">
+    <b>For the phone running the quiz</b><br>
+    Four lines, about a minute.<br>
+    Nothing gets reinstalled.
+  </div>
+</div>
+
+<div class="intro">
+  <b>You do not reinstall anything.</b> Termux, Python and git all stay exactly as they
+  are — they were set up once and that still holds. Updating is four lines typed into the
+  same black Termux screen you used before.
+</div>
+
+<div class="tip">
+  <b>Your teams, codes and scores are safe.</b> They live in a separate file that updates
+  never touch, so you can do this mid-event if you have to.
+</div>
+
+<h2>Open Termux</h2>
+<p style="margin-top:0">Everything below is typed into the <b>Termux app</b> — the black
+   screen with a prompt. Not a browser, not a file manager. If the quiz is still running
+   you will see it printing away in there.</p>
+<p><b>Press Enter after every line you type.</b></p>
+
+<div class="step">
+  <div class="n">1</div>
+  <div class="body">
+    <h3>Stop the quiz that is running</h3>
+    <p>Your phone keyboard has no Ctrl key, so there are two ways to send Ctrl-C:</p>
+
+    <div class="keys">
+      <div class="kcard">
+        <div class="t">Easiest</div>
+        <div class="row">
+          Hold <span class="kc">Volume Down</span> and tap <span class="kc">C</span>
+        </div>
+        <div class="note">Volume Down acts as the Ctrl key in Termux.</div>
+      </div>
+      <div class="kcard">
+        <div class="t">Or</div>
+        <div class="row">
+          Swipe <b>up</b> on the keyboard, tap <span class="kc">CTRL</span> then
+          <span class="kc">C</span>
+        </div>
+        <div class="note">Swiping up reveals Termux's extra key row.</div>
+      </div>
+    </div>
+
+    <p style="margin-top:8px">It worked when the printing stops and you get a prompt back —
+       a line ending in a <code>$</code>, waiting for you to type.</p>
+
+    <div class="warn">
+      <b>Do not skip this.</b> If the old quiz is still running, the update looks like it
+      did nothing — because the running copy is still the old one, sitting in memory.
+    </div>
+  </div>
+</div>
+
+<div class="step">
+  <div class="n">2</div>
+  <div class="body">
+    <h3>Go to the quiz folder</h3>
+    <span class="cmd">cd ~/Fest_26_Onam</span>
+    <p>The <code>~</code> means “my home folder”, so this works no matter where you were.</p>
+  </div>
+</div>
+
+<div class="step">
+  <div class="n">3</div>
+  <div class="body">
+    <h3>Download the update</h3>
+    <span class="cmd">git pull</span>
+    <p>It prints a few lines listing what changed. If it says
+       <b>“Already up to date.”</b> you already have the newest version and there was
+       nothing to fetch.</p>
+    <div class="warn">
+      <b>This step needs internet</b> — running the quiz does not, but fetching an update
+      does. Do it while you still have wifi or mobile data, not once you are on a hotspot
+      with nothing behind it.
+    </div>
+  </div>
+</div>
+
+<div class="step">
+  <div class="n">4</div>
+  <div class="body">
+    <h3>Start it again</h3>
+    <span class="cmd">termux-wake-lock</span>
+    <span class="cmd">python quiz-server.py</span>
+    <p>Check the hotspot is still on. It prints the addresses again and you are back
+       exactly where you were.</p>
+    <div class="warn">
+      <b>termux-wake-lock is not optional.</b> Without it Android suspends the quiz when
+      the screen sleeps, and every phone in the room stops responding with nothing on
+      screen to explain why.
+    </div>
+  </div>
+</div>
+
+<h2>Do you need git on the phone?</h2>
+<p style="margin-top:0">Yes — and it is already there. It was installed alongside Python
+   during the original setup, which is how the quiz got onto the phone in the first place.
+   You can check with:</p>
+<span class="cmd">git --version</span>
+<p>If it ever says “command not found”, install it with
+   <code>pkg install -y git</code> and carry on.</p>
+
+<h2>If step 3 goes wrong</h2>
+
+<table>
+  <tr><th>What it says</th><th>What to do</th></tr>
+  <tr>
+    <td>“git: command not found”</td>
+    <td>Git is missing. Run <code>pkg install -y git</code>, then try
+        <code>git pull</code> again.</td>
+  </tr>
+  <tr>
+    <td>“Your local changes would be overwritten”</td>
+    <td>Something in the folder was edited by hand. To discard those edits and take the
+        published version:
+        <span class="cmd" style="font-size:9.6pt">git fetch origin</span>
+        <span class="cmd" style="font-size:9.6pt">git reset --hard origin/main</span>
+        Your teams, codes and scores still survive this.</td>
+  </tr>
+  <tr>
+    <td>“could not resolve host”, or any network error</td>
+    <td>The phone has no internet. Connect to wifi or mobile data and try again. The quiz
+        itself does not need a connection — only the update does.</td>
+  </tr>
+  <tr>
+    <td>“not a git repository”</td>
+    <td>You are in the wrong folder. Run <code>cd ~/Fest_26_Onam</code> and try again. If
+        that says no such file, type <code>ls</code> to list what is actually there and
+        look for the folder name you cloned.</td>
+  </tr>
+  <tr>
+    <td>Termux was closed by accident</td>
+    <td>Nothing is lost. Reopen it and run the three lines from steps 2 and 4:
+        <code>cd ~/Fest_26_Onam</code>, <code>termux-wake-lock</code>,
+        <code>python quiz-server.py</code>.</td>
+  </tr>
+</table>
+
+<div class="tip" style="margin-top:14px">
+  <b>Do this the day before, not on the day.</b> An update needs a connection and a minute
+  of calm. Once it is done and the quiz has started again, you can go back to a hotspot
+  with no internet and everything keeps working.
+</div>
+
+<div class="foot">
+  <div>Onotsavam 2026 — Quiz Buzzer<br>Full phone setup: <b>PHONE-SERVER-SETUP.txt</b></div>
+  <div class="r">Running the quiz itself:<br><b>Quiz-Buzzer-Setup-Guide.pdf</b></div>
+</div>
+
+</body>
+</html>
