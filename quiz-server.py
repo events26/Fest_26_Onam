@@ -131,6 +131,7 @@ STATE = {
 
 _armed_at = 0.0
 _buzzes = []                # every buzz this round: {"team", "t"}
+_resume_at = -1             # question to reopen on, restored from the save file
 
 
 # ------------------------------------------------------------ persistence ---
@@ -146,6 +147,9 @@ def save():
                 "scores": STATE["scores"],
                 "sheet_id": SHEET_ID,
                 "sheet_tab": SHEET_TAB,
+                # Where the quiz had got to, so a crash mid-event resumes on the
+                # same question instead of dropping back to the start screen.
+                "q_index": STATE["q_index"],
                 # Session tokens, not passwords. Kept so a restart does not
                 # force a fresh sign-in, which would need internet.
                 "admin_tokens": sorted(ADMIN_TOKENS),
@@ -155,7 +159,7 @@ def save():
 
 
 def load_saved():
-    global SHEET_ID, SHEET_TAB
+    global SHEET_ID, SHEET_TAB, _resume_at
     try:
         # utf-8-sig, not utf-8: Windows editors and PowerShell write a byte
         # order mark that plain utf-8 chokes on, which would silently discard
@@ -172,6 +176,10 @@ def load_saved():
     set_teams(teams, d.get("codes") or {}, d.get("scores") or {})
     SHEET_ID = d.get("sheet_id", SHEET_ID)
     SHEET_TAB = d.get("sheet_tab", SHEET_TAB)
+    try:
+        _resume_at = int(d.get("q_index", -1))
+    except (TypeError, ValueError):
+        _resume_at = -1
     saved_tokens = d.get("admin_tokens") or []
     if isinstance(saved_tokens, str):        # hand-edited to a bare string
         saved_tokens = [saved_tokens]
@@ -602,6 +610,7 @@ def do_admin(action, body):
         elif action == "question":
             if "index" in body:
                 set_question(int(body["index"]))
+                save()                      # remember the place across a restart
             elif "text" in body:
                 STATE["question"] = str(body["text"])
                 STATE["options"] = []
@@ -840,8 +849,11 @@ def main():
     STATE["tiers"] = list(TIERS)          # every screen shows the same ladder
     load_saved()
     load_questions()
-    if QUESTIONS:
-        set_question(0)
+    # No question is loaded until the quizmaster starts the quiz, so the
+    # projector shows the join screen rather than giving question one away to
+    # a room that is still finding its seats.
+    if 0 <= _resume_at < len(QUESTIONS):
+        set_question(_resume_at)          # a restart mid-quiz picks up where it left off
 
     ips = lan_ips()
     ip = ips[0]

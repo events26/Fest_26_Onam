@@ -163,8 +163,17 @@
       </details>
     </div>
 
+    <!-- ---------- before the first question ---------- -->
+    <div class="card" id="startCard" style="display:none">
+      <span class="eyebrow">Not started</span>
+      <div class="qtext" style="margin-bottom:12px">Ready when you are</div>
+      <p class="hint" style="margin:0 0 14px">The projector is showing the join screen.
+        No question is loaded yet — not here and not on the big screen.</p>
+      <button class="big" id="startQuiz" type="button">Start quiz</button>
+    </div>
+
     <!-- ---------- during the game ---------- -->
-    <div class="card">
+    <div class="card" id="qCard">
       <span class="eyebrow">On the projector now</span>
       <div class="qtext" id="q">—</div>
       <div id="opts"></div>
@@ -194,7 +203,7 @@
       </div>
     </div>
 
-    <div class="card">
+    <div class="card" id="navCard">
       <button class="btn" id="reveal" type="button" style="width:100%">Show the answer on screen</button>
       <div style="height:9px"></div>
       <div class="row" style="margin-bottom:9px">
@@ -289,6 +298,7 @@ $("pinGo").addEventListener("click", async () => {
 
 const send = (action, extra) => postJSON("/api/admin", Object.assign({ action, token: TOKEN }, extra || {}));
 
+$("startQuiz").addEventListener("click", () => send("question", { index: 0 }));
 $("arm").addEventListener("click", () => send(S && S.phase === "armed" ? "reset" : "arm"));
 $("correct").addEventListener("click", () => send("correct"));
 $("wrong").addEventListener("click", () => send("wrong"));
@@ -366,6 +376,17 @@ $("saveTeams").addEventListener("click", async () => {
 function render(s){
   S = s;
   if (!TOKEN) return;
+
+  /* Nothing is loaded until the quiz is started, so neither this page nor the
+     projector shows question one to a room that is still settling. */
+  const started = s.q_index >= 0 || !!s.question;
+  $("startCard").style.display = started ? "none" : "";
+  ["qCard", "arm", "navCard"].forEach(id => $(id).style.display = started ? "" : "none");
+  if (!started){
+    $("qno").textContent = "";
+    $("resultCard").style.display = "none";
+    return;
+  }
 
   $("qno").textContent = s.q_index >= 0 ? "Q " + (s.q_index + 1) + " / " + s.q_total : "off-list";
   $("q").textContent = s.question || "Nothing on the projector yet";
