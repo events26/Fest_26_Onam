@@ -87,6 +87,11 @@ TIERS = [
 # short for anyone in the hall to notice.
 BUZZ_GRACE = 0.15
 
+# Seconds counted down after Arm before the buzzers actually open. Every screen
+# is told each number by the server rather than running its own clock, so the
+# room counts together and nobody's phone opens early.
+COUNTDOWN = 3
+
 ROOT = os.path.dirname(os.path.abspath(__file__))
 QUESTIONS_FILE = os.path.join(ROOT, "quiz-questions.json")
 SAVE_FILE = os.path.join(ROOT, "quiz-state.json")   # survives a mid-event restart
@@ -102,7 +107,8 @@ ADMIN_TOKENS = set()        # session tokens handed out after a successful login
 QUESTIONS = []              # [{q, options[], answer_index, answer_text}]
 
 STATE = {
-    "phase": "idle",        # idle | armed | buzzed
+    "phase": "idle",        # idle | countdown | armed | buzzed
+    "count": 0,             # seconds left on the countdown, 0 when not counting
     "round": 0,             # bumped on every arm; clients drop stale rounds
     "question": "",
     "options": [],
@@ -424,6 +430,34 @@ def _rebuild_order():
     STATE["winner"] = STATE["order"][i] if 0 <= i < len(STATE["order"]) else None
 
 
+def run_countdown(round_id):
+    """Tick 3, 2, 1 and then open the buzzers.
+
+    The clock is the server's alone. Broadcasting each number keeps every phone
+    and the projector on the same beat, which sharing a start time would not -
+    device clocks drift, and a phone that opened a fraction early would hand
+    that team an unearned head start.
+    """
+    global _armed_at
+    for n in range(COUNTDOWN, 0, -1):
+        with LOCK:
+            if STATE["round"] != round_id or STATE["phase"] != "countdown":
+                return                       # reset or a new question overtook us
+            STATE["count"] = n
+        broadcast()
+        time.sleep(1.0)
+
+    with LOCK:
+        if STATE["round"] != round_id or STATE["phase"] != "countdown":
+            return
+        STATE["count"] = 0
+        STATE["phase"] = "armed"
+        # Reaction times are measured from here, not from the Arm tap, so the
+        # countdown itself never lands in anyone's score.
+        _armed_at = time.monotonic()
+    broadcast()
+
+
 def resolve_buzz(round_id):
     """Close the grace window on the first buzz and hand the floor to whoever
     got there first. Buzzing stays open afterwards so the queue keeps filling."""
@@ -487,6 +521,7 @@ def set_question(index):
         STATE["current"] = 0
         STATE["locked"] = []
         STATE["spent"] = False
+        STATE["count"] = 0
         _buzzes.clear()
         _armed_at = 0.0
 
@@ -495,14 +530,17 @@ def do_admin(action, body):
     global _armed_at, SHEET_ID, SHEET_TAB
     with LOCK:
         if action == "arm":
-            STATE["phase"] = "armed"
+            STATE["phase"] = "countdown"
+            STATE["count"] = COUNTDOWN
             STATE["round"] += 1
             STATE["winner"] = None
             STATE["order"] = []
             STATE["current"] = 0
             STATE["spent"] = False
             _buzzes.clear()
-            _armed_at = time.monotonic()
+            _armed_at = 0.0
+            threading.Thread(target=run_countdown, args=(STATE["round"],),
+                             daemon=True).start()
 
         elif action == "reset":
             STATE["phase"] = "idle"
@@ -511,6 +549,7 @@ def do_admin(action, body):
             STATE["current"] = 0
             STATE["locked"] = []
             STATE["spent"] = False
+            STATE["count"] = 0      # also aborts a countdown in progress
             _buzzes.clear()
 
         elif action == "wrong":

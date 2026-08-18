@@ -30,6 +30,9 @@
        background:linear-gradient(135deg,var(--marigold),#e05a00);letter-spacing:.02em}
   .big:disabled{background:rgba(255,247,230,.09);color:rgba(255,247,230,.35);cursor:not-allowed}
   .big.live{background:linear-gradient(135deg,#e3253f,#a3132a)}
+  /* counting down - the number fills the button so it reads at a glance */
+  .big.counting{background:linear-gradient(135deg,#f4b400,var(--marigold));
+                font-size:58px;padding:14px;letter-spacing:0}
 
   .whoBox{display:flex;align-items:center;gap:13px;margin-bottom:13px}
   .whoBox .dot{width:30px;height:30px;border-radius:50%;flex:none;box-shadow:0 0 18px currentColor}
@@ -64,11 +67,10 @@
 
   .teamRow{display:flex;align-items:center;gap:8px;margin-bottom:8px}
   .teamRow .dot{width:13px;height:13px;border-radius:50%;flex:none}
-  .teamRow input.nm{flex:1;min-width:0}
-  .teamRow input.cd{width:88px;flex:none;font-family:var(--font-num);
-                    text-align:center;letter-spacing:.12em}
-  .teamRow .x{flex:none;background:none;border:0;color:rgba(255,247,230,.35);
-              font-size:20px;cursor:pointer;padding:4px 6px;line-height:1}
+  .teamRow .nm{flex:1;min-width:0;font-weight:600;font-size:15px;
+               overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .teamRow input.cd{width:96px;flex:none;font-family:var(--font-num);
+                    text-align:center;letter-spacing:.14em;font-size:17px}
 
   .scoreRow{display:flex;align-items:center;gap:11px;padding:9px 0;
             border-bottom:1px solid rgba(255,247,230,.07)}
@@ -126,18 +128,15 @@
     <!-- ---------- before the game ---------- -->
     <div class="card">
       <details id="setupBox">
-        <summary>Teams &amp; codes — set these before you start</summary>
+        <summary>Team codes — set these before you start</summary>
         <div style="height:10px"></div>
         <div id="teamRows"></div>
-        <div class="row" style="margin-top:10px">
-          <button class="btn" id="addTeam" type="button">Add team</button>
-          <button class="btn" id="genCodes" type="button">Generate codes</button>
-        </div>
+        <div style="height:10px"></div>
+        <button class="btn" id="genCodes" type="button" style="width:100%">Generate codes</button>
         <div style="height:9px"></div>
-        <button class="btn primary" id="saveTeams" type="button" style="width:100%">Save teams &amp; codes</button>
+        <button class="btn primary" id="saveTeams" type="button" style="width:100%">Save codes</button>
         <p class="hint">Read each code out to one person per team — that phone holds the buzzer.
-          A blank code lets anyone join as that team.
-          <span class="warn">Renaming a team resets its score.</span></p>
+          A blank code lets anyone join as that team.</p>
       </details>
     </div>
 
@@ -319,15 +318,17 @@ $("saveSheet").addEventListener("click", async () => {
 
 /* ------------------------------------------------------------ team setup -- */
 
+/* The roster is fixed, so only the code is editable. Names are shown, not
+   entered - renaming a team resets its score, which is not something anyone
+   should be able to do by mistyping during an event. */
 function teamRow(name, code, i){
   const st = teamStyle(name, i);
   const d = document.createElement("div");
   d.className = "teamRow";
+  d.dataset.team = name;
   d.innerHTML = '<span class="dot" style="background:' + st.c + '"></span>'
-    + '<input class="nm" type="text" value="' + esc(name) + '" placeholder="Team name">'
-    + '<input class="cd" type="text" value="' + esc(code || "") + '" placeholder="code" maxlength="8">'
-    + '<button class="x" type="button" title="Remove">×</button>';
-  d.querySelector(".x").addEventListener("click", () => d.remove());
+    + '<span class="nm">' + esc(name) + '</span>'
+    + '<input class="cd" type="text" value="' + esc(code || "") + '" placeholder="code" maxlength="8">';
   return d;
 }
 
@@ -336,10 +337,6 @@ function renderTeamRows(teams, codes){
   box.innerHTML = "";
   teams.forEach((t, i) => box.appendChild(teamRow(t, codes[t], i)));
 }
-
-$("addTeam").addEventListener("click", () => {
-  $("teamRows").appendChild(teamRow("", "", $("teamRows").children.length));
-});
 
 $("genCodes").addEventListener("click", () => {
   const used = new Set();
@@ -354,12 +351,11 @@ $("genCodes").addEventListener("click", () => {
 $("saveTeams").addEventListener("click", async () => {
   const names = [], codes = {};
   $("teamRows").querySelectorAll(".teamRow").forEach(r => {
-    const n = r.querySelector(".nm").value.trim();
-    if (!n) return;
+    const n = r.dataset.team;
     names.push(n);
     codes[n] = r.querySelector(".cd").value.trim();
   });
-  if (!names.length) return alert("Add at least one team.");
+  if (!names.length) return;
   await send("teams", { names, codes });
   await loadPrivate(TOKEN);
   alert("Saved. Read each code out to one person per team.");
@@ -386,9 +382,12 @@ function render(s){
   $("ansBox").style.display = hasKey ? "" : "none";
   if (hasKey) $("a").textContent = rec.answer_text;
 
+  const counting = s.phase === "countdown";
   const armed = s.phase === "armed";
-  $("arm").textContent = armed ? "Close buzzers" : "Arm buzzers";
+  $("arm").textContent = counting ? String(s.count)
+    : (armed ? "Close buzzers" : "Arm buzzers");
   $("arm").classList.toggle("live", armed);
+  $("arm").classList.toggle("counting", counting);
   $("arm").disabled = !s.question;
 
   $("reveal").textContent = !hasKey ? "No answer stored — call it yourself"

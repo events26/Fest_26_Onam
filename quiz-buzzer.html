@@ -69,6 +69,12 @@
   .say{text-align:center;padding:0 6px}
   .say b{display:block;font-family:var(--font-display);font-weight:800;
          font-size:clamp(26px,8vw,40px);line-height:1.1}
+  /* the countdown number gets the whole line to itself */
+  .say.count b{font-size:clamp(70px,30vw,150px);line-height:1;color:var(--pk)}
+  @keyframes cpop{0%{transform:scale(.65);opacity:0}45%{transform:scale(1.05);opacity:1}
+                  100%{transform:scale(1);opacity:1}}
+  .say.count b.pop{animation:cpop .34s cubic-bezier(.2,.9,.25,1) both}
+  @media (prefers-reduced-motion:reduce){.say.count b.pop{animation:none}}
   .say i{display:block;font-style:normal;margin-top:8px;font-size:15px;font-weight:500;
          color:rgba(255,247,230,.62);line-height:1.45}
 
@@ -124,7 +130,7 @@
           <div class="pk-core"></div>
         </div>
       </button>
-      <div class="say" aria-live="assertive">
+      <div class="say" id="say" aria-live="assertive">
         <b id="headline">Hold tight</b>
         <i id="subline">The quizmaster hasn't opened the buzzers yet.</i>
       </div>
@@ -164,7 +170,7 @@ const LS = {
 };
 
 let TEAM = LS.team(), STATE = null, style = null;
-let sentRound = -1, lastPhase = "", lastTurn = -1, pendingTeam = "";
+let sentRound = -1, lastPhase = "", lastTurn = -1, lastCount = 0, pendingTeam = "";
 
 function show(id){
   ["pick","code","game","kicked"].forEach(s => $(s).classList.toggle("on", s === id));
@@ -307,7 +313,18 @@ function render(s){
   btn.classList.remove("armed");
   btn.disabled = true;
 
-  if (s.phase === "armed"){
+  $("say").classList.toggle("count", s.phase === "countdown");
+
+  if (s.phase === "countdown"){
+    pk.classList.add("is-live");
+    say(String(s.count), lockedOut ? "You're out of this one." : "Get ready…");
+    if (s.count !== lastCount){
+      const b = $("headline");
+      b.classList.remove("pop"); void b.offsetWidth; b.classList.add("pop");
+      if (!lockedOut){ Sound.hit(0.22); navigator.vibrate && navigator.vibrate(35); }
+    }
+  }
+  else if (s.phase === "armed"){
     if (lockedOut){
       pk.classList.add("is-dead");
       say("Locked out", "You've had your go at this one. Sit tight for the next question.");
@@ -373,6 +390,7 @@ function render(s){
 
   lastPhase = s.phase;
   lastTurn = s.current;
+  lastCount = s.phase === "countdown" ? s.count : 0;
 }
 
 /* A phone that locks mid-round can't buzz. Ask to stay awake; ignore refusal. */

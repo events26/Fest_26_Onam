@@ -101,6 +101,26 @@
   .sc .v{font-family:var(--font-num);font-size:clamp(17px,1.8vw,29px);font-weight:700;line-height:1}
   .sc .off{font-size:9px;color:rgba(255,247,230,.4);font-weight:700;letter-spacing:.08em}
 
+  /* ---- countdown ---- */
+  #count{
+    position:fixed;inset:0;z-index:70;display:none;
+    align-items:center;justify-content:center;flex-direction:column;
+    background:rgba(26,13,2,.93);
+  }
+  #count.on{display:flex}
+  #count .n{
+    font-family:var(--font-display);font-weight:800;
+    font-size:min(52vh,52vw);line-height:1;color:var(--marigold);
+    text-shadow:0 0 90px rgba(255,140,0,.55);
+  }
+  #count .lbl{font-family:var(--font-display);font-weight:700;
+              font-size:clamp(20px,3vw,44px);color:rgba(255,247,230,.7);
+              letter-spacing:.08em;margin-top:6px}
+  @keyframes cpop{0%{transform:scale(.6);opacity:0}45%{transform:scale(1.06);opacity:1}
+                  100%{transform:scale(1);opacity:1}}
+  #count .n.pop{animation:cpop .38s cubic-bezier(.2,.9,.25,1) both}
+  @media (prefers-reduced-motion:reduce){#count .n.pop{animation:none}}
+
   /* ---- scoring rules ---- */
   .rules{display:flex;gap:8px;position:relative}
   .rules .tier{
@@ -176,6 +196,11 @@
   </div>
 </div>
 
+<div id="count">
+  <div class="n" id="countN">3</div>
+  <div class="lbl">GET READY</div>
+</div>
+
 <div class="ctl">
   <button class="btn" id="sound" type="button">Turn on sound</button>
   <button class="btn" id="full" type="button">Full screen</button>
@@ -186,7 +211,7 @@
 <script>
 const $ = id => document.getElementById(id);
 const KEYS = ["A","B","C","D"];
-let lastPhase = "", lastRound = -1, lastCurrent = -1, audioOn = false;
+let lastPhase = "", lastRound = -1, lastCurrent = -1, lastCount = 0, audioOn = false;
 
 $("sound").addEventListener("click", () => {
   Sound.unlock(); Sound.arm(); audioOn = true;
@@ -212,6 +237,18 @@ function render(s){
 
   const tiers = s.tiers || [];
   const live = s.phase === "buzzed" || s.phase === "armed";
+
+  /* Countdown takes the whole screen — during it the room should be looking up,
+     not reading the question again. */
+  const counting = s.phase === "countdown" && s.count > 0;
+  $("count").classList.toggle("on", counting);
+  if (counting && s.count !== lastCount){
+    const n = $("countN");
+    n.textContent = s.count;
+    n.classList.remove("pop"); void n.offsetWidth; n.classList.add("pop");
+    if (audioOn) Sound.hit(0.3);
+  }
+  lastCount = counting ? s.count : 0;
 
   /* Between questions the ladder gets the room's full attention; while a
      question is live it shrinks to one line so it never competes with it. */
